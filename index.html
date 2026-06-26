@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="/defaults.css">
+    <link rel="stylesheet" href="/test.css">
+    <script type="module" src="/src/ui-component.ts"></script>
+    <script src="/unit-sheet.js"></script>
+<!--<script src="/small_find_kaputt.js"></script>-->
+      <!--<script src="/unit-list.js"></script> -->
+      <!-- <script src="/dayplans.js"></script> -->
+<!--    <script src="/fieldorder.js"></script> -->
+    <!--<script src="/locus-list-kaputt.js"></script>-->
+<!--   <script src="/test-json.js"></script>-->
+    <title>UI Component Test</title>
+  </head>
+  <body>
+  <div style="font-size: 24px">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Animi ducimus excepturi facilis fugit laboriosam necessitatibus perspiciatis quas voluptate? Ab accusantium alias aliquid aspernatur debitis dolor itaque provident quis quisquam temporibus.
+    Lorem ipsum dolor sit amet, consectetur adipisicing elit. Animi ducimus excepturi facilis fugit laboriosam necessitatibus perspiciatis quas voluptate? Ab accusantium alias aliquid aspernatur debitis dolor itaque provident quis quisquam temporibus.
+    Lorem ipsum dolor sit amet, consectetur adipisicing elit. Animi ducimus excepturi facilis fugit laboriosam necessitatibus perspiciatis quas voluptate? Ab accusantium alias aliquid aspernatur debitis dolor itaque provident quis quisquam temporibus.
+    Lorem ipsum dolor sit amet, consectetur adipisicing elit. Animi ducimus excepturi facilis fugit laboriosam necessitatibus perspiciatis quas voluptate? Ab accusantium alias aliquid aspernatur debitis dolor itaque provident quis quisquam temporibus.
+    Lorem ipsum dolor sit amet, consectetur adipisicing elit. Animi ducimus excepturi facilis fugit laboriosam necessitatibus perspiciatis quas voluptate? Ab accusantium alias aliquid aspernatur debitis dolor itaque provident quis quisquam temporibus.
+  </div>
+  <button onclick="gotoRecord(5)">goto record 5</button>
+  <div style="display: flex; padding: 5em">
+    <ui-component id="ui" >
+    </ui-component>
+  </div>
+  <script>
+    CURRENT_ROW = 0
+    const rows = []
+
+    function initTestJsonStuff(ui) {
+      const data = {"e0": ["0: 6", "6"],
+        "e1": ["0: 125", "125"],
+        "e2": "#(asdf)",
+        "e3": "2012-02-28",
+        "e4": "2012-02-28T00:15",
+        "myBool": false,
+        "e5TemplateLabel": "This is my template label"}
+      ui.data = data
+      ui.dataProvider = (exp, id) => {
+        console.log("dataProvider", exp, id)
+        if (exp.startsWith("#(") || exp.startsWith(`$\{`)) {
+          const key = exp.substring(2, exp.length-1)
+          if (data.hasOwnProperty(key))
+            return data[key]
+          return undefined
+        } else
+          return data[exp]?data[exp]:exp
+      }
+
+      ui.lookupProvider = (id, lookupConfig, params, callback) => {
+        setTimeout(() => {
+          console.log(id, lookupConfig, params)
+          let l = []
+          for (let i = 1; i <= 250; i++) {
+            const c = String.fromCharCode(65 + i % 65)
+            l.push([params.page * params.pageSize + i, `${c} -  ${params.page}: ${i.toString()}`])
+          }
+          callback(l, 250)
+        }, 1000)
+      }
+      ui.addEventListener("dataChanged", (event) => {
+        console.log(event.detail.srcElement, event.detail.newData)
+      })
+
+      // ui.dataProvider = (exp, id = undefined) => {
+      //   console.log(`DataProvider:${exp}, ${id}`)
+      // }
+
+
+    }
+
+    function initFieldOrderStuff(ui) {
+      const data = {
+        "from_date": "2021-02-28",
+        "to_date": "2024-02-28",
+      }
+      ui.data = data
+      ui.dataProvider = (exp, id) => {
+        console.log("dataProvider", exp, id)
+        return data[exp]?data[exp]:exp
+      }
+
+      ui.addEventListener("dataChanged", (event) => {
+        console.log(event.detail.srcElement, event.detail.newData)
+      })
+
+    }
+
+    function initUnitSheetStuff(ui) {
+      ui.timeZoneInfoProvider = (tzIndex) => {
+        if (tzIndex === 40123984) return {
+          tz_IANA: "Europe/Paris",
+          tz_long: "Paris in Europe",
+          deprecated: true
+        }
+        return undefined
+      }
+      ui.dataProvider = (exp) => {
+        console.log(`called dataprovider with ${exp}`)
+        const data = {"unit/arch_domain": "DOMAIN",
+          "unit/id_site": "",
+          "unit/arch_context": "",
+          "unit/coordinates": "my coordinates",
+          "unit/term_for_unit": "unit \n identifier",
+          "unit/modified": "2021-07-22T12:29:20+00:00@40123984",
+          "unit/created": "2024-09-03T18:47:46+00:00@40123984",
+          "unit/unit_creation_date": "2023-05-03T12:00:00",
+          "unit/purpose": "Once “arch_context” became a FieldType “selection” (correct) it stopped showing its value in read only mode.\r" +
+                  "we need a new attribute “multiline” to turn a TextField into a multiline field (textarea in html).\r" +
+                  "we need a way to skip fields. I am not sure if the DSDView is really the right place to do that.\r" +
+                  "we need a way to manipulate the field order without having to list all elements manually in the general.pld. I am not sure, again, whether the DSDView would be the right place to do that. Of course, field order might matter for file export or something like that, too.\n" +
+                  "the orchestration strategy “grid” is not defined, yet.\r"
+        }
+        if (exp.startsWith("#(")) {
+          const key = exp.substring(2, exp.length-1)
+          if (data.hasOwnProperty(key))
+            return data[key]
+          return undefined
+        } else
+          return exp
+      }
+    }
+
+    function initSmallFindSheetStuff(ui) {
+      ui.dataProvider = (exp) => {
+        console.log(`called dataprovider with ${exp}`)
+        const data = {"unit/arch_domain": "DOMAIN",
+          "unit/id_site": "",
+          "unit/arch_context": "",
+          "unit/coordinates": "my coordinates",
+          "unit/term_for_unit": "unit identifier",
+          "unit/modified": "2023-02-28T14:00:00",
+          "unit/created": "2023-03-02T12:00:00",
+          "unit/unit_creation_date": "2023-05-03T12:00:00",
+          "unit/purpose": "Once “arch_context” became a FieldType “selection” (correct) it stopped showing its value in read only mode.\n" +
+                  "we need a new attribute “multiline” to turn a TextField into a multiline field (textarea in html).\n" +
+                  "we need a way to skip fields. I am not sure if the DSDView is really the right place to do that.\n" +
+                  "we need a way to manipulate the field order without having to list all elements manually in the general.pld. I am not sure, again, whether the DSDView would be the right place to do that. Of course, field order might matter for file export or something like that, too.\n" +
+                  "the orchestration strategy “grid” is not defined, yet.\n"
+        }
+        if (exp.startsWith("#(")) {
+          const key = exp.substring(2, exp.length-1)
+          if (data.hasOwnProperty(key))
+            return data[key]
+          return undefined
+        } else
+          return exp
+      }
+    }
+
+    function initSiteSheetStuff(ui) {
+      let fetchCount = 0
+
+      ui.dataProvider = (exp, id = undefined) => {
+        console.log(`called dataprovider with ${exp}`)
+        const row = [
+          "Playground",
+          "A place to try out functionality of the recording system if you are not sure. Deleting things is often impossible! So making records in the archaeological recording that are trials is a bad idea - they clutter the real data. Make them here.",
+          "PLG",
+          "ddcbc531-90bb-4f6c-b65d-8e24c31590ff",
+          null,
+          "PLG",
+          "237e10b2-db70-460b-a49d-4f1f3b4990e5",
+          "2020-07-05T18:29:05",
+          "2020-07-28T14:29:27",
+          "sgk"
+        ]
+        const headers = [
+          "id",
+          "purpose",
+          "id_short",
+          "uid_site_map",
+          "arch_domain",
+          "arch_context",
+          "uid",
+          "created",
+          "modified",
+          "modified_by"
+        ]
+
+        const data = {}
+        headers.forEach((header, index) => {
+          data["site/" + header] = row[index]
+        })
+
+        if (exp.startsWith("#(")) {
+          const key = exp.substring(2, exp.length - 1)
+          if (data.hasOwnProperty(key))
+            return data[key]
+          return undefined
+        } else
+          return exp
+      }
+      ui.fetchFileProvider = (params) => {
+        console.log("FetchFileProvider",params)
+        setTimeout(() => {
+          // params.reportURL("/block2.png")
+          params.reportURL("/spider_red.png")
+        }, 2000)
+      }
+    }
+
+    function initUnitListStuff(ui) {
+      nonrows = {"unit/term_for_unit": "area"}
+
+      for (let i=0;i<50;i++) {
+        rows.push({
+          "unit/arch_domain": "DOMAIN",
+          "unit/arch_context": `SB_7-023-${i}`,
+          "unit/unit_creation_date": "2023-02-28",
+          "unit/modified": "2023-02-28T12:00:00",
+          "unit/id_excavator": "Bob",
+          "unit/type": "excavation",
+          "unit/uid": String(i)
+        })
+      }
+      ui.dataProvider = (exp) => {
+        console.log(`called dataprovider with ${exp}`)
+        if (!exp.startsWith("#("))
+          return exp
+
+        if (CURRENT_ROW !== "") {
+          let data = rows[CURRENT_ROW]
+          if (exp.startsWith("#(")) {
+            const key = exp.substring(2, exp.length - 1)
+            if (data.hasOwnProperty(key))
+              return data[key]
+            return undefined
+          } else
+            return exp
+        }
+
+        let data = nonrows
+        if (exp.startsWith("#(")) {
+          const key = exp.substring(2, exp.length - 1)
+          if (data.hasOwnProperty(key))
+            return data[key]
+          return undefined
+        } else
+          return exp
+      }
+
+      ui.moveToNextRow = (lastUID) => {
+        const rowNr = parseInt(lastUID)
+        if (!lastUID) {
+          CURRENT_ROW = "0"
+        } else if (rowNr < rows.length-1){
+          CURRENT_ROW = `${rowNr + 1}`
+        } else {
+          CURRENT_ROW = ""
+        }
+        return CURRENT_ROW
+      };
+
+      ui.setSortOrder = (sortOrder) => console.log("SortOrder is", sortOrder)
+    }
+
+    function initDayplanListStuff(ui) {
+      alert("asdfasdf")
+      nonrows = {"unit/term_for_unit": "area",
+      "$/images/descriptions/cb5cbb5f-5c7f-4836-8ce7-9a78ac6cf408": {
+        description: "my description\ndescription line 2",
+          attributes: {
+            height: 400,
+            width: 300},
+        file_datetime: "2020-08-10T11:59:43"
+      }}
+
+      for (let i=0;i<50;i++) {
+        rows.push({
+          "dayplan/uid_unit": "42f01bcc-8086-4334-9078-fa5531b1f8aa",
+          "dayplan/image_description": `description ${i}`,
+          "dayplan/uid_image": "cb5cbb5f-5c7f-4836-8ce7-9a78ac6cf408",
+          "dayplan/uid": `${i}`,
+          "dayplan/created": "2023-07-19T06:52:10.952893",
+          "dayplan/modified": "2023-07-19T06:52:10.952893",
+          "dayplan/modified_by": 'Huxley'
+        })
+      }
+      ui.dataProvider = (exp) => {
+        console.log(`called dataprovider with ${exp}`)
+        if (!exp.startsWith("#("))
+          return exp
+
+        if (CURRENT_ROW !== "") {
+          let data = rows[CURRENT_ROW]
+          if (exp.startsWith("#(")) {
+            const key = exp.substring(2, exp.length - 1)
+            if (data.hasOwnProperty(key))
+              return data[key]
+          } else
+            return exp
+        }
+
+        let data = nonrows
+        if (exp.startsWith("#(")) {
+          const key = exp.substring(2, exp.length - 1)
+          if (data.hasOwnProperty(key))
+            return data[key]
+          return undefined
+        } else
+          return exp
+      }
+
+      ui.moveToNextRow = (lastUID) => {
+        const rowNr = parseInt(lastUID)
+        if (!lastUID) {
+          CURRENT_ROW = "0"
+        } else if (rowNr < rows.length-1){
+          CURRENT_ROW = `${rowNr + 1}`
+        } else {
+          CURRENT_ROW = ""
+        }
+        return CURRENT_ROW
+      };
+
+      ui.setSortOrder = (sortOrder) => console.log("SortOrder is", sortOrder)
+
+      ui.fetchFileProvider = (params) => {
+        console.log("FetchFileProvider",params)
+        return
+        if (params.uid_file === 'cb5cbb5f-5c7f-4836-8ce7-9a78ac6cf408') {
+          setTimeout(() => {
+            // params.reportURL("/block2.png")
+            params.reportURL("/spider_red.png")
+          }, 500)
+        } else {
+          params.reportURL(null)
+        }
+      }
+
+    }
+
+
+    function initLocusListStuff(ui) {
+      nonrows = {"unit/term_for_unit": "area"}
+
+      for (let i=0;i<50;i++) {
+        rows.push({
+          "unit/arch_domain": "DOMAIN",
+          "unit/arch_context": `LA-001${i}`,
+          "unit/unit_creation_date": "2023-02-28",
+          "unit/modified": "2023-02-28T12:00:00",
+          "unit/id_excavator": "Bob",
+          "unit/type": "excavation",
+          "unit/uid": "asdfasfdkjl",
+          "locus/arch_context": String(i),
+          "locus/type": "ac"
+        })
+      }
+      ui.dataProvider = (exp) => {
+        console.log(`called dataprovider with ${exp}`)
+        if (!exp.startsWith("#("))
+          return exp
+
+        if (CURRENT_ROW !== "") {
+          let data = rows[CURRENT_ROW]
+          if (exp.startsWith("#(")) {
+            const key = exp.substring(2, exp.length - 1)
+            if (data.hasOwnProperty(key))
+              return data[key]
+            return undefined
+          } else
+            return exp
+        }
+
+        let data = nonrows
+        if (exp.startsWith("#(")) {
+          const key = exp.substring(2, exp.length - 1)
+          if (data.hasOwnProperty(key))
+            return data[key]
+          return undefined
+        } else
+          return exp
+      }
+
+      ui.moveToNextRow = (lastUID) => {
+        const rowNr = parseInt(lastUID)
+        if (!lastUID) {
+          CURRENT_ROW = "0"
+        } else if (rowNr < rows.length-1){
+          CURRENT_ROW = `${rowNr + 1}`
+        } else {
+          CURRENT_ROW = ""
+        }
+        return CURRENT_ROW
+      };
+
+      ui.setSortOrder = (sortOrder) => console.log("SortOrder is", sortOrder)
+    }
+
+    function gotoRecord(record) {
+      let ui = document.getElementById("ui")
+      if (ui) {
+        ui.gotoRecord(record)
+      }
+    }
+
+    let ui = document.getElementById("ui")
+    // ui_schema = JSON.parse(json)
+    console.log(ui_schema)
+    // initTestJsonStuff(ui)
+    initUnitSheetStuff(ui)
+    // initSmallFindSheetStuff(ui)
+    // initUnitListStuff(ui)
+    // initLocusListStuff(ui)
+    // initDayplanListStuff(ui)
+    // initSiteSheetStuff(ui)
+    // initFieldOrderStuff(ui)
+    ui.uiSchema = ui_schema
+    ui.showDevelopmentInfo=true
+    ui.addEventListener("goto-identifier", (event) => {
+      console.log("go to identifier", event.detail)
+    })
+  </script>
+  </body>
+</html>
+<!---->
