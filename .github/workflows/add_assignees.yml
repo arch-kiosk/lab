@@ -1,0 +1,21 @@
+name: Add Assignees
+
+on:
+  issues:
+    types: [opened]
+
+jobs:
+  add-assignees:
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+    steps:
+      - name: Add assignees using GitHub CLI
+        # We use separate flags so GitHub's API can evaluate them individually 👇
+        run: |
+          gh issue edit "$ISSUE_NUM" --add-assignee "urapadmin" --add-assignee "$ACTOR"
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+          ISSUE_NUM: ${{ github.event.issue.number }}
+          ACTOR: ${{ github.actor }}
