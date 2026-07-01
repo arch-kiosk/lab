@@ -6,7 +6,8 @@
   "scripts": {
     "ready": "vp check && vp run -r test && vp run -r build",
     "dev": "vp run website#dev",
-    "prepare": "vp config"
+    "prepare": "vp config",
+    "pull:uiwebcomponent": "git subtree pull --prefix=packages/uiwebcomponent upstream-uiwebcomponent main --squash"
   },
   "devDependencies": {
     "vite-plus": "catalog:"
