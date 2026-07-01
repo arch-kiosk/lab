@@ -1,0 +1,168 @@
+// _basics.sass
+// basic styles for kiosk applications
+// sass constants are in constants.sass!
+
+\:host
+  box-sizing: border-box
+  background-color: $col-bg-1
+
+@mixin ifscreen($param)
+  @media screen and (max-width: $param)
+    @content
+
+div, thead
+  -webkit-touch-callout: none
+  -webkit-user-select: none
+  -khtml-user-select: none
+  -moz-user-select: none
+  -ms-user-select: none
+  user-select: none
+
+.read-only-textarea, .multiline-textarea, .templateLabel, .file-element-description
+  -webkit-touch-callout: text
+  -webkit-user-select: text
+  -khtml-user-select: text
+  -moz-user-select: text
+  -ms-user-select: text
+  user-select: text
+
+html
+  font-family: $standard-text
+  font-size: $font-size-standard
+  line-height: $line-height-std
+body
+  height: 100%
+  width: 100%
+  a
+    text-decoration: none
+
+label
+  font-family: $monospace
+  font-size: .9em
+input, select, textarea
+  -webkit-user-select: text
+  -moz-user-select: text
+  -ms-user-select: text
+  box-sizing: border-box
+  border-radius: 0px
+  user-select: text
+  font-family: $standard-text
+  background-color: $col-bg-1-input
+  border: none
+  height: 30px
+  color: $col-primary-bg-1
+  padding: $input-padding
+  //margin-bottom: 2px
+  &:focus
+    outline: none
+  &:focus
+    border-bottom: 2px solid rgba(0, 0, 0, 1)
+
+h1
+  font-size: $font-size-h1
+h2
+  font-size: $font-size-h2
+h3
+  font-size: $font-size-h3
+h4
+  font-size: $font-size-h4
+small, .font-small
+  font-size: $font-size-small
+
+button
+  width: var(--ui-button-width, 60px)
+  height: var(--ui-button-height, 60px)
+  border-radius: calc(var(--ui-button-height, 60px) / 2)
+  border-style: solid
+  border-width: 2px
+  background-color: $col-bg-btn
+  color: $col-primary-bg-btn
+  border-color: $col-bg-btn-darker
+  font-family: $headline-text
+  font-size: $font-size-h4
+  font-weight: bold
+  //padding-bottom: 3px
+  //margin-bottom: 2px
+  &:hover, &:focus
+    outline: none
+    background-color: $col-bg-btn-lighter
+  &:active
+    padding-top: 3px
+    color: $col-primary-bg-btn
+    background-color: $col-bg-btn-darker
+    border-color: $col-bg-btn-darker
+
+button:disabled
+  opacity: .3
+
+.modal-round-button
+  box-sizing: border-box
+  //background-repeat: no-repeat
+  //background-position: center
+  //background-size: 25px 25px
+  margin-left: 25px
+  background-image: none
+  display: inline-block
+  font-style: normal
+  font-variant: normal
+  text-rendering: auto
+  -webkit-font-smoothing: antialiased
+  font-family: $fontawesome-font-family
+  //padding-top: 4px
+  font-weight: 900
+  font-size: var(--ui-button-font-size, 24px)
+  line-height: var(--ui-button-font-size, 24px)
+  vertical-align: center
+  text-align: center
+
+.modal-button
+  @extend .modal-round-button
+
+.modal-ok
+  @extend .modal-round-button
+  &:after
+    content: var(--icon-bt-ok)
+
+.modal-next
+  @extend .modal-round-button
+  &:after
+    padding-left: 2px
+    content: var(--icon-bt-next)
+
+.modal-back
+  @extend .modal-round-button
+  &:after
+    padding-right: 2px
+    content: var(--icon-bt-back)
+
+.modal-cancel
+  @extend .modal-round-button
+  &:after
+    content: var(--icon-bt-cancel)
+
+.modal-close
+  @extend .modal-round-button
+  &:before
+    content: var(--icon-bt-close)
+
+.modal-delete
+  @extend .modal-round-button
+  background-color: $col-bg-alert
+  color: $col-primary-bg-alert
+  &:before
+    content: var(--icon-bt-trash)
+  &:hover, &:focus
+    border-color: $col-bg-alert
+    background-color: $col-bg-alert-lighter
+    background-size: 75%
+  &:active
+    border-color: $col-bg-alert
+    background-color: $col-bg-alert-darker
+    color: $col-primary-bg-alert
+
+.file-broken
+  display: flex
+  width: 64px
+  height: 64px
+  position: relative
+
