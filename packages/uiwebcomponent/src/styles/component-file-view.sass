@@ -1,0 +1,41 @@
+@import "constants"
+@import "basics"
+
+//@media only screen and (max-width: 600px)
+//  font-size: 1.2rem
+
+\:host
+  display: block
+  padding: 2px
+  box-sizing: border-box
+  background-color: $col-bg-body
+div, p
+  font-family: $standard-text
+  box-sizing: border-box
+
+.placeholder
+  width: 64px
+  height: 64px
+  display: flex
+  justify-content: center
+  align-items: center
+  i
+    font-size: 2em
+img
+  object-fit: contain
+  //width: 100%
+  //height: 100%
+.fa,.fas
+  font-family: 'Font Awesome 6 Free'
+  font-weight: 900
+  font-style: normal
+
+.fa-camera::before
+  content: "\f030"
+
+.fa-hourglass::before
+  content: "\f251"
+
+
+
+
