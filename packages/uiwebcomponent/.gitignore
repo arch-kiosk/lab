@@ -34,3 +34,5 @@ dist-ssr
 *.mjs
 /public/fonts
 /public/styles
+docs/.vitepress/dist
+docs/.vitepress/cache

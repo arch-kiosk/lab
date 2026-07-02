@@ -7,11 +7,18 @@
     "ready": "vp check && vp run -r test && vp run -r build",
     "dev": "vp run website#dev",
     "prepare": "vp config",
-    "pull:uiwebcomponent": "git subtree pull --prefix=packages/uiwebcomponent upstream-uiwebcomponent main --squash"
+    "pull:uiwebcomponent": "git subtree pull --prefix=packages/uiwebcomponent upstream-uiwebcomponent main --squash",
+    "docs:dev": "vitepress dev docs",
+    "docs:build": "vitepress build docs",
+    "docs:preview": "vitepress preview docs"
   },
   "devDependencies": {
+    "oxc-minify": "catalog:",
     "sass": "catalog:",
-    "vite-plus": "catalog:"
+    "typedoc-vitepress-theme": "catalog:",
+    "vite-plus": "catalog:",
+    "vitepress": "2.0.0-alpha.17",
+    "vitepress-sidebar": "catalog:"
   },
   "devEngines": {
     "packageManager": {

@@ -1,0 +1,30 @@
+/* docs/.vitepress/theme/custom.css */
+
+/* 1. Define your own custom root color palette aliases */
+:root {
+  --kiosk-sand: #ffeeaa;
+  --kiosk-reddish: #a05a2c;
+  --kiosk-light: #a4c700;
+  --kiosk-dark: #88aa00;
+  --kiosk-darker: #698b00;
+  --vp-nav-logo-height: 35px;
+}
+
+/* 2. OVERRIDE LIGHT MODE: Force override the primary theme variables */
+:root {
+  --vp-c-brand-1: var(--kiosk-reddish);
+  --vp-c-brand-2: var(--kiosk-dark);
+  --vp-c-brand-3: var(--kiosk-darker);
+
+  /* Home Hero Button text/background overrides */
+  --vp-home-hero-name-color: var(--kiosk-reddish);
+}
+
+/* 3. OVERRIDE DARK MODE: VitePress applies a .dark utility class to the html tag */
+.dark {
+  --vp-c-brand-1: var(
+    --kiosk-sand
+  ); /* Lighter shade of purple for better contrast on dark backgrounds */
+  --vp-c-brand-2: var(--kiosk-light);
+  --vp-c-brand-3: var(--kiosk-dark);
+}
