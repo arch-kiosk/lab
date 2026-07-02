@@ -10,6 +10,7 @@
     "pull:uiwebcomponent": "git subtree pull --prefix=packages/uiwebcomponent upstream-uiwebcomponent main --squash"
   },
   "devDependencies": {
+    "sass": "catalog:",
     "vite-plus": "catalog:"
   },
   "devEngines": {
