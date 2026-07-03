@@ -16,7 +16,7 @@
     "oxc-minify": "catalog:",
     "sass": "catalog:",
     "typedoc-vitepress-theme": "catalog:",
-    "vite": "catalog:",
+    "vite": "npm:@voidzero-dev/vite-plus-core@^0.2.2",
     "vite-plus": "catalog:",
     "vitepress": "catalog:",
     "vitepress-sidebar": "catalog:"

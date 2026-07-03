@@ -7,10 +7,10 @@ catalogMode: prefer
 
 catalog:
   "@types/node": ^24
-  typescript: ^5
+  typescript: 6.0.3,
   vite: npm:@voidzero-dev/vite-plus-core@latest
   vitest: 4.1.9
-  vite-plus: latest
+  vite-plus: ^0.2.2
   sass: ^1.101.0
   vitepress: ^1.6.4
   typedoc: ^0.28.19
