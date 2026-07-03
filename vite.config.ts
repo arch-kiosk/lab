@@ -6,14 +6,13 @@ export default defineConfig({
     cache: true,
   },
   staged: {
-    "*": "vp check --fix",
+    "*": "vp check --no-lint --fix",
   },
   fmt: {},
   lint: {
     jsPlugins: [{ name: "vite-plus", specifier: "vite-plus/oxlint-plugin" }],
     options: { typeAware: true, typeCheck: true },
     // oxlint-disable-next-line typescript/no-explicit-any
-    rules: { "no-console": "error" },
-    // oxlintConfig.rules as Record<string, any>,
+    rules: oxlintConfig.rules as Record<string, any>,
   },
 });

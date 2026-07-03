@@ -98,7 +98,6 @@ export class UIComponent extends LitElement {
   constructor() {
     super();
     this._messages = {};
-    console.log("test");
     // this.addEventListener('click', (e) => console.log(e), {capture: true});
   }
 
