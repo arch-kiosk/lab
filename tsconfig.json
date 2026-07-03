@@ -1,9 +1,10 @@
 {
   "compilerOptions": {
     "noEmit": true,
-    "module": "nodenext",
-    "moduleResolution": "nodenext",
-    "allowImportingTsExtensions": true,
-    "esModuleInterop": true
-  }
+    "module": "ESNext",
+    "esModuleInterop": true,
+    "moduleResolution": "Bundler",
+    "allowImportingTsExtensions": true
+  },
+  "include": ["vite.config.ts", "oxlint.config.ts", "src/**/*"]
 }

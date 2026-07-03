@@ -1,4 +1,5 @@
 import { defineConfig } from "vite-plus";
+import oxlintConfig from "./oxlint.config";
 
 export default defineConfig({
   run: {
@@ -10,7 +11,8 @@ export default defineConfig({
   fmt: {},
   lint: {
     jsPlugins: [{ name: "vite-plus", specifier: "vite-plus/oxlint-plugin" }],
-    rules: { "vite-plus/prefer-vite-plus-imports": "error" },
     options: { typeAware: true, typeCheck: true },
+    // oxlint-disable-next-line typescript/no-explicit-any
+    rules: oxlintConfig.rules as Record<string, any>,
   },
 });
