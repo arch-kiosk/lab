@@ -2,23 +2,23 @@ import {
   UISchemaListLayoutSettings,
   UISchemaUIElement,
   UISchemaUIElementLayoutSettings,
-} from "../uischema";
-import { html, nothing, TemplateResult } from "lit";
-import { UILayoutRenderContext } from "../uielementrendercontext";
-import { UILayoutClass, UIListLayoutClass } from "./uilayoutclass";
+} from "../uischema"
+import { html, nothing, TemplateResult } from "lit"
+import { UILayoutRenderContext } from "../uielementrendercontext"
+import { UILayoutClass, UIListLayoutClass } from "./uilayoutclass"
 
 export class UIGalleryLayoutClass extends UIListLayoutClass {
-  cssClass = "ui-gallery-layout";
-  renderElementLabels = false;
-  _sortOrder: Array<string> = [];
+  cssClass = "ui-gallery-layout"
+  renderElementLabels = false
+  _sortOrder: Array<string> = []
 
   // @state()
-  selectedItem: string | undefined;
+  selectedItem: string | undefined
 
   // @ts-ignore
   renderLayoutStyles(_?: UISchemaUIElementLayoutSettings): string {
-    let style = "";
-    return style;
+    let style = ""
+    return style
   }
 
   public itemClicked = (e: MouseEvent) => {
@@ -29,56 +29,56 @@ export class UIGalleryLayoutClass extends UIListLayoutClass {
 
     if (e.target instanceof HTMLElement) {
       if (e.target.tagName === "FILE-VIEW") {
-        e.stopPropagation();
-        let parent: HTMLElement | null = e.target.parentElement;
-        let gallery: HTMLElement | undefined = undefined;
-        let selectedItem: HTMLElement | undefined = undefined;
+        e.stopPropagation()
+        let parent: HTMLElement | null = e.target.parentElement
+        let gallery: HTMLElement | undefined = undefined
+        let selectedItem: HTMLElement | undefined = undefined
         while (parent) {
-          if (parent.classList.contains("gallery-item")) selectedItem = parent;
+          if (parent.classList.contains("gallery-item")) selectedItem = parent
           if (parent.classList.contains("ui-gallery-layout")) {
-            gallery = parent;
-            break;
+            gallery = parent
+            break
           }
           if (parent.tagName === "ui-component") {
-            parent = null;
+            parent = null
           } else {
-            parent = parent.parentElement;
+            parent = parent.parentElement
           }
         }
         if (selectedItem && gallery) {
-          let elements = gallery.querySelectorAll(".gallery-item-selected");
+          let elements = gallery.querySelectorAll(".gallery-item-selected")
           elements.forEach((e) => {
-            console.log(e);
-            e.classList.remove("gallery-item-selected");
-          });
-          selectedItem.classList.add("gallery-item-selected");
+            console.log(e)
+            e.classList.remove("gallery-item-selected")
+          })
+          selectedItem.classList.add("gallery-item-selected")
         }
       }
     }
-  };
+  }
 
   public headerClicked(event: MouseEvent) {
-    const header = event.currentTarget as HTMLElement;
-    const id = header.dataset["id"];
+    const header = event.currentTarget as HTMLElement
+    const id = header.dataset["id"]
     let orderIdx = this._sortOrder.findIndex((x) =>
       x.startsWith(">") ? x.slice(1) === id : x === id,
-    );
-    let dec = false;
+    )
+    let dec = false
 
-    if (!id) return;
+    if (!id) return
     if (orderIdx > -1) {
-      dec = this._sortOrder[orderIdx].startsWith(">");
+      dec = this._sortOrder[orderIdx].startsWith(">")
       if (orderIdx == 0) {
-        dec = !dec;
+        dec = !dec
       }
       if (orderIdx > 0) {
-        this._sortOrder[orderIdx] = this._sortOrder[0];
+        this._sortOrder[orderIdx] = this._sortOrder[0]
       }
-      this._sortOrder[0] = dec ? ">" + id : id;
+      this._sortOrder[0] = dec ? ">" + id : id
     } else {
-      this._sortOrder.splice(0, 0, id);
+      this._sortOrder.splice(0, 0, id)
     }
-    this.requestUpdate();
+    this.requestUpdate()
   }
 
   public renderSortButton(
@@ -89,10 +89,10 @@ export class UIGalleryLayoutClass extends UIListLayoutClass {
   ) {
     const orderIndex = this._sortOrder.findIndex((x) =>
       x.startsWith(">") ? x.slice(1) === id : x === id,
-    );
+    )
     if (orderIndex > -1) {
-      const order = this._sortOrder[orderIndex];
-      const cssClass = orderIndex == 0 ? "table-header-icon" : "table-header-icon-secondary";
+      const order = this._sortOrder[orderIndex]
+      const cssClass = orderIndex == 0 ? "table-header-icon" : "table-header-icon-secondary"
 
       return html` <div
         class="table-header"
@@ -108,29 +108,29 @@ export class UIGalleryLayoutClass extends UIListLayoutClass {
         <span class="table-header-text"
           >${renderContext.haulData(renderContext.entry.ui_elements[id].element_type.text)}</span
         >
-      </div>`;
+      </div>`
     }
-    return nothing;
+    return nothing
   }
 
   public renderHeaders(renderContext: UILayoutRenderContext, elements: string[]) {
-    const settings = renderContext.entry.layout_settings as UISchemaListLayoutSettings;
-    const orderAllowed = settings.allow_ordering_by || [];
-    const allAllowed = settings.allow_ordering_by == undefined;
+    const settings = renderContext.entry.layout_settings as UISchemaListLayoutSettings
+    const orderAllowed = settings.allow_ordering_by || []
+    const allAllowed = settings.allow_ordering_by == undefined
     return html`
       <div class="gallery-headers">
         ${elements.map((id) => this.renderSortButton(renderContext, id, allAllowed, orderAllowed))}
       </div>
-    `;
+    `
   }
 
   private getTableHeaderStyle(layout_settings: UISchemaUIElementLayoutSettings | undefined) {
-    let style = "";
+    let style = ""
     if (layout_settings?.min_width) {
       if (String(layout_settings.min_width).indexOf("%") > -1)
-        style = `width: ${layout_settings.min_width}`;
+        style = `width: ${layout_settings.min_width}`
     }
-    return style;
+    return style
   }
 
   public renderLayout(
@@ -143,11 +143,11 @@ export class UIGalleryLayoutClass extends UIListLayoutClass {
       layouter: UILayoutClass,
     ) => TemplateResult,
   ): TemplateResult {
-    const elements = this.getOrderedElements(renderContext.entry);
+    const elements = this.getOrderedElements(renderContext.entry)
 
-    const items: TemplateResult[] = [];
-    renderContext.resetCursor();
-    this._initSorting(renderContext);
+    const items: TemplateResult[] = []
+    renderContext.resetCursor()
+    this._initSorting(renderContext)
     while (renderContext.next()) {
       items.push(html`
         <div
@@ -157,13 +157,13 @@ export class UIGalleryLayoutClass extends UIListLayoutClass {
         >
           ${elements.map((id) => renderElement(id, renderContext.entry.ui_elements[id], layouter))}
         </div>
-      `);
+      `)
     }
 
     return html`
       ${this.renderHeaders(renderContext, elements)}
       <div class="${this.cssClass}" style="${style}">${items}</div>
-    `;
+    `
   }
 
   renderElement(
@@ -172,6 +172,6 @@ export class UIGalleryLayoutClass extends UIListLayoutClass {
   ): TemplateResult {
     return html`
       <div class="gallery-sub-item" style="${this.renderLayoutStyles(layout)}">${element}</div>
-    `;
+    `
   }
 }

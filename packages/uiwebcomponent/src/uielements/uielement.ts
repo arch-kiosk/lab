@@ -1,60 +1,60 @@
-import { ApiTimeZoneInfo, UISchemaUIElementType } from "../uischema";
-import { html, TemplateResult } from "lit";
-import { UIElementRenderContext } from "../uielementrendercontext";
+import { ApiTimeZoneInfo, UISchemaUIElementType } from "../uischema"
+import { html, TemplateResult } from "lit"
+import { UIElementRenderContext } from "../uielementrendercontext"
 
 export class UIElement {
   // eslint-disable-next-line typescript/no-explicit-any
   static haulData(context: UIElementRenderContext, value?: string, id?: string): any {
-    return context.haulData(value, id);
+    return context.haulData(value, id)
   }
 
   static getTimeZoneInfo(
     context: UIElementRenderContext,
     tzIndex: number,
   ): ApiTimeZoneInfo | undefined {
-    return context.getTimeZoneInfo(tzIndex);
+    return context.getTimeZoneInfo(tzIndex)
   }
 
   static devInfo(context: UIElementRenderContext, ...texts: Array<string | undefined>) {
     if (context.uicomponent.showDevelopmentInfo) {
-      const ht: Array<TemplateResult> = [];
+      const ht: Array<TemplateResult> = []
       for (const t of texts) {
-        ht.push(html`<span class="developer-info"">[${t == undefined ? "undefined" : t}]</span>`);
+        ht.push(html`<span class="developer-info"">[${t == undefined ? "undefined" : t}]</span>`)
       }
-      return ht;
-    } else return html``;
+      return ht
+    } else return html``
   }
 
   static render(_context: UIElementRenderContext, id: string): TemplateResult {
-    throw `UIElement.render: Call of abstract method for control ${id}`;
+    throw `UIElement.render: Call of abstract method for control ${id}`
   }
 
   static isVisible(context: UIElementRenderContext, value: unknown) {
-    const visible = context.entry.element_type.visible ?? context.layouter.defaultElementVisibility;
-    if (visible === "false" || visible == false) return false;
-    if (visible === "true" || visible == true) return true;
+    const visible = context.entry.element_type.visible ?? context.layouter.defaultElementVisibility
+    if (visible === "false" || visible == false) return false
+    if (visible === "true" || visible == true) return true
     if (visible === ".") {
-      return Boolean(value);
+      return Boolean(value)
     }
-    return Boolean(this.haulData(context, visible));
+    return Boolean(this.haulData(context, visible))
   }
 
   static isIdentifier(context: UIElementRenderContext) {
     if (context.uicomponent.linkIdentifiers) {
       if (context.entry.element_type.is_identifier) {
-        return true;
+        return true
       }
     }
-    return false;
+    return false
   }
 
   static maskIdentifier(context: UIElementRenderContext) {
     if (context.uicomponent.linkIdentifiers) {
       if (context.entry.element_type.mask_identifier) {
-        return context.entry.element_type.mask_identifier;
+        return context.entry.element_type.mask_identifier
       }
     }
-    return "";
+    return ""
   }
 
   static getStyleSetting(
@@ -64,33 +64,33 @@ export class UIElement {
   ): string {
     if (element.style) {
       if (element.style.hasOwnProperty(attribute)) {
-        return element.style[attribute];
+        return element.style[attribute]
       }
     }
-    return _default;
+    return _default
   }
 
   static getStyleTextAlign(element: UISchemaUIElementType) {
-    const textAlign = this.getStyleSetting(element, "text-align", "");
+    const textAlign = this.getStyleSetting(element, "text-align", "")
     switch (textAlign) {
       case "left":
-        return "text-align: left";
+        return "text-align: left"
       case "right":
-        return "text-align: right";
+        return "text-align: right"
       case "center":
-        return "text-align: center";
+        return "text-align: center"
     }
-    return "";
+    return ""
   }
 
   static addStyle(currentStyles: string, newStyle: string) {
-    if (!newStyle) return currentStyles;
+    if (!newStyle) return currentStyles
 
-    return currentStyles ? currentStyles + ";" : "" + newStyle;
+    return currentStyles ? currentStyles + ";" : "" + newStyle
   }
 
   // @ts-ignore
   static defaultAction(_: UISchemaUIElementType): string | undefined {
-    return undefined;
+    return undefined
   }
 }

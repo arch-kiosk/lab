@@ -1,10 +1,10 @@
-import { UIElement } from "./uielement";
-import { UIElementRenderContext } from "../uielementrendercontext";
+import { UIElement } from "./uielement"
+import { UIElementRenderContext } from "../uielementrendercontext"
 // import {html} from "lit/static-html.js";
-import { nothing, html } from "lit";
-import { DateTime } from "luxon";
-import { UISchemaDateTimeField } from "../uischema";
-import { getLatinDate } from "../tools";
+import { nothing, html } from "lit"
+import { DateTime } from "luxon"
+import { UISchemaDateTimeField } from "../uischema"
+import { getLatinDate } from "../tools"
 
 export class UIElementDateField extends UIElement {
   static renderLabel(context: UIElementRenderContext, id: string, text: string) {
@@ -19,27 +19,27 @@ export class UIElementDateField extends UIElement {
             )}
           </label>
         `
-      : this.devInfo(context, context.entry.element_type.text, context.entry.element_type.value);
+      : this.devInfo(context, context.entry.element_type.text, context.entry.element_type.value)
   }
 
   static render(context: UIElementRenderContext, id: string) {
     try {
-      const value = this.haulData(context, context.entry.element_type.value);
+      const value = this.haulData(context, context.entry.element_type.value)
       if (!this.isVisible(context, value)) {
-        return html`${nothing}`;
+        return html`${nothing}`
       }
-      let text = this.haulData(context, context.entry.element_type.text);
-      const htmlClass = this.getStyleSetting(context.entry.element_type, "classes", "");
-      const cssStyle = this.addStyle("", this.getStyleTextAlign(context.entry.element_type));
-      const ts = DateTime.fromISO(value);
-      let tsValue: string | undefined = undefined;
+      let text = this.haulData(context, context.entry.element_type.text)
+      const htmlClass = this.getStyleSetting(context.entry.element_type, "classes", "")
+      const cssStyle = this.addStyle("", this.getStyleTextAlign(context.entry.element_type))
+      const ts = DateTime.fromISO(value)
+      let tsValue: string | undefined = undefined
       if (ts.isValid) {
         if (
           ((context.entry.element_type as UISchemaDateTimeField).date_format || "latin") === "latin"
         ) {
-          tsValue = getLatinDate(ts, false);
+          tsValue = getLatinDate(ts, false)
         } else {
-          tsValue = ts.toLocaleString(DateTime.DATE_SHORT);
+          tsValue = ts.toLocaleString(DateTime.DATE_SHORT)
         }
       }
 
@@ -66,10 +66,10 @@ export class UIElementDateField extends UIElement {
               >
               </vaadin-date-picker>`}
         `,
-      );
+      )
     } catch (e) {
-      console.error(`datefield.render: ${e as string} with context`, context);
-      throw e;
+      console.error(`datefield.render: ${e as string} with context`, context)
+      throw e
     }
   }
 }

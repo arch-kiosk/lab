@@ -1,7 +1,7 @@
-import { UIElement } from "./uielement";
-import { nothing, html } from "lit";
-import { UIElementRenderContext } from "../uielementrendercontext";
-import { UISchemaFile } from "../uischema";
+import { UIElement } from "./uielement"
+import { nothing, html } from "lit"
+import { UIElementRenderContext } from "../uielementrendercontext"
+import { UISchemaFile } from "../uischema"
 
 export class UIElementFile extends UIElement {
   static renderLabel(context: UIElementRenderContext, id: string, text: string) {
@@ -16,7 +16,7 @@ export class UIElementFile extends UIElement {
             )}
           </label>
         `
-      : this.devInfo(context, context.entry.element_type.text, context.entry.element_type.value);
+      : this.devInfo(context, context.entry.element_type.text, context.entry.element_type.value)
   }
 
   static render(context: UIElementRenderContext, id: string) {
@@ -25,27 +25,27 @@ export class UIElementFile extends UIElement {
       // if (!this.isVisible(context, value)) {
       //     return html`${nothing}`
       // }
-      let value = this.haulData(context, context.entry.element_type.value);
-      let text = this.haulData(context, context.entry.element_type.text);
-      let descriptionObject = this.haulData(context, `#($/images/descriptions/${value})`);
-      let description: string = "";
-      let width: number = 0;
-      let height: number = 0;
-      let htmlClass = this.getStyleSetting(context.entry.element_type, "classes", "");
-      let cssStyle = this.addStyle("", this.getStyleTextAlign(context.entry.element_type));
-      let imageElement = context.entry.element_type as UISchemaFile;
-      let alignFileDescription = imageElement.file_description || "bottom";
+      let value = this.haulData(context, context.entry.element_type.value)
+      let text = this.haulData(context, context.entry.element_type.text)
+      let descriptionObject = this.haulData(context, `#($/images/descriptions/${value})`)
+      let description: string = ""
+      let width: number = 0
+      let height: number = 0
+      let htmlClass = this.getStyleSetting(context.entry.element_type, "classes", "")
+      let cssStyle = this.addStyle("", this.getStyleTextAlign(context.entry.element_type))
+      let imageElement = context.entry.element_type as UISchemaFile
+      let alignFileDescription = imageElement.file_description || "bottom"
 
-      console.log(descriptionObject);
+      console.log(descriptionObject)
       if (typeof descriptionObject === "string") {
-        description = descriptionObject;
+        description = descriptionObject
       } else {
         if (descriptionObject?.hasOwnProperty("description")) {
-          description = descriptionObject["description"];
+          description = descriptionObject["description"]
         }
         if (descriptionObject?.hasOwnProperty("attributes")) {
-          height = descriptionObject.attributes?.height ?? 0;
-          width = descriptionObject.attributes?.width ?? 0;
+          height = descriptionObject.attributes?.height ?? 0
+          width = descriptionObject.attributes?.width ?? 0
         }
       }
 
@@ -53,13 +53,13 @@ export class UIElementFile extends UIElement {
         cssStyle = this.addStyle(
           cssStyle,
           `max-height: ${context.entry.layout.max_height === "max" ? "" : context.entry.layout.max_height + "px"}`,
-        );
+        )
       }
       if (context.entry.layout?.max_width) {
         cssStyle = this.addStyle(
           cssStyle,
           `max-width: ${context.entry.layout.max_width === "max" ? "" : context.entry.layout.max_width + "px"}`,
-        );
+        )
       }
       // if (!value && !description) {
       //     return html`${nothing}`
@@ -129,10 +129,10 @@ export class UIElementFile extends UIElement {
               : nothing}
           </div>
         `,
-      );
+      )
     } catch (e) {
-      console.error(`UIElementFile.render: ${e as string} with context`, context);
-      throw e;
+      console.error(`UIElementFile.render: ${e as string} with context`, context)
+      throw e
     }
   }
 }

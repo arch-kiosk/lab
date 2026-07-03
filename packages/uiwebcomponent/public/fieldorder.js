@@ -1,9 +1,9 @@
 ui_schema = {
-  "header": {
-    "version": 1
+  header: {
+    version: 1,
   },
-  "layout_settings": {
-    "orchestration_strategy": "stack",
+  layout_settings: {
+    orchestration_strategy: "stack",
     // "order": [
     //   "to_date",
     //   "from_date",
@@ -13,47 +13,46 @@ ui_schema = {
     // ],
     // "type": "list"
   },
-  "ui_elements": {
-    "to_date": {
-      "binding": {
-        "field_name": "to_date"
+  ui_elements: {
+    to_date: {
+      binding: {
+        field_name: "to_date",
       },
-      "element_type": {
-        "datetime_format": "date",
-        "name": "DateField",
-        "text": "to"
-      }
-    },
-    "from_date": {
-      "binding": {
-        "field_name": "from_date"
+      element_type: {
+        datetime_format: "date",
+        name: "DateField",
+        text: "to",
       },
-      "element_type": {
-        "datetime_format": "date",
-        "name": "DateField",
-        "text": "from"
-      }
     },
-    "zzz_date": {
+    from_date: {
+      binding: {
+        field_name: "from_date",
+      },
+      element_type: {
+        datetime_format: "date",
+        name: "DateField",
+        text: "from",
+      },
+    },
+    zzz_date: {
       // "binding": {
       //   "field_name": "zzz_date"
       // },
-      "element_type": {
-        "datetime_format": "date",
-        "name": "DateField",
-        "text": "zzz"
-      }
+      element_type: {
+        datetime_format: "date",
+        name: "DateField",
+        text: "zzz",
+      },
     },
-    "zzz2_date": {
+    zzz2_date: {
       // "binding": {
       //   "field_name": "zzz2_date"
       // },
-      "element_type": {
-        "datetime_format": "date",
-        "name": "DateField",
-        "text": "zzz2"
-      }
+      element_type: {
+        datetime_format: "date",
+        name: "DateField",
+        text: "zzz2",
+      },
     },
-
   },
 }

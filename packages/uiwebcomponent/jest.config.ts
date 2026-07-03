@@ -1,9 +1,9 @@
-import type { Config } from "jest";
+import type { Config } from "jest"
 // Sync object
 const config: Config = {
   verbose: true,
   transform: {
     "^.+\\.tsx?$": "ts-jest",
   },
-};
-export default config;
+}
+export default config

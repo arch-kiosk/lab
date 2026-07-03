@@ -1,6 +1,6 @@
-import { UIElement } from "./uielement";
-import { nothing, html } from "lit";
-import { UIElementRenderContext } from "../uielementrendercontext";
+import { UIElement } from "./uielement"
+import { nothing, html } from "lit"
+import { UIElementRenderContext } from "../uielementrendercontext"
 
 export class UIElementBoolField extends UIElement {
   static renderLabel(context: UIElementRenderContext, id: string, text: string) {
@@ -15,24 +15,24 @@ export class UIElementBoolField extends UIElement {
             )}
           </label>
         `
-      : this.devInfo(context, context.entry.element_type.text, context.entry.element_type.value);
+      : this.devInfo(context, context.entry.element_type.text, context.entry.element_type.value)
   }
 
   static render(context: UIElementRenderContext, id: string) {
     try {
-      let value = this.haulData(context, context.entry.element_type.value, id);
+      let value = this.haulData(context, context.entry.element_type.value, id)
 
       if (!this.isVisible(context, value)) {
-        return html`${nothing}`;
+        return html`${nothing}`
       }
-      let text = this.haulData(context, context.entry.element_type.text);
-      let htmlClass = this.getStyleSetting(context.entry.element_type, "classes", "");
-      let cssStyle = this.addStyle("", this.getStyleTextAlign(context.entry.element_type));
+      let text = this.haulData(context, context.entry.element_type.text)
+      let htmlClass = this.getStyleSetting(context.entry.element_type, "classes", "")
+      let cssStyle = this.addStyle("", this.getStyleTextAlign(context.entry.element_type))
       if (context.entry.layout?.max_height) {
         cssStyle = this.addStyle(
           cssStyle,
           `max-height: ${context.entry.layout.max_height === "max" ? "none" : context.entry.layout.max_height + "em"}`,
-        );
+        )
       }
 
       if (context.entry.element_type.readonly) {
@@ -48,9 +48,9 @@ export class UIElementBoolField extends UIElement {
               <span><span>${value ? "YES" : "NO"}</span></span>
             </div>
           `,
-        );
+        )
       } else {
-        htmlClass = htmlClass ? htmlClass + " input-checkbox" : "input-checkbox";
+        htmlClass = htmlClass ? htmlClass + " input-checkbox" : "input-checkbox"
         return context.layouter.renderElement(
           context.entry.layout,
           html`
@@ -66,11 +66,11 @@ export class UIElementBoolField extends UIElement {
               ?disabled=${!context.entry.element_type.enabled}
             />
           `,
-        );
+        )
       }
     } catch (e) {
-      console.error(`textfield.render: ${e as string} with context`, context);
-      throw e;
+      console.error(`textfield.render: ${e as string} with context`, context)
+      throw e
     }
   }
 }

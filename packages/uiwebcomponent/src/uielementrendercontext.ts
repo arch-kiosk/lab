@@ -1,70 +1,70 @@
-import { UIComponent } from "./ui-component";
-import { ApiTimeZoneInfo, UIInputData, UILayout, UISchemaUIElement } from "./uischema";
-import { UILayoutClass } from "./layoutclasses";
-import { replaceData } from "./tools";
+import { UIComponent } from "./ui-component"
+import { ApiTimeZoneInfo, UIInputData, UILayout, UISchemaUIElement } from "./uischema"
+import { UILayoutClass } from "./layoutclasses"
+import { replaceData } from "./tools"
 
 export class RenderContext {
-  uicomponent: UIComponent;
-  layouter: UILayoutClass;
-  data: UIInputData;
-  _lastUID: string = "";
+  uicomponent: UIComponent
+  layouter: UILayoutClass
+  data: UIInputData
+  _lastUID: string = ""
 
   constructor(component: UIComponent, layouter: UILayoutClass, data: UIInputData) {
-    this.uicomponent = component;
-    this.layouter = layouter;
-    this.data = data;
-    this._lastUID = "";
+    this.uicomponent = component
+    this.layouter = layouter
+    this.data = data
+    this._lastUID = ""
   }
 
   public haulData(value?: string, id?: string): unknown {
-    if (value === undefined) return "";
-    value = replaceData(value, this.data);
+    if (value === undefined) return ""
+    value = replaceData(value, this.data)
     if (!!this.uicomponent.dataProvider && value != undefined) {
-      value = this.uicomponent.dataProvider(value, id);
+      value = this.uicomponent.dataProvider(value, id)
       // console.log(`Dataprovider returned ${value}`)
     }
-    return value;
+    return value
   }
 
   public getTimeZoneInfo(tzIndex: number | undefined): ApiTimeZoneInfo | undefined {
-    let rc = undefined;
+    let rc = undefined
     if (!!this.uicomponent.timeZoneInfoProvider && tzIndex != undefined) {
-      rc = this.uicomponent.timeZoneInfoProvider(tzIndex);
+      rc = this.uicomponent.timeZoneInfoProvider(tzIndex)
     }
-    return rc;
+    return rc
   }
 
   public resetCursor() {
-    this._lastUID = "";
+    this._lastUID = ""
   }
 
   public getCurrentUID() {
     try {
       // if (!!this.uicomponent.dataProvider) Gemini purports the !! is really redundant. I don't know how or why it got there
       if (this.uicomponent.dataProvider) {
-        let value = this.uicomponent.dataProvider("#(uid)", undefined);
+        let value = this.uicomponent.dataProvider("#(uid)", undefined)
         if (value && value === "#(uid)") {
-          return undefined;
+          return undefined
         } else {
-          return value;
+          return value
         }
       }
     } catch (e) {
-      console.error(`uielementrendercontext.getCurrentUID:`, e);
+      console.error(`uielementrendercontext.getCurrentUID:`, e)
     }
-    return undefined;
+    return undefined
   }
 
   public next(): boolean {
     if (this.uicomponent && this.uicomponent.moveToNextRow) {
-      this._lastUID = this.uicomponent.moveToNextRow(this._lastUID);
-      return this._lastUID !== "";
-    } else return false;
+      this._lastUID = this.uicomponent.moveToNextRow(this._lastUID)
+      return this._lastUID !== ""
+    } else return false
   }
 }
 
 export class UIElementRenderContext extends RenderContext {
-  entry: UISchemaUIElement;
+  entry: UISchemaUIElement
 
   constructor(
     component: UIComponent,
@@ -72,20 +72,20 @@ export class UIElementRenderContext extends RenderContext {
     layouter: UILayoutClass,
     data: UIInputData,
   ) {
-    super(component, layouter, data);
-    this.entry = entry;
+    super(component, layouter, data)
+    this.entry = entry
   }
 }
 
 export class UILayoutRenderContext extends RenderContext {
-  entry: UILayout;
+  entry: UILayout
 
   constructor(component: UIComponent, entry: UILayout, layouter: UILayoutClass, data: UIInputData) {
-    super(component, layouter, data);
-    this.entry = entry;
+    super(component, layouter, data)
+    this.entry = entry
   }
 
   resetCursor() {
-    super.resetCursor();
+    super.resetCursor()
   }
 }

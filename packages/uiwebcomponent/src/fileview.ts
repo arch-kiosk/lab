@@ -1,43 +1,43 @@
-import { LitElement } from "lit";
+import { LitElement } from "lit"
 
 // @ts-ignore
-import local_css from "./styles/component-file-view.sass?inline";
-import { nothing, PropertyValues, unsafeCSS } from "lit";
-import { html } from "lit";
-import { property, state, customElement } from "lit/decorators.js";
-import { UIComponentFileFetchParams } from "./uischema";
+import local_css from "./styles/component-file-view.sass?inline"
+import { nothing, PropertyValues, unsafeCSS } from "lit"
+import { html } from "lit"
+import { property, state, customElement } from "lit/decorators.js"
+import { UIComponentFileFetchParams } from "./uischema"
 
 @customElement("file-view")
 export class FileView extends LitElement {
-  static styles = unsafeCSS(local_css);
+  static styles = unsafeCSS(local_css)
 
-  private observer?: IntersectionObserver = undefined;
+  private observer?: IntersectionObserver = undefined
 
   constructor() {
-    super();
-    this.observerCallback = this.observerCallback.bind(this);
+    super()
+    this.observerCallback = this.observerCallback.bind(this)
   }
 
   @state()
-  private visible = false;
+  private visible = false
 
   @state()
-  private loadError = false;
+  private loadError = false
 
   @property()
-  uuid_file: string = "";
+  uuid_file: string = ""
 
   @property()
-  resolution: string = "";
+  resolution: string = ""
 
   @property()
-  description: string = "";
+  description: string = ""
 
   @property()
-  fitContent: string = "contain";
+  fitContent: string = "contain"
 
   @property()
-  url: string = "";
+  url: string = ""
 
   // get visible() {
   //     return (this._visible)
@@ -51,26 +51,26 @@ export class FileView extends LitElement {
   // }
 
   connectedCallback() {
-    super.connectedCallback();
+    super.connectedCallback()
     // Remove the wrapping `<lazy-image>` element from the a11y tree.
-    this.setAttribute("role", "presentation");
+    this.setAttribute("role", "presentation")
     // if IntersectionObserver is available, initialize it.
-    this.initIntersectionObserver();
+    this.initIntersectionObserver()
   }
 
   disconnectedCallback() {
-    super.disconnectedCallback();
-    this.disconnectObserver();
+    super.disconnectedCallback()
+    this.disconnectObserver()
   }
 
   private observerCallback = (entries: IntersectionObserverEntry[]) => {
     // @ts-ignore
-    const isIntersecting = ({ isIntersecting }) => isIntersecting;
+    const isIntersecting = ({ isIntersecting }) => isIntersecting
     if (entries.some(isIntersecting)) {
-      this.disconnectObserver();
-      this.visible = true;
+      this.disconnectObserver()
+      this.visible = true
     }
-  };
+  }
 
   /**
    * Initializes the IntersectionObserver when the element instantiates.
@@ -78,15 +78,15 @@ export class FileView extends LitElement {
    */
   initIntersectionObserver() {
     // if IntersectionObserver is unavailable, simply load the image.
-    if (!("IntersectionObserver" in window)) return (this.visible = true);
+    if (!("IntersectionObserver" in window)) return (this.visible = true)
     // Short-circuit if observer has already initialized.
     // Short-circuit if observer has already initialized.
-    if (this.observer) return;
+    if (this.observer) return
     // Start loading the image 10px before it appears on screen
-    const rootMargin = "10px";
-    this.observer = new IntersectionObserver(this.observerCallback.bind(this), { rootMargin });
-    this.observer.observe(this);
-    return;
+    const rootMargin = "10px"
+    this.observer = new IntersectionObserver(this.observerCallback.bind(this), { rootMargin })
+    this.observer.observe(this)
+    return
   }
 
   /**
@@ -94,13 +94,13 @@ export class FileView extends LitElement {
    * @protected
    */
   disconnectObserver() {
-    this.observer?.disconnect();
-    delete this.observer;
-    this.observer = undefined;
+    this.observer?.disconnect()
+    delete this.observer
+    this.observer = undefined
   }
 
   protected clicked = () => {
-    const ds = this.dataset;
+    const ds = this.dataset
     this.dispatchEvent(
       new CustomEvent("select-image", {
         bubbles: true,
@@ -111,64 +111,64 @@ export class FileView extends LitElement {
           height: ds.height ?? "0",
         },
       }),
-    );
-  };
+    )
+  }
 
   protected willUpdate(_changedProperties: PropertyValues) {
-    super.willUpdate(_changedProperties);
-    if (_changedProperties.has("uuid_file") || _changedProperties.has("resolution")) this.url = "";
-    if (!this.url && !this.loadError) this.load_image();
+    super.willUpdate(_changedProperties)
+    if (_changedProperties.has("uuid_file") || _changedProperties.has("resolution")) this.url = ""
+    if (!this.url && !this.loadError) this.load_image()
   }
 
   protected firstUpdated() {}
 
   public reportURL(url: string | null) {
     if (typeof url === "string" && url) {
-      console.log(`GOT URL: ${url} `);
-      this.url = url;
+      console.log(`GOT URL: ${url} `)
+      this.url = url
     } else {
-      this.url = "";
-      this.loadError = true;
+      this.url = ""
+      this.loadError = true
     }
   }
 
   fetch_image() {
-    this.url = "";
+    this.url = ""
 
     const detail: UIComponentFileFetchParams = {
       uuid: this.uuid_file,
       resolution: this.resolution,
       reportURL: this.reportURL.bind(this),
-    };
+    }
 
     const event = new CustomEvent("fetchfile", {
       detail,
       bubbles: false,
       composed: true,
       cancelable: false,
-    });
-    this.dispatchEvent(event);
+    })
+    this.dispatchEvent(event)
   }
 
   load_image() {
     if (this.resolution && this.uuid_file) {
       if (this.visible) {
-        this.fetch_image();
+        this.fetch_image()
       }
     }
   }
 
   renderImage() {
-    let cssStyle: string;
+    let cssStyle: string
     switch (this.fitContent) {
       case "fit":
-        cssStyle = "object-fit: scale-down;max-width:100%";
-        break;
+        cssStyle = "object-fit: scale-down;max-width:100%"
+        break
       case "scale":
-        cssStyle = "height: 100%;width:100%";
-        break;
+        cssStyle = "height: 100%;width:100%"
+        break
       default:
-        cssStyle = "object-fit: contain";
+        cssStyle = "object-fit: contain"
     }
 
     return this.visible
@@ -178,13 +178,13 @@ export class FileView extends LitElement {
           src="${this.url}"
           alt="${this.description}"
         />`
-      : nothing;
+      : nothing
   }
 
   renderPlaceholder() {
     return this.visible
       ? html` <div class="placeholder"><i class="fa fa-hourglass"></i></div>`
-      : nothing;
+      : nothing
   }
 
   renderLoadError() {
@@ -225,7 +225,7 @@ export class FileView extends LitElement {
             <circle cx="302.672" cy="226.702" r="22.577" style="fill:#555c5e" />
           </svg>
         </div>`
-      : nothing;
+      : nothing
   }
 
   render() {
@@ -233,6 +233,6 @@ export class FileView extends LitElement {
       ? this.renderImage()
       : this.loadError
         ? this.renderLoadError()
-        : this.renderPlaceholder()}`;
+        : this.renderPlaceholder()}`
   }
 }

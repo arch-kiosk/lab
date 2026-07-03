@@ -2,65 +2,65 @@ import {
   UISchemaListLayoutSettings,
   UISchemaUIElement,
   UISchemaUIElementLayoutSettings,
-} from "../uischema";
-import { html, nothing, TemplateResult } from "lit";
-import { UILayoutRenderContext } from "../uielementrendercontext";
-import { UILayoutClass, UIListLayoutClass } from "./uilayoutclass";
+} from "../uischema"
+import { html, nothing, TemplateResult } from "lit"
+import { UILayoutRenderContext } from "../uielementrendercontext"
+import { UILayoutClass, UIListLayoutClass } from "./uilayoutclass"
 
 export class UITableLayoutClass extends UIListLayoutClass {
-  cssClass = "ui-table-layout";
-  renderElementLabels = false;
+  cssClass = "ui-table-layout"
+  renderElementLabels = false
 
   // @ts-ignore
   renderLayoutStyles(_?: UISchemaUIElementLayoutSettings): string {
-    let style = "";
-    return style;
+    let style = ""
+    return style
   }
 
   public headerClicked(event: MouseEvent) {
-    const header = event.currentTarget as HTMLElement;
-    const id = header.dataset["id"];
+    const header = event.currentTarget as HTMLElement
+    const id = header.dataset["id"]
     let orderIdx = this._sortOrder.findIndex((x) =>
       x.startsWith(">") ? x.slice(1) === id : x === id,
-    );
-    let dec = false;
+    )
+    let dec = false
 
-    if (!id) return;
+    if (!id) return
     if (orderIdx > -1) {
-      dec = this._sortOrder[orderIdx].startsWith(">");
+      dec = this._sortOrder[orderIdx].startsWith(">")
       if (orderIdx == 0) {
-        dec = !dec;
+        dec = !dec
       }
       if (orderIdx > 0) {
-        this._sortOrder[orderIdx] = this._sortOrder[0];
+        this._sortOrder[orderIdx] = this._sortOrder[0]
       }
-      this._sortOrder[0] = dec ? ">" + id : id;
+      this._sortOrder[0] = dec ? ">" + id : id
     } else {
-      this._sortOrder.splice(0, 0, id);
+      this._sortOrder.splice(0, 0, id)
     }
-    this.requestUpdate();
+    this.requestUpdate()
   }
 
   public renderSortButton(id: string) {
     const orderIndex = this._sortOrder.findIndex((x) =>
       x.startsWith(">") ? x.slice(1) === id : x === id,
-    );
+    )
     if (orderIndex > -1) {
-      const order = this._sortOrder[orderIndex];
-      const cssClass = orderIndex == 0 ? "table-header-icon" : "table-header-icon-secondary";
+      const order = this._sortOrder[orderIndex]
+      const cssClass = orderIndex == 0 ? "table-header-icon" : "table-header-icon-secondary"
       if (order.startsWith(">")) {
-        return html`<span class="${cssClass}"><i></i></span>`;
+        return html`<span class="${cssClass}"><i></i></span>`
       } else {
-        return html`<span class="${cssClass}"><i></i></span>`;
+        return html`<span class="${cssClass}"><i></i></span>`
       }
     }
-    return nothing;
+    return nothing
   }
   public renderHeaders(renderContext: UILayoutRenderContext, elements: string[]) {
-    const settings = renderContext.entry.layout_settings as UISchemaListLayoutSettings;
-    const orderAllowed = settings.allow_ordering_by || [];
-    const allAllowed = settings.allow_ordering_by == undefined;
-    console.log(orderAllowed);
+    const settings = renderContext.entry.layout_settings as UISchemaListLayoutSettings
+    const orderAllowed = settings.allow_ordering_by || []
+    const allAllowed = settings.allow_ordering_by == undefined
+    console.log(orderAllowed)
     return html`
       <thead>
         <tr>
@@ -85,16 +85,16 @@ export class UITableLayoutClass extends UIListLayoutClass {
           )}
         </tr>
       </thead>
-    `;
+    `
   }
 
   private getTableHeaderStyle(layout_settings: UISchemaUIElementLayoutSettings | undefined) {
-    let style = "";
+    let style = ""
     if (layout_settings?.min_width) {
       if (String(layout_settings.min_width).indexOf("%") > -1)
-        style = `width: ${layout_settings.min_width}`;
+        style = `width: ${layout_settings.min_width}`
     }
-    return style;
+    return style
   }
 
   public renderLayout(
@@ -107,17 +107,17 @@ export class UITableLayoutClass extends UIListLayoutClass {
       layouter: UILayoutClass,
     ) => TemplateResult,
   ): TemplateResult {
-    const elements = this.getOrderedElements(renderContext.entry);
+    const elements = this.getOrderedElements(renderContext.entry)
 
-    const rows: TemplateResult[] = [];
-    renderContext.resetCursor();
-    this._initSorting(renderContext);
+    const rows: TemplateResult[] = []
+    renderContext.resetCursor()
+    this._initSorting(renderContext)
     while (renderContext.next()) {
       rows.push(html`
         <tr id="R${renderContext.getCurrentUID() ? renderContext.getCurrentUID() : nothing}">
           ${elements.map((id) => renderElement(id, renderContext.entry.ui_elements[id], layouter))}
         </tr>
-      `);
+      `)
     }
 
     return html`
@@ -127,13 +127,13 @@ export class UITableLayoutClass extends UIListLayoutClass {
           ${rows}
         </tbody>
       </table>
-    `;
+    `
   }
 
   renderElement(
     layout: UISchemaUIElementLayoutSettings | undefined,
     element: TemplateResult,
   ): TemplateResult {
-    return html` <td class="text-cell" style="${this.renderLayoutStyles(layout)}">${element}</td> `;
+    return html` <td class="text-cell" style="${this.renderLayoutStyles(layout)}">${element}</td> `
   }
 }

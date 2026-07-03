@@ -1,10 +1,10 @@
-import { UIElement } from "./uielement";
-import { UIElementRenderContext } from "../uielementrendercontext";
+import { UIElement } from "./uielement"
+import { UIElementRenderContext } from "../uielementrendercontext"
 
-import { nothing, html } from "lit";
-import { DateTime } from "luxon";
-import { ApiTimeZoneInfo, UISchemaDateTimeField } from "../uischema";
-import { getLatinDate } from "../tools";
+import { nothing, html } from "lit"
+import { DateTime } from "luxon"
+import { ApiTimeZoneInfo, UISchemaDateTimeField } from "../uischema"
+import { getLatinDate } from "../tools"
 // import {computePosition} from "@floating-ui/dom";
 
 export class UIElementDateTimeField extends UIElement {
@@ -20,67 +20,67 @@ export class UIElementDateTimeField extends UIElement {
             )}
           </label>
         `
-      : this.devInfo(context, context.entry.element_type.text, context.entry.element_type.value);
+      : this.devInfo(context, context.entry.element_type.text, context.entry.element_type.value)
   }
 
   static openDateTimePopover(this: void, e: MouseEvent) {
     if (e.target) {
-      e.stopPropagation();
-      const target = <HTMLElement>e.target;
-      let icon: HTMLElement;
-      let popover: HTMLElement;
+      e.stopPropagation()
+      const target = <HTMLElement>e.target
+      let icon: HTMLElement
+      let popover: HTMLElement
       if (target.tagName === "I") {
-        icon = <HTMLDivElement>e.target;
-        popover = <HTMLElement>icon.firstElementChild;
+        icon = <HTMLDivElement>e.target
+        popover = <HTMLElement>icon.firstElementChild
       } else {
-        popover = target;
-        icon = <HTMLElement>target.parentElement;
+        popover = target
+        icon = <HTMLElement>target.parentElement
       }
       if (popover.checkVisibility()) {
-        icon.style.backgroundColor = "unset";
-        popover.style.display = "none";
+        icon.style.backgroundColor = "unset"
+        popover.style.display = "none"
       } else {
-        icon.style.backgroundColor = "var(--col-bg-ack)";
-        popover.style.display = "block";
+        icon.style.backgroundColor = "var(--col-bg-ack)"
+        popover.style.display = "block"
       }
     }
   }
   static render(context: UIElementRenderContext, id: string) {
     try {
-      const ts_value = this.haulData(context, context.entry.element_type.value, id)?.split("@");
-      let value = ts_value ? ts_value[0] : "";
-      let timeZoneInfo: ApiTimeZoneInfo | undefined = undefined;
+      const ts_value = this.haulData(context, context.entry.element_type.value, id)?.split("@")
+      let value = ts_value ? ts_value[0] : ""
+      let timeZoneInfo: ApiTimeZoneInfo | undefined = undefined
 
       if (ts_value && ts_value[1] && ts_value[1] !== "-") {
-        timeZoneInfo = this.getTimeZoneInfo(context, parseInt(ts_value[1]));
+        timeZoneInfo = this.getTimeZoneInfo(context, parseInt(ts_value[1]))
       }
 
       if (!this.isVisible(context, value)) {
-        return html`${nothing}`;
+        return html`${nothing}`
       }
-      const text = this.haulData(context, context.entry.element_type.text);
-      const htmlClass = this.getStyleSetting(context.entry.element_type, "classes", "");
-      const cssStyle = this.addStyle("", this.getStyleTextAlign(context.entry.element_type));
+      const text = this.haulData(context, context.entry.element_type.text)
+      const htmlClass = this.getStyleSetting(context.entry.element_type, "classes", "")
+      const cssStyle = this.addStyle("", this.getStyleTextAlign(context.entry.element_type))
 
-      let ts = DateTime.fromISO(value, { zone: "utc", setZone: true });
+      let ts = DateTime.fromISO(value, { zone: "utc", setZone: true })
 
-      let includeTime = (context.entry.element_type as UISchemaDateTimeField).include_time;
-      if (includeTime === undefined) includeTime = true;
-      let tsValue: string | undefined = undefined;
+      let includeTime = (context.entry.element_type as UISchemaDateTimeField).include_time
+      if (includeTime === undefined) includeTime = true
+      let tsValue: string | undefined = undefined
       if (ts.isValid) {
         // console.log(`${id} ts is valid and is: ${value}`)
-        if (timeZoneInfo) ts = ts.setZone(timeZoneInfo.tz_IANA);
+        if (timeZoneInfo) ts = ts.setZone(timeZoneInfo.tz_IANA)
         if (
           ((context.entry.element_type as UISchemaDateTimeField).date_format || "latin") === "latin"
         ) {
-          tsValue = getLatinDate(ts, includeTime);
+          tsValue = getLatinDate(ts, includeTime)
         } else {
           tsValue = includeTime
             ? ts.toLocaleString(DateTime.DATETIME_SHORT)
-            : ts.toLocaleString(DateTime.DATE_SHORT);
+            : ts.toLocaleString(DateTime.DATE_SHORT)
         }
       } else {
-        console.log(`${id} ts is NOT valid and is: ${value}`);
+        console.log(`${id} ts is NOT valid and is: ${value}`)
       }
 
       return context.layouter.renderElement(
@@ -115,10 +115,10 @@ export class UIElementDateTimeField extends UIElement {
                                     ?disabled=${!context.entry.element_type.enabled}>
                             </vaadin-date-time-picker></div`}
         `,
-      );
+      )
     } catch (e) {
-      console.error(`datetimefield.render: ${e as string} with context`, context);
-      throw e;
+      console.error(`datetimefield.render: ${e as string} with context`, context)
+      throw e
     }
   }
 }

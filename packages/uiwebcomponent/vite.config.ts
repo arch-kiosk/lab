@@ -1,14 +1,14 @@
 // noinspection JSUnusedGlobalSymbols,JSUnusedLocalSymbols
 
-import { defineConfig } from "vite-plus";
-import { resolve } from "path";
+import { defineConfig } from "vite-plus"
+import { resolve } from "path"
 // import dts from 'vite-plugin-dts'
-import packageJson from "./package.json";
+import packageJson from "./package.json"
 
 // https://vitejs.dev/config/
 export default defineConfig(({ command, mode }) => {
   // const env = loadEnv(mode, "env");
-  const _a = mode || null; // just suppressing a linter error until mode is used
+  const _a = mode || null // just suppressing a linter error until mode is used
 
   return {
     build: {
@@ -61,5 +61,5 @@ export default defineConfig(({ command, mode }) => {
     },
 
     // publicDir: "/public/static"
-  };
-});
+  }
+})

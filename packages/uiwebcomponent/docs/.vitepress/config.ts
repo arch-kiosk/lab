@@ -1,5 +1,5 @@
-import { defineConfig } from "vitepress";
-import { generateSidebar } from "vitepress-sidebar";
+import { defineConfig } from "vitepress"
+import { generateSidebar } from "vitepress-sidebar"
 export default defineConfig({
   title: "ui-component",
   base: "/lab/uicomponent/",
@@ -21,4 +21,4 @@ export default defineConfig({
       },
     ]),
   },
-});
+})

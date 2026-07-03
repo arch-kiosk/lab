@@ -2,7 +2,7 @@ name: "Set Assignee"
 on:
   issues:
     branches-ignore:
-        - '**'
+      - "**"
     types: [opened]
 
 jobs:
