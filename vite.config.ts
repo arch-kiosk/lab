@@ -13,6 +13,7 @@ export default defineConfig({
     jsPlugins: [{ name: "vite-plus", specifier: "vite-plus/oxlint-plugin" }],
     options: { typeAware: true, typeCheck: true },
     // oxlint-disable-next-line typescript/no-explicit-any
-    rules: oxlintConfig.rules as Record<string, any>,
+    rules: { "no-console": "error" },
+    // oxlintConfig.rules as Record<string, any>,
   },
 });
