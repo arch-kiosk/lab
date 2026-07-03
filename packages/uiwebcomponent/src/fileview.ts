@@ -63,19 +63,14 @@ export class FileView extends LitElement {
     this.disconnectObserver();
   }
 
-  /**
-   * Sets the `intersecting` property when the element is on screen.
-   * @param  {[IntersectionObserverEntry]} entries
-   * @protected
-   */
-  observerCallback(entries: IntersectionObserverEntry[]) {
+  private observerCallback = (entries: IntersectionObserverEntry[]) => {
     // @ts-ignore
     const isIntersecting = ({ isIntersecting }) => isIntersecting;
     if (entries.some(isIntersecting)) {
       this.disconnectObserver();
       this.visible = true;
     }
-  }
+  };
 
   /**
    * Initializes the IntersectionObserver when the element instantiates.
@@ -89,7 +84,7 @@ export class FileView extends LitElement {
     if (this.observer) return;
     // Start loading the image 10px before it appears on screen
     const rootMargin = "10px";
-    this.observer = new IntersectionObserver(this.observerCallback, { rootMargin });
+    this.observer = new IntersectionObserver(this.observerCallback.bind(this), { rootMargin });
     this.observer.observe(this);
     return;
   }
@@ -104,7 +99,7 @@ export class FileView extends LitElement {
     this.observer = undefined;
   }
 
-  protected clicked() {
+  protected clicked = () => {
     const ds = this.dataset;
     this.dispatchEvent(
       new CustomEvent("select-image", {
@@ -117,7 +112,7 @@ export class FileView extends LitElement {
         },
       }),
     );
-  }
+  };
 
   protected willUpdate(_changedProperties: PropertyValues) {
     super.willUpdate(_changedProperties);
@@ -127,7 +122,7 @@ export class FileView extends LitElement {
 
   protected firstUpdated() {}
 
-  public reportURL(url: string | null | unknown) {
+  public reportURL(url: string | null) {
     if (typeof url === "string" && url) {
       console.log(`GOT URL: ${url} `);
       this.url = url;
@@ -164,7 +159,7 @@ export class FileView extends LitElement {
   }
 
   renderImage() {
-    let cssStyle: string = "";
+    let cssStyle: string;
     switch (this.fitContent) {
       case "fit":
         cssStyle = "object-fit: scale-down;max-width:100%";

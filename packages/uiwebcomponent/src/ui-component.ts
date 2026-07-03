@@ -1,5 +1,5 @@
 "use strict";
-import { unsafeCSS, LitElement, TemplateResult, PropertyValues } from "lit";
+import { unsafeCSS, LitElement, TemplateResult, PropertyValues, PropertyValueMap } from "lit";
 import { html } from "lit/static-html.js";
 import { customElement, property, state } from "lit/decorators.js";
 import "@vaadin/date-picker";
@@ -7,7 +7,6 @@ import "@vaadin/date-time-picker";
 import "@vaadin/combo-box";
 import "./fileview";
 
-// import local_css from "/src/static/logviewerapp.sass?inline";
 // @ts-ignore
 import local_css from "./styles/ui-component.sass?inline";
 import { UIElementFactory } from "./uielementfactory";
@@ -108,7 +107,7 @@ export class UIComponent extends LitElement {
     }
   }
 
-  public keyupOnElement(e: KeyboardEvent) {
+  public keyupOnElement = (e: KeyboardEvent) => {
     if (e.key === "Enter" && this._default?.["ENTER"]) {
       this.fieldChangedById(this._default?.["ENTER"]);
     } else {
@@ -116,9 +115,9 @@ export class UIComponent extends LitElement {
         this.fieldChangedById(this._default?.["CANCEL"]);
       }
     }
-  }
+  };
 
-  firstUpdated(_changedProperties: any) {
+  firstUpdated(_changedProperties: PropertyValueMap<unknown>) {
     super.firstUpdated(_changedProperties);
 
     for (const comboBox of this.renderRoot.querySelectorAll("vaadin-combo-box")) {
@@ -163,7 +162,7 @@ export class UIComponent extends LitElement {
     }
   }
 
-  updated(_changedProperties: any) {
+  updated(_changedProperties: PropertyValueMap<unknown>) {
     super.updated(_changedProperties);
   }
 
@@ -297,7 +296,7 @@ export class UIComponent extends LitElement {
   }
 
   gatherData() {
-    const result: { [key: string]: any } = {};
+    const result: { [key: string]: unknown } = {};
     if (!this._dsd_to_element_list || Object.keys(this._dsd_to_element_list).length === 0)
       return {};
     Object.entries(this._dsd_to_element_list).map(([dsd_field, element_entry]) => {
@@ -306,12 +305,13 @@ export class UIComponent extends LitElement {
     return result;
   }
 
-  public fetchFile(event: CustomEvent) {
+  public fetchFile = (event: CustomEvent) => {
     const params = event.detail as UIComponentFileFetchParams;
     if (this.fetchFileProvider) {
-      this.fetchFileProvider(params);
+      // eslint-disable-next-line typescript/no-floating-promises
+      void this.fetchFileProvider(params);
     }
-  }
+  };
 
   get_field_value(id: string, element: UISchemaUIElement) {
     const domElement: HTMLFormElement | null = this.renderRoot.querySelector(`#${id}`);
@@ -328,8 +328,8 @@ export class UIComponent extends LitElement {
   //Todo: This should be in the uielementcombobox.ts
   getSelectionValue(id: string, domElement: HTMLFormElement | null, comboBox: UISchemaComboBox) {
     let displayValue = domElement?.value ? domElement?.value : "";
-    let dataValue: any;
-    this._element_list[id].element_type;
+    let dataValue: unknown;
+    // this._element_list[id].element_type;
     if (Array.isArray(comboBox.items) && comboBox.items.length > 0) {
       if (Array.isArray(comboBox.items[0])) {
         for (const item of comboBox.items) {
@@ -365,7 +365,7 @@ export class UIComponent extends LitElement {
     this.dispatchEvent(new CustomEvent("dataChanged", options));
   }
 
-  fieldChanged(e: Event) {
+  public fieldChanged = (e: Event) => {
     if ("currentTarget" in e) {
       const id = (<HTMLElement>e.currentTarget).id;
       // const element = this.getSchemaElement(id)
@@ -374,9 +374,9 @@ export class UIComponent extends LitElement {
       // }
       this.fieldChangedById(id);
     }
-  }
+  };
 
-  comboBoxFilterChanged(e: ComboBoxFilterChangedEvent) {
+  comboBoxFilterChanged = (e: ComboBoxFilterChangedEvent) => {
     const filter = e.detail.value.toLowerCase();
     const comboBox = e.currentTarget as ComboBox;
     if (comboBox) {
@@ -391,7 +391,7 @@ export class UIComponent extends LitElement {
         comboBox.filteredItems = filteredItemsList;
       }
     }
-  }
+  };
 
   private getLayoutClass(
     layoutElementId: string,
@@ -425,7 +425,11 @@ export class UIComponent extends LitElement {
             throw `Unknown orchestration strategy ${layoutSettings.orchestration_strategy}`;
         }
       } else {
-        throw `Unknown layout type ${layoutType}`;
+        if (layoutType) {
+          throw `Unknown layout type ${layoutType as string}`;
+        } else {
+          throw `no layout type}`;
+        }
       }
     } else return new UIColumnLayoutClass(layoutElementId, layoutSettings);
   }
@@ -439,6 +443,7 @@ export class UIComponent extends LitElement {
   private renderUIElement(id: string, entry: UISchemaUIElement, layouter: UILayoutClass) {
     try {
       if (!this.uiElementFactory) {
+        // noinspection ExceptionCaughtLocallyJS
         throw `UIComponent.renderUIElement: no elementFactory to instantiate ${entry.element_type.name}`;
       }
 
@@ -448,7 +453,7 @@ export class UIComponent extends LitElement {
         renderContext.entry.element_type.readonly || layouter?.layoutSettings?.readonly;
       return uiElementClass.render(renderContext, id);
     } catch (e) {
-      console.error(`Exception in UIComponent.renderUIElement: ${e}`);
+      console.error(`Exception in UIComponent.renderUIElement: ${e as string}`);
       return html` ${entry.element_type.name} "${id}": ${e} `;
     }
   }
@@ -474,10 +479,10 @@ export class UIComponent extends LitElement {
     return style;
   }
 
-  private onRequestUpdate() {
+  private onRequestUpdate = () => {
     console.log("requesting update");
     this.requestUpdate();
-  }
+  };
 
   private renderLayoutElement(
     id: string,
@@ -509,13 +514,13 @@ export class UIComponent extends LitElement {
     );
   }
 
-  hideDevelopmentInfo() {
+  private hideDevelopmentInfo = () => {
     this.renderRoot
       .querySelectorAll(".developer-info")
       .forEach((e) => ((e as HTMLElement).style.display = "none"));
-  }
+  };
 
-  gotoIdentifier(event: PointerEvent) {
+  gotoIdentifier = (event: PointerEvent) => {
     const detail = {
       identifier: (event.currentTarget as HTMLElement).dataset.identifier,
       fieldId: (event.currentTarget as HTMLElement).id,
@@ -527,9 +532,10 @@ export class UIComponent extends LitElement {
       cancelable: false,
     });
     this.dispatchEvent(gotoEvent);
-  }
+  };
 
   render() {
+    // noinspection JSMismatchedCollectionQueryUpdate
     const itemTemplates: TemplateResult[] = [];
     let layoutClass;
     if (this.showDevelopmentInfo)
@@ -537,12 +543,12 @@ export class UIComponent extends LitElement {
         class="uicomponent-version"
         @click="${this.hideDevelopmentInfo}"
       >
-        ${html`${(import.meta as any).env.PACKAGE_VERSION}`}
+        ${html`${import.meta.env.PACKAGE_VERSION}`}
       </div>`);
     try {
       layoutClass = this.getLayoutClass("root", this.uiSchema?.layout_settings);
       layoutClass.onRequestUpdate = this.onRequestUpdate.bind(this);
-    } catch (e) {
+    } catch {
       this._showError = `The schema definition is calling an unknown Orchestration Strategy "${this.uiSchema?.layout_settings?.orchestration_strategy}"`;
     }
     if (!this._showError) {
@@ -564,7 +570,7 @@ export class UIComponent extends LitElement {
           );
         }
       } catch (e) {
-        this._showError = `An error occurred when rendering this component:\n"${e}"`;
+        this._showError = `An error occurred when rendering this component:\n"${e as string}"`;
       }
     }
     if (this._showError) {

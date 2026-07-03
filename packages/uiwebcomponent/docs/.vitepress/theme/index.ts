@@ -7,7 +7,7 @@ export default {
   extends: DefaultTheme,
 
   // @ts-ignore
-  enhanceApp({ app, router, siteData }) {
+  enhanceApp() {
     // You can also register global components here if needed later
   },
 };

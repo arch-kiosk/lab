@@ -16,6 +16,7 @@
     }
   },
   "scripts": {
+    "check types": "tsc",
     "dev": "vp dev -- --host 127.0.0.1",
     "build only": "tsc && vp build",
     "rollout": "tsc && vp build && npm pack --pack-destination .\\dist",
