@@ -1,6 +1,6 @@
 {
   "name": "utils",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "A starter for creating a TypeScript package.",
   "homepage": "https://github.com/author/library#readme",
   "bugs": {
@@ -29,7 +29,7 @@
     "test": "vp test",
     "check": "vp check",
     "prepublishOnly": "vp run build",
-    "release": "bumpp"
+    "release": "bumpp --no-push --commit \"chore(release): upstream v%s\""
   },
   "devDependencies": {
     "@types/node": "^25.6.2",
