@@ -1,18 +1,15 @@
 {
-  "name": "lab",
+  "name": "@arch-kiosk/lab",
   "version": "0.0.0",
   "private": true,
   "type": "module",
   "scripts": {
-    "ready": "vp check && vp run -r test && vp run -r build",
-    "dev": "vp run website#dev",
-    "prepare": "vp config",
-    "pull:uiwebcomponent": "git subtree pull --prefix=packages/uiwebcomponent upstream-uiwebcomponent main --squash",
     "docs:dev": "vitepress dev docs",
     "docs:build": "vitepress build docs",
     "docs:preview": "vitepress preview docs"
   },
   "devDependencies": {
+    "bumpp": "catalog:",
     "oxc-minify": "catalog:",
     "sass": "catalog:",
     "typedoc-vitepress-theme": "catalog:",

@@ -205,6 +205,9 @@ settings:
 
 catalogs:
   default:
+    bumpp:
+      specifier: ^11.1.0
+      version: 11.1.0
     oxc-minify:
       specifier: ^0.138.0
       version: 0.138.0
@@ -238,6 +241,9 @@ importers:
 
   .:
     devDependencies:
+      bumpp:
+        specifier: 'catalog:'
+        version: 11.1.0
       oxc-minify:
         specifier: 'catalog:'
         version: 0.138.0
@@ -344,9 +350,6 @@ importers:
       '@typescript/native-preview':
         specifier: 7.0.0-dev.20260509.2
         version: 7.0.0-dev.20260509.2
-      bumpp:
-        specifier: ^11.1.0
-        version: 11.1.0
       typescript:
         specifier: ^6.0.3
         version: 6.0.3
