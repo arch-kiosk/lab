@@ -23,13 +23,15 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
-docs/.vitepress/dist
-docs/.vitepress/cache
+**/docs/.vitepress/dist
+**/docs/.vitepress/cache
+**/docs/api
+
 
 
 # AI agent worktrees
-.claude/worktrees/
-!.vscode/
+**/.claude/worktrees/
+**/!.vscode/
 
 #environment
 .env.development.local
