@@ -1,6 +1,6 @@
 {
   "name": "@arch-kiosk/appfoundation",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "fundamental building blocks for K67",
   "keywords": [
     "architecture",
@@ -29,16 +29,25 @@
     "access": "public"
   },
   "scripts": {
-    "build": "vp pack",
+    "build": "vp test && vp pack",
     "dev": "vp pack --watch",
     "test": "vp test",
     "check": "vp check",
-    "prepublishOnly": "vp run build"
+    "docs:generate": "typedoc",
+    "docs:dev": "pnpm docs:generate && vitepress dev docs",
+    "docs:build": "vitepress build docs",
+    "prepublishOnly": "vp run build",
+    "bump-ver": "bumpp --no-push --commit \"bumped version to v%s\""
   },
   "devDependencies": {
     "@types/node": "catalog:",
-    "@typescript/native-preview": "catalog:",
+    "bumpp": "catalog:",
+    "typedoc-plugin-markdown": "catalog:",
+    "typedoc-vitepress-theme": "catalog:",
     "typescript": "catalog:",
-    "vite-plus": "catalog:"
+    "vite-plus": "catalog:",
+    "vitepress": "catalog:",
+    "vitepress-sidebar": "catalog:",
+    "vitest": "catalog:"
   }
 }
