@@ -1,6 +1,6 @@
 {
   "name": "@arch-kiosk/appfoundation",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "fundamental building blocks for K67",
   "keywords": [
     "architecture",
@@ -33,6 +33,7 @@
     "dev": "vp pack --watch",
     "test": "vp test",
     "check": "vp check",
+    "rollout": "tsc && pnpm bump-ver && pnpm build",
     "docs:generate": "typedoc",
     "docs:dev": "pnpm docs:generate && vitepress dev docs",
     "docs:build": "vitepress build docs",
