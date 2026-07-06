@@ -1,5 +1,5 @@
 <p float="left">
-  <img src="K67.png" alt="Project Logo" width="128" height="128" align="left" style="margin-right: 20px;">
+  <img alt="image of a Kiosk with a Spider Icon" src="K67.png" alt="Project Logo" width="128" height="128" align="left" style="margin-right: 20px;">
   <h1>Kiosk TypeScript App Foundation</h1>
 </p>
 <p align="left">
