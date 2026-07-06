@@ -26,7 +26,6 @@ dist-ssr
 *.sw?
 
 *.zip
-.env.development.local
 /src/**/*.css
 /src/**/*.css.map
 /public/**/*.css

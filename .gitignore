@@ -30,5 +30,6 @@ docs/.vitepress/cache
 # AI agent worktrees
 .claude/worktrees/
 !.vscode/
-!.vscode/settings.json
-!.vscode/extensions.json
+
+#environment
+.env.development.local
