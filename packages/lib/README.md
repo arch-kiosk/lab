@@ -3,7 +3,5 @@
   <h1>Kiosk TypeScript App Foundation</h1>
 </p>
 <p align="left">
-  A flexible and lightweight foundation for building modern kiosk applications.
-</p>
-
 Foundational library for K67 (the next Kiosk with integrated Recording App)
+</p>
