@@ -16,11 +16,11 @@ test("init plugin manager with hook catalog", async () => {
     title: string
   }
 
-  interface HookCatalog extends BaseEvents {
+  interface EventCatalog extends BaseEvents {
     boot: (appContext: AppContext) => void | Promise<void>
   }
 
-  class TestPlugin extends BasePlugin<AppContext, HookCatalog> {
+  class TestPlugin extends BasePlugin<AppContext, EventCatalog> {
     hasBooted = false
     lastSeenContextValue = ""
 
@@ -28,15 +28,15 @@ test("init plugin manager with hook catalog", async () => {
       super(name)
     }
 
-    register(pluginManager: PluginManager<AppContext, HookCatalog>) {
-      super.register(pluginManager)
-      this.pluginManager?.listen(this, "boot", this.boot)
-    }
-
     public boot = async (appContext: AppContext): Promise<void> => {
       await new Promise((resolve) => setTimeout(resolve, 500))
       this.hasBooted = true
       this.lastSeenContextValue = appContext.title
+    }
+
+    register(pluginManager: PluginManager<AppContext, EventCatalog>) {
+      super.register(pluginManager)
+      this.pluginManager?.listen(this, "boot", this.boot)
     }
   }
 
@@ -45,7 +45,7 @@ test("init plugin manager with hook catalog", async () => {
    ----------- */
 
   const testPlugin = new TestPlugin("test plugin")
-  const pluginManager = createPluginManager<AppContext, HookCatalog>()
+  const pluginManager = createPluginManager<AppContext, EventCatalog>()
   expect(pluginManager, "init plugin manager").toBeDefined()
   pluginManager.registerPlugin(testPlugin)
   expect(testPlugin.handle, "init plugin got handle").toBe(1)
@@ -156,6 +156,7 @@ test("PluginManager - callLastAsynchronous and callLastSynchronous local isolate
     500,
     "oauth-token",
   )
+
   expect(resultFallback).toBe("pluginA-oauth-token")
 
   const syncResult = manager.callLastSynchronous("formatSyncLabel", "standalone-test")
