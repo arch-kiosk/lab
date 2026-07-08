@@ -1,1 +1,5 @@
-export { PluginManager } from "./pluginmanager"
+export { createPluginManager } from "./pluginmanager"
+export type { PluginManager } from "./pluginmanager"
+export { BasePlugin, CorePluginManager } from "./corepluginmanager.ts"
+export type { Plugin, BaseEvents } from "./corepluginmanager.ts"
+export { fireWithTimeouts } from "./strategies"
