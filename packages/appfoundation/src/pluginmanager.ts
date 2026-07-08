@@ -1,6 +1,6 @@
 import { CorePluginManager } from "./corepluginmanager"
 import type { BaseEvents } from "./corepluginmanager"
-import { fireWithTimeouts } from "./strategies"
+import { fire, callMostRecentSync, callMostRecent } from "./strategies"
 
 export interface StandardFireExtensions<AppEvents extends BaseEvents> {
   fireTimeSafe<Name extends keyof AppEvents>(
@@ -8,6 +8,17 @@ export interface StandardFireExtensions<AppEvents extends BaseEvents> {
     timeoutMs: number,
     ...args: Parameters<AppEvents[Name]>
   ): Promise<void>
+
+  callLastAsynchronous<Name extends keyof AppEvents>(
+    name: Name,
+    timeoutMs: number,
+    ...args: Parameters<AppEvents[Name]>
+  ): Promise<ReturnType<AppEvents[Name]>>
+
+  callLastSynchronous<Name extends keyof AppEvents>(
+    name: Name,
+    ...args: Parameters<AppEvents[Name]>
+  ): ReturnType<AppEvents[Name]>
 }
 
 /**
@@ -32,7 +43,11 @@ export function createPluginManager<AppContext, AppEvents extends BaseEvents>():
   const extendedManager = manager as unknown as PluginManager<AppContext, AppEvents>
 
   // Weld the standalone execution strategy from strategies.ts onto the core manager instance
-  extendedManager.fireTimeSafe = fireWithTimeouts
+  extendedManager.fireTimeSafe = fire
+
+  extendedManager.callLastAsynchronous = callMostRecent
+
+  extendedManager.callLastSynchronous = callMostRecentSync
 
   return extendedManager
 }
