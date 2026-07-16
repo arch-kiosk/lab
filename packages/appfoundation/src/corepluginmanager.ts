@@ -1,7 +1,11 @@
-// oxlint-disable-next-line typescript/no-explicit-any
-export type BaseEvents = Record<string, (...args: any[]) => any>
+//corepluginmanager.ts
+/* oxlint-disable typescript/no-explicit-any */
+// export type BaseEvents = Record<string, (...args: any[]) => any>
 
-export interface Plugin<AppContext, AppEvents extends BaseEvents> {
+export interface Plugin<
+  AppContext,
+  AppEvents extends Record<keyof AppEvents, (...args: any[]) => any>,
+> {
   version?: string
   name: string
   handle?: number
@@ -14,14 +18,14 @@ export interface Plugin<AppContext, AppEvents extends BaseEvents> {
 
 export type ListenerTuple<
   AppContext,
-  AppEvents extends BaseEvents,
+  AppEvents extends Record<keyof AppEvents, (...args: any[]) => any>,
   Name extends keyof AppEvents,
 > = [Plugin<AppContext, AppEvents>, AppEvents[Name]]
 
-export abstract class BasePlugin<AppContext, AppEvents extends BaseEvents> implements Plugin<
+export abstract class BasePlugin<
   AppContext,
-  AppEvents
-> {
+  AppEvents extends Record<keyof AppEvents, (...args: any[]) => any>,
+> implements Plugin<AppContext, AppEvents> {
   protected pluginManager?: CorePluginManager<AppContext, AppEvents>
   name: string
   active: boolean
@@ -57,7 +61,10 @@ export abstract class BasePlugin<AppContext, AppEvents extends BaseEvents> imple
 /**
  * The core registry engine.
  */
-export class CorePluginManager<AppContext, AppEvents extends BaseEvents> {
+export class CorePluginManager<
+  AppContext,
+  AppEvents extends Record<keyof AppEvents, (...args: any[]) => any>,
+> {
   readonly #plugins: Array<Plugin<AppContext, AppEvents>> = []
   // oxlint-disable-next-line typescript/no-explicit-any
   readonly #listeners = new Map<keyof AppEvents, Array<[Plugin<AppContext, AppEvents>, any]>>()

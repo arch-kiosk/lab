@@ -22,10 +22,15 @@
   ],
   "type": "module",
   "exports": {
-    ".": "./dist/index.mjs",
+    ".": {
+      "development": "./src/index.ts",
+      "default": "./dist/index.mjs"
+    },
     "./package.json": "./package.json"
   },
   "publishConfig": {
+    "main": "./dist/index.mjs",
+    "types": "./dist/index.d.ts",
     "access": "public"
   },
   "scripts": {

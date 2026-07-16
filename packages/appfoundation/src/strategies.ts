@@ -1,10 +1,15 @@
+// strategies.ts
+/* oxlint-disable typescript/no-explicit-any */
 import { CorePluginManager } from "./corepluginmanager"
-import type { BaseEvents } from "./corepluginmanager"
 
 /**
  * Strategy: Executes all listeners in parallel, isolating each execution with an individual timeout.
  */
-export async function fire<AppContext, AppEvents extends BaseEvents, Name extends keyof AppEvents>(
+export async function fire<
+  AppContext,
+  AppEvents extends Record<keyof AppEvents, (...args: any[]) => any>,
+  Name extends keyof AppEvents,
+>(
   this: CorePluginManager<AppContext, AppEvents>,
   // strictly references the core manager
   eventName: Name,
@@ -35,12 +40,35 @@ export async function fire<AppContext, AppEvents extends BaseEvents, Name extend
 }
 
 /**
+ * Strategy: Executes all listeners synchronously
+ */
+export function fireSync<
+  AppContext,
+  AppEvents extends Record<keyof AppEvents, (...args: any[]) => any>,
+  Name extends keyof AppEvents,
+>(
+  this: CorePluginManager<AppContext, AppEvents>,
+  eventName: Name,
+  ...args: Parameters<AppEvents[Name]>
+): void {
+  const listeners = this.getListenersForEvent(eventName)
+
+  for (const [plugin, handler] of listeners) {
+    try {
+      handler(...args)
+    } catch (e) {
+      console.error(`${plugin.name} caused exception on ${eventName as string}: ${e as string}`)
+    }
+  }
+}
+
+/**
  * Strategy: Asynchronously calls the most recently registered active subscriber with a timeout safety net.
  * Used for events defined in AppEvents that return a Promise.
  */
 export async function callMostRecent<
   AppContext,
-  AppEvents extends BaseEvents,
+  AppEvents extends Record<keyof AppEvents, (...args: any[]) => any>,
   Name extends keyof AppEvents,
 >(
   this: CorePluginManager<AppContext, AppEvents>,
@@ -80,7 +108,7 @@ export async function callMostRecent<
  */
 export function callMostRecentSync<
   AppContext,
-  AppEvents extends BaseEvents,
+  AppEvents extends Record<keyof AppEvents, (...args: any[]) => any>,
   Name extends keyof AppEvents,
 >(
   this: CorePluginManager<AppContext, AppEvents>,

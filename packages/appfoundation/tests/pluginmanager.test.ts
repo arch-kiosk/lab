@@ -1,6 +1,5 @@
 import { expect, test } from "vite-plus/test"
 import { createPluginManager, BasePlugin, type PluginManager } from "../src"
-import type { BaseEvents } from "../src"
 // import {TimeSafeHookLooper} from "../src/pluginmanager.ts";
 
 test("init plugin manager", () => {
@@ -16,7 +15,7 @@ test("init plugin manager with hook catalog", async () => {
     title: string
   }
 
-  interface EventCatalog extends BaseEvents {
+  interface EventCatalog {
     boot: (appContext: AppContext) => void | Promise<void>
   }
 
@@ -73,7 +72,7 @@ test("PluginManager - callLastAsynchronous and callLastSynchronous local isolate
     apiEndpoint: string
   }
 
-  interface FeatureCatalog extends BaseEvents {
+  interface FeatureCatalog {
     calculateAsyncConfig: (key: string) => Promise<string>
     formatSyncLabel: (input: string) => string
   }
@@ -138,7 +137,7 @@ test("PluginManager - callLastAsynchronous and callLastSynchronous local isolate
   manager.activatePlugin(handleB, true)
   manager.activatePlugin(handleSync, true)
 
-  const resultNormal = await manager.callLastAsynchronous(
+  const resultNormal = await manager.callLastAsynchronously(
     "calculateAsyncConfig",
     500,
     "oauth-token",
@@ -146,12 +145,12 @@ test("PluginManager - callLastAsynchronous and callLastSynchronous local isolate
   expect(resultNormal).toBe("pluginB-oauth-token")
 
   await expect(
-    manager.callLastAsynchronous("calculateAsyncConfig", 100, "hang-me"),
+    manager.callLastAsynchronously("calculateAsyncConfig", 100, "hang-me"),
   ).rejects.toThrow(/timed out/)
 
   expect(pluginB.active).toBe(false)
 
-  const resultFallback = await manager.callLastAsynchronous(
+  const resultFallback = await manager.callLastAsynchronously(
     "calculateAsyncConfig",
     500,
     "oauth-token",
@@ -159,6 +158,101 @@ test("PluginManager - callLastAsynchronous and callLastSynchronous local isolate
 
   expect(resultFallback).toBe("pluginA-oauth-token")
 
-  const syncResult = manager.callLastSynchronous("formatSyncLabel", "standalone-test")
+  const syncResult = manager.callLastSynchronously("formatSyncLabel", "standalone-test")
   expect(syncResult).toBe("STANDALONE-TEST")
+})
+
+//     This test was AI generated
+test("PluginManager - fireSynchronously execution, isolation, and state boundaries", () => {
+  /* ---------
+     set up
+     ----------- */
+  interface AppContext {
+    env: "test"
+  }
+
+  interface LogCatalog {
+    logInfo: (message: string) => void
+  }
+
+  type LocalPluginManager = PluginManager<AppContext, LogCatalog>
+
+  const executionTrace: string[] = []
+
+  class NormalLogger extends BasePlugin<AppContext, LogCatalog> {
+    constructor(name: string) {
+      super(name)
+    }
+
+    register(pm: LocalPluginManager) {
+      super.register(pm)
+      this.pluginManager?.listen(this, "logInfo", (message) => {
+        executionTrace.push(`${this.name}:${message}`)
+      })
+    }
+  }
+
+  class CrashingLogger extends BasePlugin<AppContext, LogCatalog> {
+    constructor(name: string) {
+      super(name)
+    }
+
+    register(pm: LocalPluginManager) {
+      super.register(pm)
+      this.pluginManager?.listen(this, "logInfo", (message) => {
+        executionTrace.push(`${this.name}:crash-attempt`)
+        throw new Error("Deliberate simulation crash")
+      })
+    }
+  }
+
+  /* ---------
+     test
+     ----------- */
+  const manager = createPluginManager<AppContext, LogCatalog>()
+
+  const firstLogger = new NormalLogger("Logger-1")
+  const badLogger = new CrashingLogger("Logger-Buggy")
+  const secondLogger = new NormalLogger("Logger-2")
+
+  const h1 = manager.registerPlugin(firstLogger)
+  const h2 = manager.registerPlugin(badLogger)
+  const h3 = manager.registerPlugin(secondLogger)
+
+  // --- Scenario 1: No active plugins should execute ---
+  manager.fireSynchronously("logInfo", "hello")
+  expect(executionTrace.length).toBe(0)
+
+  // --- Scenario 2: Active plugins execute sequentially ---
+  manager.activatePlugin(h1, true)
+  manager.activatePlugin(h3, true)
+
+  manager.fireSynchronously("logInfo", "active-run")
+  expect(executionTrace).toEqual(["Logger-1:active-run", "Logger-2:active-run"])
+
+  // Clear trace for next run
+  executionTrace.length = 0
+
+  // --- Scenario 3: Error Isolation ---
+  // Activate the buggy logger between the two healthy loggers
+  manager.activatePlugin(h2, true)
+
+  // Temporarily suppress console.error output in Jest/Vitest for clean test logs
+  const originalConsoleError = console.error
+  console.error = () => {}
+
+  try {
+    // Should run 1st logger, swallow 2nd logger's error safely, then run 3rd logger
+    expect(() => {
+      manager.fireSynchronously("logInfo", "unsafe-run")
+    }).not.toThrow()
+
+    expect(executionTrace).toEqual([
+      "Logger-1:unsafe-run",
+      "Logger-Buggy:crash-attempt",
+      "Logger-2:unsafe-run",
+    ])
+  } finally {
+    console.error = originalConsoleError
+  }
 })

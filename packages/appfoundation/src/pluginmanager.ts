@@ -1,43 +1,50 @@
+//pluginmanager.ts
+/* oxlint-disable typescript/no-explicit-any */
 import { CorePluginManager } from "./corepluginmanager"
-import type { BaseEvents } from "./corepluginmanager"
-import { fire, callMostRecentSync, callMostRecent } from "./strategies"
+import { fire, callMostRecentSync, callMostRecent, fireSync } from "./strategies"
 
-export interface StandardFireExtensions<AppEvents extends BaseEvents> {
+export interface StandardFireExtensions<
+  AppEvents extends Record<keyof AppEvents, (...args: any[]) => any>,
+> {
   fireTimeSafe<Name extends keyof AppEvents>(
     name: Name,
     timeoutMs: number,
     ...args: Parameters<AppEvents[Name]>
   ): Promise<void>
 
-  callLastAsynchronous<Name extends keyof AppEvents>(
+  callLastAsynchronously<Name extends keyof AppEvents>(
     name: Name,
     timeoutMs: number,
     ...args: Parameters<AppEvents[Name]>
   ): Promise<ReturnType<AppEvents[Name]>>
 
-  callLastSynchronous<Name extends keyof AppEvents>(
+  callLastSynchronously<Name extends keyof AppEvents>(
     name: Name,
     ...args: Parameters<AppEvents[Name]>
   ): ReturnType<AppEvents[Name]>
+
+  fireSynchronously<Name extends keyof AppEvents>(
+    name: Name,
+    ...args: Parameters<AppEvents[Name]>
+  ): void
 }
 
 /**
  * The standard, full-featured platform manager variant for everyday use.
  */
-export type PluginManager<AppContext, AppEvents extends BaseEvents> = CorePluginManager<
+export type PluginManager<
   AppContext,
-  AppEvents
-> &
-  StandardFireExtensions<AppEvents>
+  AppEvents extends Record<keyof AppEvents, (...args: any[]) => any>,
+> = CorePluginManager<AppContext, AppEvents> & StandardFireExtensions<AppEvents>
 
 /**
  * THE EVERYDAY GRAFTER FACTORY
  * Automatically instantiates a Core registry and welds the standard strategies onto it.
  */
-export function createPluginManager<AppContext, AppEvents extends BaseEvents>(): PluginManager<
+export function createPluginManager<
   AppContext,
-  AppEvents
-> {
+  AppEvents extends Record<keyof AppEvents, (...args: any[]) => any>,
+>(): PluginManager<AppContext, AppEvents> {
   const manager = new CorePluginManager<AppContext, AppEvents>()
 
   const extendedManager = manager as unknown as PluginManager<AppContext, AppEvents>
@@ -45,9 +52,11 @@ export function createPluginManager<AppContext, AppEvents extends BaseEvents>():
   // Weld the standalone execution strategy from strategies.ts onto the core manager instance
   extendedManager.fireTimeSafe = fire
 
-  extendedManager.callLastAsynchronous = callMostRecent
+  extendedManager.fireSynchronously = fireSync
 
-  extendedManager.callLastSynchronous = callMostRecentSync
+  extendedManager.callLastAsynchronously = callMostRecent
+
+  extendedManager.callLastSynchronously = callMostRecentSync
 
   return extendedManager
 }
