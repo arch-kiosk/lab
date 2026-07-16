@@ -8,9 +8,6 @@
     "docs:build": "vitepress build docs",
     "docs:preview": "vitepress preview docs"
   },
-  "dependencies": {
-    "pino": "catalog:"
-  },
   "devDependencies": {
     "bumpp": "catalog:",
     "oxc-minify": "catalog:",

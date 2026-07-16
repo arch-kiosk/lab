@@ -46,7 +46,6 @@
     "bump-ver": "bumpp --no-push --commit \"bumped version to v%s\""
   },
   "dependencies": {
-    "hookable": "catalog:"
   },
   "devDependencies": {
     "@types/node": "catalog:",
