@@ -1,6 +1,6 @@
-import { UIElement } from "./uielement"
+import { UIElement } from "#src/uielement"
 import { nothing, html } from "lit"
-import { UIElementRenderContext } from "../uielementrendercontext"
+import { UIElementRenderContext } from "#src/uielementrendercontext"
 
 export class UIElementBoolField extends UIElement {
   static renderLabel(context: UIElementRenderContext, id: string, text: string) {

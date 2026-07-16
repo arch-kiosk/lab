@@ -1,6 +1,6 @@
-import { ApiTimeZoneInfo, UISchemaUIElementType } from "../uischema"
+import { ApiTimeZoneInfo, UISchemaUIElementType } from "#src/uischema"
 import { html, TemplateResult } from "lit"
-import { UIElementRenderContext } from "../uielementrendercontext"
+import { UIElementRenderContext } from "#src/uielementrendercontext"
 
 export class UIElement {
   // eslint-disable-next-line typescript/no-explicit-any

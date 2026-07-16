@@ -1,7 +1,7 @@
-import { UIElement } from "./uielement"
+import { UIElement } from "#src/uielement"
 import { nothing, html } from "lit"
-import { UIElementRenderContext } from "../uielementrendercontext"
-import { UISchemaFile } from "../uischema"
+import { UIElementRenderContext } from "#src/uielementrendercontext"
+import { UISchemaFile } from "#src/uischema"
 
 export class UIElementFile extends UIElement {
   static renderLabel(context: UIElementRenderContext, id: string, text: string) {

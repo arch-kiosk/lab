@@ -1,10 +1,10 @@
-import { UIElement } from "./uielement"
-import { UIElementRenderContext } from "../uielementrendercontext"
+import { UIElement } from "#src/uielement"
+import { UIElementRenderContext } from "#src/uielementrendercontext"
 // import {html} from "lit/static-html.js";
 import { nothing, html } from "lit"
 import { DateTime } from "luxon"
-import { UISchemaDateTimeField } from "../uischema"
-import { getLatinDate } from "../tools"
+import { UISchemaDateTimeField } from "#src/uischema"
+import { getLatinDate } from "#src/tools"
 
 export class UIElementDateField extends UIElement {
   static renderLabel(context: UIElementRenderContext, id: string, text: string) {

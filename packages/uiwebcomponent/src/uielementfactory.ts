@@ -1,4 +1,4 @@
-import { UIElement } from "./uielements/uielement"
+import { UIElement } from "./uielement"
 
 export interface UIElementFactory {
   getUIElementClass(elementTypeName: string): typeof UIElement
@@ -13,7 +13,7 @@ export class UIConfigurableElementFactory implements UIElementFactory {
   getUIElementClass(elementTypeName: string): typeof UIElement {
     const elementClass = this._elementClasses[elementTypeName.toLowerCase()]
     if (!elementClass)
-      throw `UIConfigurableElementFactory.getUIElementClass: no element class for ${elementTypeName}`
+      throw `UIConfigurableElementFactory.getUIElementClass: no element class for ${elementTypeName.toLowerCase()}`
 
     return elementClass
   }

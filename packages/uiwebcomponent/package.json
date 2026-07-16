@@ -15,9 +15,12 @@
       "import": "./dist/uicomponent.js"
     }
   },
+  "imports": {
+    "#src/*": "./src/*"
+  },
   "scripts": {
     "check types": "tsc",
-    "dev": "vp dev -- --host 127.0.0.1",
+    "dev": "vp dev -- --force --host 127.0.0.1",
     "build-only": "tsc && vp build",
     "bump-ver": "bumpp --no-push --commit \"bumped version to v%s\"",
     "rollout": "tsc && pnpm bump-ver && vp build && npm pack --pack-destination .\\dist",
@@ -28,11 +31,13 @@
     "docs:preview": "vitepress preview docs"
   },
   "dependencies": {
-    "@vaadin/combo-box": "^24.3.10",
-    "@vaadin/date-picker": "^24.3.10",
-    "@vaadin/date-time-picker": "^24.3.10",
+    "@arch-kiosk/appfoundation": "workspace:*",
+    "@vaadin/combo-box": "^25.2.4",
+    "@vaadin/date-picker": "^25.2.4",
+    "@vaadin/date-time-picker": "^25.2.4",
     "lit": "^3.3.3",
-    "luxon": "^3.7.2"
+    "luxon": "^3.7.2",
+    "pino": "catalog:"
   },
   "devDependencies": {
     "@babel/core": "^7.29.7",

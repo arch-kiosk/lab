@@ -1,7 +1,7 @@
-import { UIElement } from "./uielement"
+import { UIElement } from "#src/uielement"
 import { nothing, html } from "lit"
-import { UISchemaButton, UISchemaUIElementType } from "../uischema"
-import { UIElementRenderContext } from "../uielementrendercontext"
+import { UISchemaButton, UISchemaUIElementType } from "#src/uischema"
+import { UIElementRenderContext } from "#src/uielementrendercontext"
 
 export class UIElementButton extends UIElement {
   static defaultAction(element: UISchemaUIElementType): string | undefined {

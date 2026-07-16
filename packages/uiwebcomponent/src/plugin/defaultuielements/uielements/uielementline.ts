@@ -1,9 +1,9 @@
-import { UIElement } from "./uielement"
-import { UIElementRenderContext } from "../uielementrendercontext"
+import { UIElement } from "#src/uielement"
+import { UIElementRenderContext } from "#src/uielementrendercontext"
 
 // import {html} from "lit/static-html.js";
 import { html, nothing } from "lit"
-import { UISchemaLine } from "../uischema"
+import { UISchemaLine } from "#src/uischema"
 
 export class UIElementLine extends UIElement {
   // line needs a different way of dealing with the defaultElementVisibility

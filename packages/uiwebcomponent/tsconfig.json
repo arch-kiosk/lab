@@ -3,7 +3,12 @@
     "target": "esnext",
     "sourceMap": true,
     "module": "esnext",
-    "lib": ["esnext", "DOM", "DOM.Iterable"],
+    "moduleResolution": "Bundler",
+    "lib": [
+      "esnext",
+      "DOM",
+      "DOM.Iterable"
+    ],
     //    "declaration": false,
     //    "emitDeclarationOnly": true,
     //    "outDir": "./types",
@@ -19,9 +24,26 @@
     "forceConsistentCasingInFileNames": true,
     "useDefineForClassFields": false,
     "skipLibCheck": true,
-    "types": ["vite-plus/client"]
+    "types": [
+      "vite-plus/client"
+    ],
+    "paths": {
+      "@arch-kiosk/appfoundation": ["../appfoundation/src/index.ts"],
+      "#src/*": ["./src/*"]
+    }
   },
-  "include": ["src/**/*.ts"],
-  "exclude": ["node_modules", "dist", "old"],
-  "references": [{ "path": "./tsconfig.node.json" }]
+  "include": [
+    "src/**/*.ts"
+  ],
+  "exclude": [
+    "node_modules",
+    "dist",
+    "old"
+  ],
+  "references": [
+    {
+      "path": "./tsconfig.node.json"
+    }
+  ]
 }
+

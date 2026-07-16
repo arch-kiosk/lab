@@ -1,10 +1,10 @@
-import { UIElement } from "./uielement"
-import { UIElementRenderContext } from "../uielementrendercontext"
+import { UIElement } from "#src/uielement"
+import { UIElementRenderContext } from "#src/uielementrendercontext"
 
 import { nothing, html } from "lit"
 import { DateTime } from "luxon"
-import { ApiTimeZoneInfo, UISchemaDateTimeField } from "../uischema"
-import { getLatinDate } from "../tools"
+import { ApiTimeZoneInfo, UISchemaDateTimeField } from "#src/uischema"
+import { getLatinDate } from "#src/tools"
 // import {computePosition} from "@floating-ui/dom";
 
 export class UIElementDateTimeField extends UIElement {

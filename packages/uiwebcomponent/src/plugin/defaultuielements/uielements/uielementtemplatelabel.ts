@@ -1,5 +1,5 @@
-import { UIElement } from "./uielement"
-import { UIElementRenderContext } from "../uielementrendercontext"
+import { UIElement } from "#src/uielement"
+import { UIElementRenderContext } from "#src/uielementrendercontext"
 
 // import {html} from "lit/static-html.js";
 import { nothing, html } from "lit"

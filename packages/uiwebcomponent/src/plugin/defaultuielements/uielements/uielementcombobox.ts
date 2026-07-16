@@ -1,9 +1,9 @@
-import { UIElement } from "./uielement"
-import { replaceData } from "../tools"
+import { UIElement } from "#src/uielement"
+import { replaceData } from "#src/tools"
 // import {html} from "lit/static-html.js";
 import { nothing, html } from "lit"
-import { Dictionary, UISchemaComboBox } from "../uischema"
-import { UIElementRenderContext } from "../uielementrendercontext"
+import { Dictionary, UISchemaComboBox } from "#src/uischema"
+import { UIElementRenderContext } from "#src/uielementrendercontext"
 
 export class UIElementComboBox extends UIElement {
   static renderLabel(context: UIElementRenderContext, id: string, text: string) {

@@ -11,6 +11,17 @@ export default defineConfig(({ command, mode }) => {
   const _a = mode || null // just suppressing a linter error until mode is used
 
   return {
+    optimizeDeps: {
+      // noDiscovery: true,
+      // Force these packages to be bundled together as a single entry
+
+      // exclude: [
+      //   '@vaadin/field-base',
+      //   '@vaadin/combo-box',
+      //   '@vaadin/date-picker',
+      //   '@vaadin/date-time-picker',
+      // ]
+    },
     build: {
       copyPublicDir: false,
       outDir: "./dist",

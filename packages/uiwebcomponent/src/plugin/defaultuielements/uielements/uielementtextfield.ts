@@ -1,7 +1,7 @@
-import { UIElement } from "./uielement"
+import { UIElement } from "#src/uielement"
 import { nothing, html } from "lit"
-import { UISchemaTexTField } from "../uischema"
-import { UIElementRenderContext } from "../uielementrendercontext"
+import { UISchemaTexTField } from "#src/uischema"
+import { UIElementRenderContext } from "#src/uielementrendercontext"
 
 export class UIElementTextField extends UIElement {
   static renderLabel(context: UIElementRenderContext, id: string, text: string) {

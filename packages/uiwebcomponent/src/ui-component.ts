@@ -6,10 +6,11 @@ import "@vaadin/date-picker"
 import "@vaadin/date-time-picker"
 import "@vaadin/combo-box"
 import "./fileview"
+import bootPluginManager from "./boot"
 
 // @ts-ignore
 import local_css from "./styles/ui-component.sass?inline"
-import { UIElementFactory } from "./uielementfactory"
+import {UIConfigurableElementFactory} from "./uielementfactory"
 
 import {
   UISchema,
@@ -43,8 +44,10 @@ import {
   UIGalleryLayoutClass,
 } from "./layoutclasses"
 import { UIElementRenderContext, UILayoutRenderContext } from "./uielementrendercontext"
-import { UIDefaultElementFactory } from "./uidefaultelementfactory"
 import { ComboBox, ComboBoxFilterChangedEvent } from "@vaadin/combo-box"
+import {type AppContext, type EventCatalog} from "#src/apptypes";
+import {PluginManager} from "@arch-kiosk/appfoundation";
+
 
 @customElement("ui-component")
 export class UIComponent extends LitElement {
@@ -55,9 +58,12 @@ export class UIComponent extends LitElement {
   _element_list: { [key: string]: UISchemaUIElement } = {}
   _selection_data: { [key: string]: { [key: string]: string } } = {}
 
+  @state()
+  private pluginManager?: PluginManager<AppContext, EventCatalog>
+
   // changed this to @state and private for typedoc. I don't think the factory should be set from the outside.
   @state()
-  private uiElementFactory: UIElementFactory | null = new UIDefaultElementFactory()
+  private uiElementFactory?: UIConfigurableElementFactory
 
   @property()
   uiSchema: UISchema | null = null
@@ -98,6 +104,17 @@ export class UIComponent extends LitElement {
     super()
     this._messages = {}
     // this.addEventListener('click', (e) => console.log(e), {capture: true});
+  }
+
+  override async connectedCallback() {
+    console.info(`connectedCallback`)
+    super.connectedCallback()
+    try {
+      this.pluginManager = await bootPluginManager()
+      console.info(`plugin Manager has booted!`)
+    } catch (e) {
+      console.error(`ui-component could not boot the PluginManager: ${e as string}`)
+    }
   }
 
   protected willUpdate(_changedProperties: PropertyValues) {
@@ -440,12 +457,12 @@ export class UIComponent extends LitElement {
    * @param layouter
    */
   private renderUIElement(id: string, entry: UISchemaUIElement, layouter: UILayoutClass) {
+
     try {
       if (!this.uiElementFactory) {
-        // noinspection ExceptionCaughtLocallyJS
-        throw `UIComponent.renderUIElement: no elementFactory to instantiate ${entry.element_type.name}`
+        this.uiElementFactory = new UIConfigurableElementFactory()
+        this.pluginManager?.fireSynchronously("registerUIElements", this.uiElementFactory)
       }
-
       const renderContext = new UIElementRenderContext(this, entry, layouter, this.data)
       const uiElementClass = this.uiElementFactory.getUIElementClass(entry.element_type.name)
       renderContext.entry.element_type.readonly =
@@ -535,6 +552,9 @@ export class UIComponent extends LitElement {
 
   render() {
     // noinspection JSMismatchedCollectionQueryUpdate
+    if (!this.pluginManager) {
+      return html`<div>booting.../div>`
+    }
     const itemTemplates: TemplateResult[] = []
     let layoutClass
     if (this.showDevelopmentInfo)
