@@ -20,7 +20,6 @@ catalog:
   oxc-minify: ^0.138.0
   bumpp: ^11.1.0
   vite-plugin-dts: ^5.0.3
-  hookable: ^6.1.1
   pino: ^10.3.1
 overrides:
   vite: "catalog:"

@@ -5,9 +5,6 @@ export default defineConfig({
   run: {
     cache: true,
   },
-  staged: {
-    "*": "vp check --no-lint --fix",
-  },
   fmt: {
     semi: false,
   },

@@ -9,7 +9,6 @@
     "docs:preview": "vitepress preview docs"
   },
   "dependencies": {
-    "hookable": "catalog:",
     "pino": "catalog:"
   },
   "devDependencies": {

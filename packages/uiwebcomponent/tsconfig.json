@@ -27,6 +27,7 @@
     "types": [
       "vite-plus/client"
     ],
+    "baseUrl": ".",
     "paths": {
       "@arch-kiosk/appfoundation": ["../appfoundation/src/index.ts"],
       "#src/*": ["./src/*"]
