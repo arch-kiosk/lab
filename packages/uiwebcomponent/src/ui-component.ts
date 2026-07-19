@@ -109,6 +109,8 @@ export class UIComponent extends LitElement {
   override async connectedCallback() {
     console.info(`connectedCallback`)
     super.connectedCallback()
+
+
     try {
       this.pluginManager = await bootPluginManager()
       console.info(`plugin Manager has booted!`)

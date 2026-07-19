@@ -24,6 +24,8 @@
     "forceConsistentCasingInFileNames": true,
     "useDefineForClassFields": false,
     "skipLibCheck": true,
+    "allowJs": true,
+    "checkJs": true,
     "types": [
       "vite-plus/client"
     ],
@@ -33,17 +35,17 @@
     }
   },
   "include": [
-    "src/**/*.ts"
+    "src/**/*.ts", "bootkiosklogger.js"
   ],
   "exclude": [
     "node_modules",
     "dist",
     "old"
   ],
-  "references": [
-    {
-      "path": "./tsconfig.node.json"
-    }
-  ]
+//  "references": [
+//    {
+//      "path": "./tsconfig.node.json"
+//    }
+//  ]
 }
 
