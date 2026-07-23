@@ -1,7 +1,7 @@
 import pino, { type Logger, type Level, type LogEvent } from 'pino'
 import { KioskLogWriter } from './kiosklogwriters'
 
-export interface ConsoleBackup {
+interface ConsoleBackup {
     log: typeof console.log
     info: typeof console.info
     warn: typeof console.warn
@@ -17,8 +17,9 @@ const ORIGINAL_CONSOLE: ConsoleBackup = {
 }
 
 /**
- * Sanitizes an array of raw log arguments into pure JSON-safe primitives or structural clones.
- * Prevents DataCloneError exceptions in storage engines caused by DOM nodes, functions, or circular structures.
+ * Gemini: Sanitizes an array of raw log arguments into pure JSON-safe primitives or structural clones.
+ *          Prevents DataCloneError exceptions in storage engines caused by DOM nodes, functions, or circular structures.
+ *
  */
 export function sanitizeLogPayload(args: unknown[]): unknown[] {
     return args.map(arg => {
@@ -38,14 +39,21 @@ export function sanitizeLogPayload(args: unknown[]): unknown[] {
 }
 
 /**
- * KioskLogger class
- *
+ * Central Kiosk Logger class that routes logs to pino.
+ * This needs a KioskLogWriter instance which consumes the logs and outputs them.
+ * The KioskLogWriter also decides if the console gets hijacked.
+ * However, it is KioskLogger that allows you to restore the original console.
  */
 export class KioskLogger {
     private writer: KioskLogWriter
     private readonly pino: Logger
     public readonly originalConsole = ORIGINAL_CONSOLE
 
+    /**
+     * Creates a KioskLogger instance
+     * @param writer - An instance of a KioskLogWriter subclass
+     * @param logLevel - the severity of loglines that get logged. Logs with levels below this one get swallowed.
+     */
     constructor(writer: KioskLogWriter, logLevel: Level = 'info') {
         this.writer = writer
 
@@ -70,7 +78,7 @@ export class KioskLogger {
     }
 
     /**
-     * Replace the global console object methods with our Pino wrapper
+     * Reroutes console.log/info/warn etc. to the according methods of this
      */
     hijackConsole(): ConsoleBackup {
         /* eslint-disable @typescript-eslint/no-explicit-any */
@@ -94,54 +102,45 @@ export class KioskLogger {
         console.debug = this.originalConsole.debug.bind(console)
     }
 
+    /**
+     * works like console.log
+     * @param args
+     */
     log(...args: unknown[]) {
         // @ts-expect-error: Pino overloads prevent spreading generic any[]
         this.pino.info(...args)
     }
+    /**
+     * works like console.info
+     * @param args
+     */
     info(...args: unknown[]) {
         // @ts-expect-error: Pino overloads prevent spreading generic any[]
         this.pino.info(...args)
     }
+    /**
+     * works like console.error
+     * @param args
+     */
     error(...args: unknown[]) {
         // @ts-expect-error: Pino overloads prevent spreading generic any[]
         this.pino.error(...args)
     }
+    /**
+     * works like console.warn
+     * @param args
+     */
     warn(...args: unknown[]) {
         // @ts-expect-error: Pino overloads prevent spreading generic any[]
         this.pino.warn(...args)
     }
+    /**
+     * works like console.debug
+     * @param args
+     */
     debug(...args: unknown[]) {
         // @ts-expect-error: Pino overloads prevent spreading generic any[]
         this.pino.debug(...args)
     }
 
-    // /**
-    //  * Internal parser to transform raw console arguments for Pino compatibility
-    //  */
-    // // oxlint-disable-next-line typescript/no-explicit-any
-    // private _route(level: string, args: any[]) {
-    //     // try {
-    //         const logMethod = {
-    //             "info": this.pino.info.bind(this.pino),
-    //             "log": this.pino.info.bind(this.pino),
-    //             "error": this.pino.error.bind(this.pino),
-    //             "warn": this.pino.warn.bind(this.pino),
-    //             "debug": this.pino.debug.bind(this.pino),
-    //         }[level]
-    //         if (typeof logMethod !== 'function') return;
-    //
-    //         const cleanStrings = args.map(arg => {
-    //             if (typeof arg !== 'object' || arg === null) return String(arg);
-    //             try {
-    //                 return JSON.stringify(arg);
-    //             } catch {
-    //                 return '[KioskLogger: Unserializable Object]';
-    //             }
-    //         });
-    //         logMethod(cleanStrings.join(' '));
-    //
-    //     // } catch (e) {
-    //     //     ORIGINAL_CONSOLE.error('[KioskLogger] Hard failure in routing pipeline', e);
-    //     // }
-    // }
 }

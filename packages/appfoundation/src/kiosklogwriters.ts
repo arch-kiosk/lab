@@ -3,7 +3,8 @@ import {type LogEvent } from "pino"
 import {KioskLogger, sanitizeLogPayload} from "./kiosklogger"
 import Dexie from "dexie";
 /**
- * Base class for Kiosk writers.
+ * Base class for Kiosk writers. By default this makes sure that all log writers intercept console.log.
+ * Override setKioskLogger if you don't want that for a specific log writers.
  */
 export abstract class KioskLogWriter
 {
@@ -20,10 +21,9 @@ export abstract class KioskLogWriter
 }
 
 /**
- * Writer 1: Pipes logs straight back to the browser's original console.
+ * KioskConsoleLogWriter: Pipes logs straight back to the browser's original console.
  */
 export class KioskConsoleLogWriter extends KioskLogWriter {
-
 
     async write(logEvent: LogEvent): Promise<void> {
         if (!this.kioskLogger) return
@@ -59,11 +59,12 @@ export class KioskConsoleLogWriter extends KioskLogWriter {
         logFn(...outputArgs)
     }
 }
-/**
- * Writer 2: Saves structured JSON logs directly into IndexedDB.
- */
 
-interface KioskLogRecord {
+/**
+ * The interface for the log records in the IndexedDb database
+ *
+ */
+export interface KioskLogRecord {
     id?: number
     level: number
     levelLabel: string
@@ -73,12 +74,18 @@ interface KioskLogRecord {
 }
 
 /**
- * Writer 2: Saves structured JSON logs directly into IndexedDB via Dexie.
+ * KioskIndexedDbLogWriter: Saves structured JSON logs directly into IndexedDB via Dexie.
+ * By default, this is using "kiosk-logs-db" and the store "logs"
  */
 export class KioskIndexedDbLogWriter extends KioskLogWriter {
     private readonly storeName: string
     private db: Dexie
 
+    /**
+     * create a KioskLogWriter that writes logs to IndexedDb
+     * @param dbName - the name of the IndexedDb database
+     * @param storeName _ the name of the store
+     */
     constructor(dbName = 'kiosk-logs-db', storeName = 'logs') {
         super()
         this.storeName = storeName
