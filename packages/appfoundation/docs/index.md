@@ -6,8 +6,8 @@ hero:
   text: "Foundational Library for K67 Apps"
   tagline: "@arch-kiosk/appfoundation"
   image:
-    src: /assets/K67.png
-    alt: "Project Logo"
+    src: K67.png
+    alt: "K67 Project Logo"
   actions:
     - theme: brand
       text: "Get Started"
