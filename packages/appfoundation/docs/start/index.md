@@ -9,3 +9,4 @@ editLink: true
 # package overview
 
 - [type-safe plugin manager](packages/pluginmanager.md)
+- [Kiosk logger](packages/kiosklogger.md)

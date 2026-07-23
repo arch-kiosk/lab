@@ -4,6 +4,23 @@ export default defineConfig({
   title: "appfoundation",
   base: "/lab/packages/appfoundation",
   description: "Foundational Libraray for K67 Apps",
+  head: [
+    [
+      'link',
+      { rel: 'preconnect', href: 'https://fonts.googleapis.com' }
+    ],
+    [
+      'link',
+      { rel: 'preconnect', href: 'https://fonts.gstatic.com', crossorigin: '' }
+    ],
+    [
+      'link',
+      {
+        rel: 'stylesheet',
+        href: 'https://fonts.googleapis.com/css2?family=Kumbh+Sans:wght@100..900&display=swap'
+      }
+    ]
+  ],
   themeConfig: {
     logo: "/assets/kiosk_spider.svg",
     nav: [

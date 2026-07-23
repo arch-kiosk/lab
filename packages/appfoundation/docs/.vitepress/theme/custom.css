@@ -1,0 +1,16 @@
+:root {
+    --vp-home-hero-name-color: transparent;
+    --vp-home-hero-name-background: -webkit-linear-gradient(120deg, #A4C700, #698B00);
+    --vp-c-brand-1: #698B00;
+    --vp-c-brand-2: #A4C700;
+    --vp-button-brand-bg:#698B00;
+    /* Apply Kumbh Sans across the entire site */
+}
+.VPHero .name {
+    font-family: 'Kumbh Sans', sans-serif;
+    font-weight: 900;
+}
+.VPHero .text {
+    font-family: 'Kumbh Sans', sans-serif;
+    font-weight: 600;
+}
