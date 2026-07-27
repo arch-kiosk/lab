@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="/defaults.css" />
+<!--    <script type="module" src="src/virtualizer-lab.ts"></script>-->
+    <script type="module" src="src/tanstack-virtualizer-lab.ts"></script>
+
+    <title>Virtualizer Lab</title>
+  </head>
+  <body>
+      <virtualizer-lab id="virtualizer-lab"></virtualizer-lab>
+  </body>
+  <script type="module">
+    import {DataProvider, FifoEvictionStrategy} from "/src/tanstack-virtualizer-lab.ts"
+      await customElements.whenDefined('virtualizer-lab')
+      console.log("defined")
+      const ui = document.getElementById("virtualizer-lab")
+      ui.setDataProvider(new DataProvider(), new FifoEvictionStrategy(4))
+  </script>
+</html>

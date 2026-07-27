@@ -9,7 +9,8 @@ clean code with a priority on readability,
 modularity, 
 avoid coupling,
 keep responsibilities focused,
-consider Inversion of Control to achieve this.
+consider Inversion of Control to achieve this,
+don't use semicolons and avoid constructs that require them like leading brackets.
 
 The software architecture is:
 TypeScript,

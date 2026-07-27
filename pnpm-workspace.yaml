@@ -22,6 +22,10 @@ catalog:
   vite-plugin-dts: ^5.0.3
   pino: ^10.3.1
   dexie: ^4.4.4
+  '@lit-labs/virtualizer': ^2.1.1
+  delay: ^7.0.0
+  '@tanstack/lit-virtual': ^3.13.35
+  '@tanstack/virtual-core': ^3.17.6
 overrides:
   vite: "catalog:"
   vitest: "catalog:"
@@ -37,3 +41,5 @@ allowBuilds:
   "@vaadin/vaadin-usage-statistics": false
 patchedDependencies:
   '@vaadin/vaadin-usage-statistics': patches/@vaadin__vaadin-usage-statistics.patch
+minimumReleaseAgeExclude:
+  - sass@1.101.7

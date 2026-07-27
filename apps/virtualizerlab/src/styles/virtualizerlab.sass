@@ -1,0 +1,56 @@
+html, body
+  margin: 0
+  padding: 0
+  height: 100vh
+  overflow: hidden
+:host
+  display: block
+  height: 100vh
+  width: 100%
+  overflow: hidden
+.dev-row-count
+  width: 5em
+  //height: 2em
+  font-size: 12px
+  padding: 5px
+  position: absolute
+  right: 2em
+  top: -2px
+  z-index: 1
+  font-family: var(--standard-text-font)
+
+
+  background: #FFEEAA
+  color: black
+lit-virtualizer
+  max-height: 100vh
+
+@keyframes skWave
+  100%
+    transform: translateX(100%)
+
+.sk-wave
+  width: 220px
+  display: flex
+  flex-direction: column
+  gap: 10px
+
+  &-bar
+    height: 12px
+    border-radius: 6px
+    background: #b0b0af
+    position: relative
+    overflow: hidden
+
+    &::after
+      content: ""
+      position: absolute
+      inset: 0
+      background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.55) 50%, transparent 100%)
+      transform: translateX(-100%)
+      animation: skWave .9s linear infinite
+
+@media (prefers-reduced-motion: reduce)
+  .sk-wave,
+  .sk-wave *
+    animation: none !important

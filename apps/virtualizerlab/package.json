@@ -1,0 +1,41 @@
+{
+  "name": "@arch-kiosk/virtualizerlab",
+  "version": "1.0.0-local",
+  "private": true,
+  "files": [
+    "./dist"
+  ],
+  "type": "module",
+  "main": "./dist/uicomponent.js",
+  "module": "./dist/uicomponent.js",
+  "types": "./dist/uicomponent.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/uicomponent.d.ts",
+      "import": "./dist/uicomponent.js"
+    }
+  },
+  "imports": {
+    "#src/*": "./src/*"
+  },
+  "scripts": {
+    "check types": "tsc",
+    "dev": "vp dev -- --force --host 127.0.0.1",
+    "build-only": "tsc && vp build"
+  },
+  "dependencies": {
+    "@lit-labs/virtualizer": "catalog:",
+    "@tanstack/lit-virtual": "catalog:",
+    "@tanstack/virtual-core": "catalog:",
+    "delay": "catalog:",
+    "lit": "^3.3.3"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.29.7",
+    "@babel/preset-env": "^7.29.7",
+    "sass": "^1.101.7",
+    "ts-node": "^10.9.2",
+    "vite": "catalog:",
+    "vite-plus": "catalog:"
+  }
+}

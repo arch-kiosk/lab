@@ -35,3 +35,4 @@ dist-ssr
 
 #environment
 .env.development.local
+**/public/fontawe*

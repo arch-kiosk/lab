@@ -1,0 +1,63 @@
+html, body
+  margin: 0
+  padding: 0
+  height: 100vh
+  overflow: hidden
+
+:host
+  display: block
+  height: 100vh
+  width: 100%
+  position: relative
+#dev-row-count
+  width: 5em
+  //height: 2em
+  font-size: 12px
+  padding: 5px
+  position: absolute
+  right: 2em
+  top: -2px
+  z-index: 1
+  font-family: var(--standard-text-font)
+
+
+  background: #FFEEAA
+  color: black
+
+lit-virtualizer
+  max-height: 100vh
+
+.scroll-container
+  height: 100%
+  width: 100%
+  overflow-y: auto
+
+.scroll-track
+  width: 100%
+  position: relative
+
+.virtual-row
+  position: absolute
+  top: 0
+  left: 0
+  width: 100%
+  height: 48px
+  box-sizing: border-box
+  padding: 0.75rem 1rem
+  border-bottom: 1px solid #e0e0e0
+  display: flex
+  align-items: center
+
+.sk-wave-bar
+  height: 1.25rem
+  width: 85%
+  border-radius: 4px
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%)
+  background-size: 200% 100%
+  animation: sk-wave 1.5s infinite ease-in-out
+
+@keyframes sk-wave
+  0%
+    background-position: 200% 0
+  100%
+    background-position: -200% 0
