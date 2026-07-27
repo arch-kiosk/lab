@@ -13,10 +13,10 @@
       <virtualizer-lab id="virtualizer-lab"></virtualizer-lab>
   </body>
   <script type="module">
-    import {DataProvider, FifoEvictionStrategy} from "/src/tanstack-virtualizer-lab.ts"
+    import {DataProvider, FifoPageCache, LruPageCache} from "/src/tanstack-virtualizer-lab.ts"
       await customElements.whenDefined('virtualizer-lab')
       console.log("defined")
       const ui = document.getElementById("virtualizer-lab")
-      ui.setDataProvider(new DataProvider(), new FifoEvictionStrategy(4))
+      ui.setDataProvider(new DataProvider(), new LruPageCache(4))
   </script>
 </html>

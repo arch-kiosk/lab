@@ -1,93 +1,125 @@
-export interface ViewportContext {
-    startPage: number
-    endPage: number
+export interface PageCache<T> {
+    readonly size: number
+    readonly capacity: number
+    isProtected?: (key: number) => boolean
+    get(key: number): T[] | undefined
+    set(key: number, page: T[]): void
+    has(key: number): boolean
+    delete(key: number): boolean
 }
 
-export interface CacheEvictionStrategy {
-    /** Maximum number of page slots the cache is allowed to retain */
-    readonly maxSlots: number
+export class FifoPageCache<T> implements PageCache<T> {
+    public readonly capacity: number
+    public isProtected?: (key: number) => boolean
 
-    /**
-     * Selects a victim page index to evict from a candidate list.
-     * Pure strategy logic—has zero knowledge of UI or viewports.
-     */
-    selectVictim(candidates: number[]): number | undefined
-}
-
-export class FifoEvictionStrategy implements CacheEvictionStrategy {
-    constructor(public readonly maxSlots: number = 10) {}
-
-    selectVictim(candidates: number[]): number | undefined {
-        // In FIFO, candidates array maintains insertion order.
-        // Return the oldest candidate (first index).
-        return candidates[0]
-    }
-}
-
-export class PageCache<T> {
     private pages = new Map<number, T[]>()
-    private pendingPages = new Set<number>()
+    private queue: number[] = []
 
     constructor(
-        public readonly pageSize: number,
-        private readonly strategy: CacheEvictionStrategy
-    ) {}
-
-    get maxPages(): number {
-        return this.strategy.maxSlots
+        capacity: number,
+        isProtected?: (key: number) => boolean
+    ) {
+        this.capacity = capacity
+        this.isProtected = isProtected
     }
 
-    get pageCount(): number {
+    public get size(): number {
         return this.pages.size
     }
 
-    public hasPage(pageIndex: number): boolean {
-        return this.pages.has(pageIndex)
+    public get(key: number): T[] | undefined {
+        return this.pages.get(key)
     }
 
-    public isPending(pageIndex: number): boolean {
-        return this.pendingPages.has(pageIndex)
+    public has(key: number): boolean {
+        return this.pages.has(key)
     }
 
-    public markPending(pageIndex: number): void {
-        this.pendingPages.add(pageIndex)
+    public set(key: number, page: T[]): void {
+        if (!this.pages.has(key)) {
+            this.queue.push(key)
+        }
+        this.pages.set(key, page)
+        this.evict()
     }
 
-    public clearPending(pageIndex: number): void {
-        this.pendingPages.delete(pageIndex)
+    public delete(key: number): boolean {
+        this.queue = this.queue.filter(k => k !== key)
+        return this.pages.delete(key)
     }
 
-    public get(rowIndex: number): { data: T | undefined } | undefined {
-        const pageIndex = Math.floor(rowIndex / this.pageSize)
-        const offset = rowIndex % this.pageSize
-        const page = this.pages.get(pageIndex)
+    private evict(): void {
+        while (this.pages.size > this.capacity) {
+            const candidateIndex = this.queue.findIndex(
+                k => !this.isProtected || !this.isProtected(k)
+            )
 
-        if (!page) return undefined
-        return { data: page[offset] }
+            if (candidateIndex === -1) break
+
+            const [evictedKey] = this.queue.splice(candidateIndex, 1)
+            this.pages.delete(evictedKey)
+        }
+    }
+}
+
+export class LruPageCache<T> implements PageCache<T> {
+    public readonly capacity: number
+    public isProtected?: (key: number) => boolean
+
+    private pages = new Map<number, T[]>()
+
+    constructor(
+        capacity: number,
+        isProtected?: (key: number) => boolean
+    ) {
+        this.capacity = capacity
+        this.isProtected = isProtected
     }
 
-    public setPage(
-        pageIndex: number,
-        data: T[],
-        viewport: ViewportContext
-    ): void {
-        this.pages.set(pageIndex, data)
-        this.evictIfNecessary(viewport)
+    public get size(): number {
+        return this.pages.size
     }
 
-    private evictIfNecessary(viewport: ViewportContext): void {
-        if (this.pages.size <= this.strategy.maxSlots) return
+    public has(key: number): boolean {
+        return this.pages.has(key)
+    }
 
-        // Domain logic: Filter out pages that currently intersect the active viewport
-        const candidates = Array.from(this.pages.keys()).filter(
-            (page) => page < viewport.startPage || page > viewport.endPage
-        )
+    public delete(key: number): boolean {
+        return this.pages.delete(key)
+    }
 
-        // Delegate victim selection purely to the strategy algorithm
-        const victim = this.strategy.selectVictim(candidates)
+    public get(key: number): T[] | undefined {
+        const page = this.pages.get(key)
+        if (page) {
+            // Touch key: move to back of Map order (MRU)
+            this.pages.delete(key)
+            this.pages.set(key, page)
+        }
+        return page
+    }
 
-        if (victim !== undefined) {
-            this.pages.delete(victim)
+    public set(key: number, page: T[]): void {
+        if (this.pages.has(key)) {
+            this.pages.delete(key)
+        }
+        this.pages.set(key, page)
+        this.evict()
+    }
+
+    private evict(): void {
+        while (this.pages.size > this.capacity) {
+            let evictedKey: number | undefined
+
+            for (const k of this.pages.keys()) {
+                if (!this.isProtected || !this.isProtected(k)) {
+                    evictedKey = k
+                    break
+                }
+            }
+
+            if (evictedKey === undefined) break
+
+            this.pages.delete(evictedKey)
         }
     }
 }
