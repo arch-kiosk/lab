@@ -9,9 +9,9 @@ import { VirtualizerController } from "@tanstack/lit-virtual"
 import type { VirtualItem } from "@tanstack/virtual-core"
 
 import { DataProvider } from "./dataprovider"
-// import {FifoPageCache, LruPageCache, PageCache} from "./cache"
+import {FifoPageCache, LruPageCache, PageCache} from "./cache"
 import local_css from "./styles/tanstack-virtualizerlab.sass?inline"
-export { DataProvider}
+export { DataProvider, FifoPageCache, LruPageCache }
 
 export type RowRenderer = (rowNr: number, rowKey: string, record: Record<string, any>) => HTMLTemplateResult
 
@@ -26,7 +26,7 @@ export class VirtualScrollLayout extends LitElement {
 
     // Internal Injected Dependencies (Managed via setDataProvider)
     private dataProvider?: DataProvider
-    // private pageCache?: PageCache<Record<string, any>>
+    private pageCache?: PageCache<Record<string, any>>
     private pendingPages!: Map<number, "pending" | number>
 
     // State & Instance variables
@@ -64,7 +64,7 @@ export class VirtualScrollLayout extends LitElement {
     public init(
         dataProvider: DataProvider,
         rowRenderer: RowRenderer,
-        // pageCache?: PageCache<Record<string, any>>,
+        pageCache?: PageCache<Record<string, any>>,
         cachePageSize = this.DEFAULT_CACHE_PAGE_SIZE
     ): void {
         if (this.dataProvider === dataProvider) return
@@ -74,11 +74,11 @@ export class VirtualScrollLayout extends LitElement {
         this.pageSize = cachePageSize
         this.resetState()
 
-        // if (pageCache) {
-        //     pageCache.isProtected = this.isPageVisible
-        // } else {
-        //     pageCache = new FifoPageCache(this.DEFAULT_CACHE_SIZE, this.isPageVisible)
-        // }
+        if (pageCache) {
+            pageCache.isProtected = this.isPageVisible
+        } else {
+            pageCache = new FifoPageCache(this.DEFAULT_CACHE_SIZE, this.isPageVisible)
+        }
 
         void this.handleDataProviderChange(pageCache)
     }
@@ -105,7 +105,7 @@ export class VirtualScrollLayout extends LitElement {
             this.updateVirtualizerCount(count)
 
             // Gate component rendering until data is confirmed
-            // this.pageCache = cache
+            this.pageCache = cache
         } catch (err) {
             if (this.dataProvider !== activeProvider) return
             console.error("[VirtualScrollLayout] Failed to initialize DataProvider:", err)
@@ -320,6 +320,7 @@ export class VirtualScrollLayout extends LitElement {
                             const record = this.getRecord(row.index)
                             const renderedRow = this.renderVirtualRow(row, record)
                             const isLoaded = Boolean(renderedRow)
+                            console.log(row.start)
                             return html`
                                             <div
                                                 id=${row.key} 
