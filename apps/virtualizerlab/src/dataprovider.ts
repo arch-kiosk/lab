@@ -11,12 +11,12 @@ export class DataProvider {
 
     // oxlint-disable-next-line typescript/no-explicit-any
     async fetch(fromRecord: number, toRecord: number) : Promise<Record<string, any>[]> {
-        await delay(Math.floor(Math.random() * 701) + 50)
+        await delay(Math.floor(Math.random() * 1201) + 50)
         if (fromRecord <= MAX_RECORDS && toRecord >= fromRecord && toRecord <= MAX_RECORDS) {
             console.log(`loading ${fromRecord} to ${toRecord}`)
             const recs: Array<Record<string, any>> = Array.from({length: toRecord - fromRecord})
             recs.forEach((_rec, idx) => {
-                recs[idx] = {"id": fromRecord + idx, "data": `record ${fromRecord +idx}`}
+                recs[recs.length - idx - 1] = {"id": `REC${fromRecord+idx}`, "data": {}}
             })
 
             return recs

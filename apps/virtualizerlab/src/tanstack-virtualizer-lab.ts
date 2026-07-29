@@ -1,7 +1,7 @@
 // oxlint-disable typescript/no-explicit-any
-import { LitElement, html, PropertyValues, unsafeCSS } from "lit"
+import {LitElement, html, PropertyValues, unsafeCSS, HTMLTemplateResult} from "lit"
 import { when } from "lit/directives/when.js"
-import { customElement, state } from "lit/decorators.js"
+import {customElement, property, state} from "lit/decorators.js"
 import { repeat } from "lit/directives/repeat.js"
 import { createRef, ref, Ref } from "lit/directives/ref.js"
 
@@ -9,21 +9,24 @@ import { VirtualizerController } from "@tanstack/lit-virtual"
 import type { VirtualItem } from "@tanstack/virtual-core"
 
 import { DataProvider } from "./dataprovider"
-import {FifoPageCache, LruPageCache, PageCache} from "./cache"
+// import {FifoPageCache, LruPageCache, PageCache} from "./cache"
 import local_css from "./styles/tanstack-virtualizerlab.sass?inline"
-export { DataProvider, FifoPageCache, LruPageCache }
+export { DataProvider}
+
+export type RowRenderer = (rowNr: number, rowKey: string, record: Record<string, any>) => HTMLTemplateResult
 
 @customElement("virtualizer-lab")
 export class VirtualScrollLayout extends LitElement {
     static styles = unsafeCSS(local_css)
     DEFAULT_CACHE_PAGE_SIZE = 50
     DEFAULT_CACHE_SIZE = 10
+    DEFAULT_ROW_HEIGHT = 42
     MAX_PAGE_RETRIES = 3
     private pageSize = this.DEFAULT_CACHE_PAGE_SIZE
 
     // Internal Injected Dependencies (Managed via setDataProvider)
     private dataProvider?: DataProvider
-    private pageCache?: PageCache<Record<string, any>>
+    // private pageCache?: PageCache<Record<string, any>>
     private pendingPages!: Map<number, "pending" | number>
 
     // State & Instance variables
@@ -32,7 +35,8 @@ export class VirtualScrollLayout extends LitElement {
     private scrollContainerRef: Ref<HTMLDivElement> = createRef()
     private devTelemetryRef: Ref<HTMLDivElement> = createRef()
 
-    private rowHeight!: number
+    @property({ type: Number }) rowHeight!: number
+    @state() private activeRecordKey?: string
 
     // Directive Flag: Directs component to measure next available loaded row DOM height
     private recalcRowHeight!: boolean
@@ -43,6 +47,8 @@ export class VirtualScrollLayout extends LitElement {
         estimateSize: () => this.rowHeight,
         overscan: 5,
     })
+    private rowRenderer?: (rowNr: number, rowKey: string, record: Record<string, any>) => HTMLTemplateResult;
+
 
     constructor() {
         super()
@@ -55,22 +61,24 @@ export class VirtualScrollLayout extends LitElement {
      * @param pageCache some PageCache instance
      * @param cachePageSize number of records per cache page
      */
-    public setDataProvider(
+    public init(
         dataProvider: DataProvider,
-        pageCache?: PageCache<Record<string, any>>,
+        rowRenderer: RowRenderer,
+        // pageCache?: PageCache<Record<string, any>>,
         cachePageSize = this.DEFAULT_CACHE_PAGE_SIZE
     ): void {
         if (this.dataProvider === dataProvider) return
 
         this.dataProvider = dataProvider
+        this.rowRenderer = rowRenderer
         this.pageSize = cachePageSize
         this.resetState()
 
-        if (pageCache) {
-            pageCache.isProtected = this.isPageVisible
-        } else {
-            pageCache = new FifoPageCache(this.DEFAULT_CACHE_SIZE, this.isPageVisible)
-        }
+        // if (pageCache) {
+        //     pageCache.isProtected = this.isPageVisible
+        // } else {
+        //     pageCache = new FifoPageCache(this.DEFAULT_CACHE_SIZE, this.isPageVisible)
+        // }
 
         void this.handleDataProviderChange(pageCache)
     }
@@ -97,7 +105,7 @@ export class VirtualScrollLayout extends LitElement {
             this.updateVirtualizerCount(count)
 
             // Gate component rendering until data is confirmed
-            this.pageCache = cache
+            // this.pageCache = cache
         } catch (err) {
             if (this.dataProvider !== activeProvider) return
             console.error("[VirtualScrollLayout] Failed to initialize DataProvider:", err)
@@ -105,9 +113,10 @@ export class VirtualScrollLayout extends LitElement {
         }
     }
 
+
     private resetState() {
         this.recordCount = 0
-        this.rowHeight = 42
+        this.rowHeight = this.rowHeight ?? this.DEFAULT_ROW_HEIGHT
         this.recalcRowHeight = true
         this.pageCache = undefined
         this.pendingPages = new Map()
@@ -129,10 +138,12 @@ export class VirtualScrollLayout extends LitElement {
         this.requestUpdate()
     }
 
-    // protected willUpdate(changedProperties: PropertyValues) {
-    //     super.willUpdate(changedProperties)
-    //
-    // }
+    protected willUpdate(changedProperties: PropertyValues) {
+        super.willUpdate(changedProperties)
+        if (changedProperties.has("rowHeight")) {
+            this.recalcRowHeight = true
+        }
+    }
 
 
     private isPageVisible = (pageIndex: number): boolean => {
@@ -154,7 +165,6 @@ export class VirtualScrollLayout extends LitElement {
             count,
         })
     }
-
 
     protected updated(changedProperties: PropertyValues) {
         super.updated(changedProperties)
@@ -260,6 +270,27 @@ export class VirtualScrollLayout extends LitElement {
         return page?.[offset]
     }
 
+    activateRecord = (key: string)=> {
+        this.activeRecordKey = key
+    }
+
+    private focusChange = (event: FocusEvent) =>  {
+
+            if (event.type === "focusin" && event.currentTarget && event.currentTarget instanceof HTMLElement) {
+                console.log(`Got focus for record ${event.currentTarget.id}`)
+                this.activateRecord(event.currentTarget.id)
+            } else if (event.type === "focusout" && event.currentTarget && event.currentTarget instanceof HTMLElement){
+                console.log(`Lost focus for record ${event.currentTarget.id}`)
+
+            }
+    }
+
+    renderVirtualRow(row: VirtualItem, record?: Record<string, any>) {
+        return this.rowRenderer && record ? html`
+            <div class="row-selector${this.activeRecordKey == row.key?' active':''}"></div>
+            <div class="row-content">${this.rowRenderer(row.index, row.key as string, record)}</div>` : undefined
+    }
+
     render() {
         if (!this.pageCache) {
             return html`
@@ -268,6 +299,10 @@ export class VirtualScrollLayout extends LitElement {
                 }
                 <div class="scroll-container empty-state">please wait ...</div>
             `
+        }
+
+        if (!this.rowRenderer) {
+            return html`no row renderer assigned`
         }
 
         const virtualizer = this.virtualizerController.getVirtualizer()
@@ -283,17 +318,19 @@ export class VirtualScrollLayout extends LitElement {
                         (row: VirtualItem) => row.key,
                         (row: VirtualItem) => {
                             const record = this.getRecord(row.index)
-                            const isLoaded = record != null
-            
+                            const renderedRow = this.renderVirtualRow(row, record)
+                            const isLoaded = Boolean(renderedRow)
                             return html`
                                             <div
+                                                id=${row.key} 
                                                 class="virtual-row"
                                                 ?data-loaded=${isLoaded}
-                                                style="transform: translateY(${row.start}px);"
+                                                @focusin="${this.focusChange}"
+                                                @focusout="${this.focusChange}"
+                                                style="height:${this.rowHeight}px;transform: translateY(${row.start}px);"
                                             >
                                                 ${isLoaded
-                                ? `${row.index} - ${record?JSON.stringify(record.data):""}`
-                                : html`<div class="sk-wave-bar"></div>`}
+                                ? renderedRow : html`<div class="sk-wave-bar"></div>`}
                                             </div>
                                         `
                     })}
