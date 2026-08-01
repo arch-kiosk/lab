@@ -1,25 +1,123 @@
 // oxlint-disable typescript/no-explicit-any
-import delay from "delay";
+import delay from "delay"
+import { LruPageCache, PageCache } from "./cache"
 
 const MAX_RECORDS = 1000
+export type DataNotifier = () => void
 
-export class DataProvider {
-    async recordCount(): Promise<number> {
-        await delay(1000)
+export interface DataProvider {
+    recordCount(): number
+    getRecord(index: number, bufferedOnly?: boolean): Record<string, any> | undefined
+    setNotifier?(notifier: DataNotifier): void
+    getTelemetry?(): { cached: number; capacity: number }
+}
+
+export abstract class DataProviderBasis implements DataProvider {
+    protected pageSize: number
+    protected pageCache: PageCache<Record<string, any>>
+    protected pendingPages = new Map<number, "pending" | number>()
+    protected protectedRows = new Set<number>()
+    protected maxRetries = 3
+
+    private notifier?: DataNotifier
+
+    protected constructor(pageSize = 50, cacheCapacity = 10) {
+        this.pageSize = pageSize
+        this.pageCache = new LruPageCache(cacheCapacity, this.isPageProtected)
+    }
+
+    abstract recordCount(): number
+    abstract fetch(fromRecord: number, toRecord: number): Promise<Record<string, any>[]>
+
+    public setNotifier(notifier: DataNotifier): void {
+        this.notifier = notifier
+    }
+
+    public getRecord(index: number, bufferedOnly = false): Record<string, any> | undefined {
+        const pageIndex = Math.floor(index / this.pageSize)
+        const offset = index % this.pageSize
+
+        if (this.pageCache.has(pageIndex)) {
+            return this.pageCache.get(pageIndex)?.[offset]
+        }
+
+        if (!bufferedOnly) {
+            this.ensurePage(pageIndex)
+        }
+
+        return undefined
+    }
+
+    private ensurePage(pageIndex: number): void {
+        const status = this.pendingPages.get(pageIndex)
+        const isPending = status === "pending"
+        const retryCount = isPending ? 0 : status ?? 0
+
+        if (!isPending && retryCount < this.maxRetries) {
+            void this.fetchPage(pageIndex, retryCount)
+        }
+    }
+
+    public protectRow(rowIndex: number): void {
+        this.protectedRows.add(rowIndex)
+    }
+
+    public unprotectRow(rowIndex: number): void {
+        this.protectedRows.delete(rowIndex)
+    }
+
+    public getTelemetry() {
+        return {
+            cached: this.pageCache.size,
+            capacity: this.pageCache.capacity,
+        }
+    }
+
+    private isPageProtected = (pageIndex: number): boolean => {
+        for (const rowIndex of this.protectedRows) {
+            if (Math.floor(rowIndex / this.pageSize) === pageIndex) {
+                return true
+            }
+        }
+        return false
+    }
+
+    private async fetchPage(pageIndex: number, currentRetries: number): Promise<void> {
+        this.pendingPages.set(pageIndex, "pending")
+
+        try {
+            const from = pageIndex * this.pageSize
+            const to = Math.min(from + this.pageSize, this.recordCount())
+            const fetched = await this.fetch(from, to)
+
+            this.pageCache.set(pageIndex, fetched)
+            this.pendingPages.delete(pageIndex)
+            this.notifier?.()
+        } catch (err) {
+            this.pendingPages.set(pageIndex, currentRetries + 1)
+            console.error(`[DataProviderBasis] Fetch page ${pageIndex} failed:`, err)
+        }
+    }
+}
+
+export class ConcreteDataProvider extends DataProviderBasis {
+    recordCount(): number {
         return MAX_RECORDS
     }
 
-    // oxlint-disable-next-line typescript/no-explicit-any
-    async fetch(fromRecord: number, toRecord: number) : Promise<Record<string, any>[]> {
+    constructor(pageSize = 50, cacheCapacity = 10) {
+        super(pageSize, cacheCapacity)
+    }
+
+    async fetch(fromRecord: number, toRecord: number): Promise<Record<string, any>[]> {
         await delay(Math.floor(Math.random() * 1201) + 50)
         if (fromRecord <= MAX_RECORDS && toRecord >= fromRecord && toRecord <= MAX_RECORDS) {
             console.log(`loading ${fromRecord} to ${toRecord}`)
-            const recs: Array<Record<string, any>> = Array.from({length: toRecord - fromRecord})
-            recs.forEach((_rec, idx) => {
-                recs[recs.length - idx - 1] = {"id": `REC${fromRecord+idx}`, "data": {}}
-            })
-
-            return recs
-        } else throw Error(`it is not possible to fetch records ${fromRecord} to ${toRecord} from the data provider`)
+            return Array.from({ length: toRecord - fromRecord }, (_, idx) => ({
+                id: `REC${fromRecord + idx}`,
+                data: {},
+            }))
+        }
+        throw Error(`it is not possible to fetch records ${fromRecord} to ${toRecord} from the data provider`)
     }
 }

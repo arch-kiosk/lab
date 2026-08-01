@@ -1,0 +1,68 @@
+import {customElement} from "lit/decorators.js";
+import {html, LitElement, PropertyValues, unsafeCSS} from "lit";
+import local_css from "./styles/lab-app.sass?inline"
+import {createRef, Ref, ref} from 'lit/directives/ref.js';
+import {VirtualScrollLayout} from "./tanstack-virtualizer-lab"
+import "./tanstack-virtualizer-lab"
+import {ConcreteDataProvider} from "#src/dataprovider"
+
+@customElement("lab-app")
+export class LabApp extends LitElement {
+    static styles = unsafeCSS(local_css)
+    virtualLayoutRef: Ref<VirtualScrollLayout> = createRef();
+    virtualLayoutRef2: Ref<VirtualScrollLayout> = createRef();
+    private dataProvider = new ConcreteDataProvider()
+    private dataProvider2 = new ConcreteDataProvider()
+
+
+    renderVirtualLayout () {
+        return html`
+            <virtualizer-lab ${ref(this.virtualLayoutRef)} id="virtualizerLayout" rowheight="64"></virtualizer-lab>
+        `
+    }
+
+    renderVirtualLayout2 () {
+        return html`
+            <virtualizer-lab ${ref(this.virtualLayoutRef2)} id="virtualizerLayout2" rowheight="36"></virtualizer-lab>
+        `
+    }
+
+    protected firstUpdated(_changedProperties: PropertyValues) {
+        super.firstUpdated(_changedProperties);
+        const virtualLayout = this.virtualLayoutRef.value
+        const virtualLayout2 = this.virtualLayoutRef2.value
+        if (virtualLayout) {
+            this.dataProvider.setNotifier(() => {
+                console.log(this.dataProvider.getTelemetry())
+                virtualLayout.notifyDataReady()
+            })
+            virtualLayout.init(this.dataProvider, this.renderRow.bind(this))
+        }
+        if (virtualLayout2) {
+            this.dataProvider2.setNotifier(() => virtualLayout2.notifyDataReady())
+            virtualLayout2.init(this.dataProvider2, this.renderRow.bind(this))
+        }
+    }
+
+    // oxlint-disable-next-line typescript/no-explicit-any
+    renderRow(rowNr: number, rowKey: string, record: Record<string, any>) {
+        return html`<div class="row-style" part="row">
+                <div>${rowNr} - ${rowKey} - ${record?record.id:""}</div>
+                <div><input type="text"/></div>
+            </div>`
+    }
+
+    render() {
+        return html`
+            <div class="outer-form">
+                <div style="min-height: 5em;background-color: papayawhip">1 record form </div>
+                <div style="height: 35vh;border: 2px solid darkred">
+                    ${this.renderVirtualLayout()}
+                </div>
+            </div>
+            <div style="height: 25vh;border: 2px solid green">
+                ${this.renderVirtualLayout2()}
+            </div>
+        `
+    }
+}
