@@ -32,14 +32,14 @@ export class LabApp extends LitElement {
         const virtualLayout = this.virtualLayoutRef.value
         const virtualLayout2 = this.virtualLayoutRef2.value
         if (virtualLayout) {
-            this.dataProvider.setNotifier(() => {
+            this.dataProvider.setNotifier((notification) => {
                 console.log(this.dataProvider.getTelemetry())
-                virtualLayout.notifyDataReady()
+                virtualLayout.notifyDataReady(notification)
             })
             virtualLayout.init(this.dataProvider, this.renderRow.bind(this))
         }
         if (virtualLayout2) {
-            this.dataProvider2.setNotifier(() => virtualLayout2.notifyDataReady())
+            this.dataProvider2.setNotifier((notification) => virtualLayout2.notifyDataReady(notification))
             virtualLayout2.init(this.dataProvider2, this.renderRow.bind(this))
         }
     }

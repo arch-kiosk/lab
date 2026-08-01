@@ -8,7 +8,7 @@ import { createRef, ref, Ref } from "lit/directives/ref.js"
 import { VirtualizerController } from "@tanstack/lit-virtual"
 import type { VirtualItem } from "@tanstack/virtual-core"
 
-import { DataProvider } from "./dataprovider"
+import {DataNotification, DataProvider} from "./dataprovider"
 import local_css from "./styles/tanstack-virtualizerlab.sass?inline"
 
 export type RowRenderer = (
@@ -23,10 +23,17 @@ export class VirtualScrollLayout extends LitElement {
 
     DEFAULT_ROW_HEIGHT = 42
 
-    @property({ type: Number, attribute: "rowheight" }) rowHeight = this.DEFAULT_ROW_HEIGHT
-    @state() private recordCount = 0
-    @state() private activeRecordKey?: string
-    @state() private isScrolling = false
+    @property({ type: Number, attribute: "rowheight" })
+    rowHeight = this.DEFAULT_ROW_HEIGHT
+
+    @state()
+    private recordCount = 0
+
+    @property({reflect: true, type: Number })
+    private activeRecordIndex?: number
+
+    @state()
+    private isScrolling = false
 
     private dataProvider?: DataProvider
     private rowRenderer?: RowRenderer
@@ -44,8 +51,12 @@ export class VirtualScrollLayout extends LitElement {
         overscan: 5,
     })
 
-    public notifyDataReady = (): void => {
-        this.requestUpdate()
+    public notifyDataReady = (notification?: DataNotification): void => {
+        if (notification?.currentRecord !== undefined) {
+            this.activeRecordIndex = notification.currentRecord
+        }
+        else
+            this.requestUpdate()
     }
 
     public init(dataProvider: DataProvider, rowRenderer: RowRenderer): void {
@@ -140,14 +151,14 @@ export class VirtualScrollLayout extends LitElement {
         }
     }
 
-    public activateRecord = (key: string) => {
-        this.activeRecordKey = key
+    public activateRecord = (index: number | string) => {
+        this.dataProvider?.setActiveRecord(typeof index === "number" ? index : Number(index))
     }
 
     private focusChange = (event: FocusEvent) => {
         if (event.type === "focusin" && event.currentTarget && event.currentTarget instanceof HTMLElement) {
             console.log(`Got focus for record ${event.currentTarget.id}`)
-            this.activateRecord(event.currentTarget.id)
+            if (event.currentTarget.dataset.index) this.activateRecord(event.currentTarget.dataset.index)
         } else if (event.type === "focusout" && event.currentTarget && event.currentTarget instanceof HTMLElement) {
             console.log(`Lost focus for record ${event.currentTarget.id}`)
         }
@@ -156,7 +167,7 @@ export class VirtualScrollLayout extends LitElement {
     private renderVirtualRow(row: VirtualItem, record?: Record<string, any>) {
         return this.rowRenderer && record
             ? html`
-                    <div class="row-selector${this.activeRecordKey === row.key ? " active" : ""}"></div>
+                    <div class="row-selector ${this.activeRecordIndex === row.index ? " active" : ""}"></div>
                     <div class="row-content" style="flex: 1; height: 100%; display: flex;">
                         ${this.rowRenderer(row.index, row.key as string, record)}
                     </div>
@@ -193,17 +204,18 @@ export class VirtualScrollLayout extends LitElement {
                 <div class="scroll-track" part="scroll-track" style="position: relative; width: 100%; height: ${virtualizer.getTotalSize()}px;">
                     ${repeat(
                             virtualizer.getVirtualItems(),
-                            (row: VirtualItem) => row.key,
+                            (row: VirtualItem) => row.key as string,
                             (row: VirtualItem) => {
                                 // While scrolling, only get cached records (don't trigger fetches).
                                 // When scrolling stops, fetch missing records for visible rows.
-                                const record = this.dataProvider!.getRecord(row.index, this.isScrolling)
+                                let record = this.dataProvider!.getRecord(row.index, this.isScrolling)
                                 const renderedRow = this.renderVirtualRow(row, record)
                                 const isLoaded = Boolean(renderedRow)
 
                                 return html`
                                     <div
-                                            id=${row.key}
+                                            id="${row.key}"
+                                            data-index="${row.index}"
                                             class="virtual-row"
                                             ?data-loaded=${isLoaded}
                                             @focusin="${this.focusChange}"
