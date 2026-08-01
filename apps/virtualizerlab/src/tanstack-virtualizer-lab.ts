@@ -189,8 +189,7 @@ export class VirtualScrollLayout extends LitElement {
                     part="scroll-container"
                     ${ref(this.scrollContainerRef)}
                     @scroll=${this.handleScroll}
-                    style="height: 100%; overflow: auto; position: relative;"
-            >
+                    style="height: 100%; overflow: auto; position: relative;">
                 <div class="scroll-track" part="scroll-track" style="position: relative; width: 100%; height: ${virtualizer.getTotalSize()}px;">
                     ${repeat(
                             virtualizer.getVirtualItems(),
