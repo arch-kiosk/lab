@@ -11,6 +11,7 @@ avoid coupling,
 keep responsibilities focused,
 consider Inversion of Control to achieve this,
 don't use semicolons and avoid constructs that require them like leading brackets.
+Don't ask cliffhanger questions. I do the interview. Only ask things that need to be clarified to answer my question.
 
 The software architecture is:
 TypeScript,
