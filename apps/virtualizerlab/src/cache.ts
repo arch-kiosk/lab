@@ -6,6 +6,7 @@ export interface PageCache<T> {
     set(key: number, page: T[]): void
     has(key: number): boolean
     delete(key: number): boolean
+    findPageAndOffset(finder: (page: T[]) => number): { pageIndex: number; offset: number } | undefined
 }
 
 export class FifoPageCache<T> implements PageCache<T> {
@@ -59,6 +60,16 @@ export class FifoPageCache<T> implements PageCache<T> {
             const [evictedKey] = this.queue.splice(candidateIndex, 1)
             this.pages.delete(evictedKey)
         }
+    }
+
+    public findPageAndOffset(finder: (page: T[]) => number): { pageIndex: number; offset: number } | undefined {
+        for (const [pageIndex, page] of this.pages.entries()) {
+            const offset = finder(page)
+            if (offset >= 0) {
+                return { pageIndex, offset }
+            }
+        }
+        return undefined
     }
 }
 
@@ -121,5 +132,15 @@ export class LruPageCache<T> implements PageCache<T> {
 
             this.pages.delete(evictedKey)
         }
+    }
+
+    public findPageAndOffset(finder: (page: T[]) => number): { pageIndex: number; offset: number } | undefined {
+        for (const [pageIndex, page] of this.pages.entries()) {
+            const offset = finder(page)
+            if (offset >= 0) {
+                return { pageIndex, offset }
+            }
+        }
+        return undefined
     }
 }

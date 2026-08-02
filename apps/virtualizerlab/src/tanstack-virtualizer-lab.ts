@@ -52,11 +52,18 @@ export class VirtualScrollLayout extends LitElement {
     })
 
     public notifyDataReady = (notification?: DataNotification): void => {
+        console.log("notified:", notification)
         if (notification?.currentRecord !== undefined) {
             this.activeRecordIndex = notification.currentRecord
+            return
         }
-        else
-            this.requestUpdate()
+
+        if (notification?.countChanged){
+            this.recordCount = this.dataProvider!.recordCount()
+            this.updateVirtualizerCount(this.recordCount)
+        }
+
+        this.requestUpdate()
     }
 
     public init(dataProvider: DataProvider, rowRenderer: RowRenderer): void {
@@ -164,6 +171,13 @@ export class VirtualScrollLayout extends LitElement {
         }
     }
 
+    private dataChanged = (event: Event) => {
+        const element = event.target as HTMLInputElement
+        const row = (event.currentTarget as HTMLElement).dataset.index
+        console.log(`${element.id} changed to ${element.value}`)
+        this.dataProvider?.dataChanged(Number(row), element.id, element.value)
+    }
+
     private renderVirtualRow(row: VirtualItem, record?: Record<string, any>) {
         return this.rowRenderer && record
             ? html`
@@ -193,7 +207,9 @@ export class VirtualScrollLayout extends LitElement {
 
         return html`
             ${when(import.meta.env?.DEV, () => html`
-                <div id="dev-row-count" ${ref(this.devTelemetryRef)}></div>`
+                
+                <div id="dev-row-count" ${ref(this.devTelemetryRef)}>
+                </div>`
             )}
             <div
                     class="scroll-container"
@@ -214,12 +230,14 @@ export class VirtualScrollLayout extends LitElement {
 
                                 return html`
                                     <div
-                                            id="${row.key}"
+                                            id="ROW${row.index}"
                                             data-index="${row.index}"
+                                            data-uid="${record?.uid}"
                                             class="virtual-row"
                                             ?data-loaded=${isLoaded}
                                             @focusin="${this.focusChange}"
                                             @focusout="${this.focusChange}"
+                                            @input="${this.dataChanged}"
                                             style="position: absolute; top: 0; left: 0; width: 100%; height: ${this.rowHeight}px; transform: translateY(${row.start}px); display: flex; align-items: center;"
                                     >
                                         ${isLoaded
