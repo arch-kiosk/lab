@@ -4,7 +4,6 @@ import {html, HTMLTemplateResult, LitElement, nothing, PropertyValues, TemplateR
 import {DataProvider} from "#src/dataprovider";
 import "@lit-labs/virtualizer";
 import local_css from "./styles/virtualizerlab.sass?inline"
-export {DataProvider}
 
 @customElement("virtualizer-lab")
 export class UIComponent extends LitElement {

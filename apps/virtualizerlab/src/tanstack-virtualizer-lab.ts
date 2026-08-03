@@ -32,15 +32,11 @@ export class VirtualScrollLayout extends LitElement {
     @property({reflect: true, type: Number })
     private activeRecordIndex?: number
 
-    @state()
-    private isScrolling = false
-
     private dataProvider?: DataProvider
     private rowRenderer?: RowRenderer
 
     private scrollContainerRef: Ref<HTMLDivElement> = createRef()
     private devTelemetryRef: Ref<HTMLDivElement> = createRef()
-    private scrollStopTimer?: ReturnType<typeof setTimeout>
 
     private recalcRowHeight = true
 
@@ -53,14 +49,16 @@ export class VirtualScrollLayout extends LitElement {
 
     public notifyDataReady = (notification?: DataNotification): void => {
         console.log("notified:", notification)
-        if (notification?.currentRecord !== undefined) {
-            this.activeRecordIndex = notification.currentRecord
-            return
-        }
+        if (notification) {
+            if ("currentRecord" in notification) {
+                this.activeRecordIndex = notification.currentRecord
+                return
+            }
 
-        if (notification?.countChanged){
-            this.recordCount = this.dataProvider!.recordCount()
-            this.updateVirtualizerCount(this.recordCount)
+            if ("countChanged" in notification) {
+                this.recordCount = this.dataProvider!.recordCount() ?? 0
+                this.updateVirtualizerCount(this.recordCount)
+            }
         }
 
         this.requestUpdate()
@@ -76,7 +74,7 @@ export class VirtualScrollLayout extends LitElement {
         this.rowRenderer = rowRenderer
         this.resetState()
 
-        const count = dataProvider.recordCount()
+        const count = dataProvider.recordCount() ?? 0
         this.recordCount = count
         this.updateVirtualizerCount(count)
 
@@ -91,21 +89,6 @@ export class VirtualScrollLayout extends LitElement {
         if (this.devTelemetryRef.value) {
             this.devTelemetryRef.value.textContent = "No data"
         }
-    }
-
-    private handleScroll = () => {
-        if (!this.isScrolling) {
-            this.isScrolling = true
-        }
-
-        if (this.scrollStopTimer !== undefined) {
-            clearTimeout(this.scrollStopTimer)
-        }
-
-        // When scrolling pauses for 100ms, mark scrolling as finished
-        this.scrollStopTimer = setTimeout(() => {
-            this.isScrolling = false
-        }, 100)
     }
 
     public requestRowHeightRecalc() {
@@ -215,7 +198,6 @@ export class VirtualScrollLayout extends LitElement {
                     class="scroll-container"
                     part="scroll-container"
                     ${ref(this.scrollContainerRef)}
-                    @scroll=${this.handleScroll}
                     style="height: 100%; overflow: auto; position: relative;">
                 <div class="scroll-track" part="scroll-track" style="position: relative; width: 100%; height: ${virtualizer.getTotalSize()}px;">
                     ${repeat(
@@ -224,7 +206,7 @@ export class VirtualScrollLayout extends LitElement {
                             (row: VirtualItem) => {
                                 // While scrolling, only get cached records (don't trigger fetches).
                                 // When scrolling stops, fetch missing records for visible rows.
-                                let record = this.dataProvider!.getRecord(row.index, this.isScrolling)
+                                let record = this.dataProvider!.getRecord(row.index, virtualizer.isScrolling)
                                 const renderedRow = this.renderVirtualRow(row, record)
                                 const isLoaded = Boolean(renderedRow)
 

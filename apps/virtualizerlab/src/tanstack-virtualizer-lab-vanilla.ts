@@ -15,8 +15,6 @@ import {
 import { DataProvider } from "./dataprovider";
 import local_css from "./styles/tanstack-virtualizerlab.sass?inline";
 
-export { DataProvider };
-
 const PAGE_SIZE = 50;
 
 @customElement("virtualizer-lab")
@@ -52,7 +50,9 @@ export class UIComponent extends LitElement {
     async connectedCallback() {
         super.connectedCallback();
         if (!this.dataProvider) {
-            this.dataProvider = new DataProvider();
+            this.recordCount = 0
+            // this.dataProvider = new DataProvider();
+            return
         }
 
         const count = await this.dataProvider.recordCount();

@@ -3,7 +3,6 @@ import {html, LitElement, PropertyValues, unsafeCSS} from "lit";
 import local_css from "./styles/lab-app.sass?inline"
 import {createRef, Ref, ref} from 'lit/directives/ref.js';
 import {VirtualScrollLayout} from "./tanstack-virtualizer-lab"
-import {DraftDataProviderDecorator} from "./draftdataproviderdecorator"
 import "./tanstack-virtualizer-lab"
 import {ConcreteDataProvider} from "#src/dataprovider"
 
@@ -12,7 +11,7 @@ export class LabApp extends LitElement {
     static styles = unsafeCSS(local_css)
     virtualLayoutRef: Ref<VirtualScrollLayout> = createRef();
     virtualLayoutRef2: Ref<VirtualScrollLayout> = createRef();
-    private dataProvider = new DraftDataProviderDecorator(new ConcreteDataProvider())
+    private dataProvider = new ConcreteDataProvider(10, 2)
     private dataProvider2 = new ConcreteDataProvider()
 
 
@@ -55,11 +54,18 @@ export class LabApp extends LitElement {
         }
     }
 
+    removeRecord(layoutNr: number, _event: Event, uid:string) {
+        if (uid && layoutNr == 1) {
+            void this.dataProvider.deleteRecords([uid])
+        }
+    }
+
     // oxlint-disable-next-line typescript/no-explicit-any
-    renderRow(rowNr: number, _: string, record: Record<string, any>) {
-        return html`<div class="row-style" part="row">
-<!--                <div>${rowNr} - ${record?record.uid:""}</div>-->
+    renderRow(_rowNr: number, _: string, record: Record<string, any>) {
+        return html`
+            <div class="row-style" part="row">
                 <div><input id="textInput" type="text" value="${record.textInput}"/></div>
+                <button @click="${(event: Event) => this.removeRecord(1, event, record.uid)}">delete row</button>
             </div>`
     }
 

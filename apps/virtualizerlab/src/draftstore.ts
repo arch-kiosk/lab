@@ -47,4 +47,18 @@ export class DraftStore {
     public getAllDrafts(): DraftEntry[] {
         return Array.from(this.#drafts.values())
     }
-}
+
+    /**
+     * removes drafts with a certain uid.
+     * UIDs that don't exist in the first place are silently ignored.
+     * @param uids
+     */
+    public remove(uids: string[] = []): void {
+        if (uids.length === 0) return
+
+        const delSet = new Set(uids)
+        for (const delUid of uids) {
+            this.#drafts.delete(delUid)
+        }
+        this.#newUids = this.#newUids.filter((uid) => !delSet.has(uid))
+    }}

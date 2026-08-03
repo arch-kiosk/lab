@@ -1,27 +1,27 @@
 export interface PageCache<T> {
     readonly size: number
     readonly capacity: number
-    isProtected?: (key: number) => boolean
     get(key: number): T[] | undefined
     set(key: number, page: T[]): void
     has(key: number): boolean
     delete(key: number): boolean
+    clear(): void
     findPageAndOffset(finder: (page: T[]) => number): { pageIndex: number; offset: number } | undefined
 }
 
 export class FifoPageCache<T> implements PageCache<T> {
     public readonly capacity: number
-    public isProtected?: (key: number) => boolean
 
     private pages = new Map<number, T[]>()
     private queue: number[] = []
 
-    constructor(
-        capacity: number,
-        isProtected?: (key: number) => boolean
-    ) {
+    constructor(capacity: number) {
         this.capacity = capacity
-        this.isProtected = isProtected
+    }
+
+    public clear() {
+        this.pages = new Map<number, T[]>()
+        this.queue = []
     }
 
     public get size(): number {
@@ -51,13 +51,9 @@ export class FifoPageCache<T> implements PageCache<T> {
 
     private evict(): void {
         while (this.pages.size > this.capacity) {
-            const candidateIndex = this.queue.findIndex(
-                k => !this.isProtected || !this.isProtected(k)
-            )
-
-            if (candidateIndex === -1) break
-
-            const [evictedKey] = this.queue.splice(candidateIndex, 1)
+            // FIFO: shift the oldest inserted key directly off the queue
+            const evictedKey = this.queue.shift()
+            if (evictedKey === undefined) break
             this.pages.delete(evictedKey)
         }
     }
@@ -75,16 +71,15 @@ export class FifoPageCache<T> implements PageCache<T> {
 
 export class LruPageCache<T> implements PageCache<T> {
     public readonly capacity: number
-    public isProtected?: (key: number) => boolean
 
     private pages = new Map<number, T[]>()
 
-    constructor(
-        capacity: number,
-        isProtected?: (key: number) => boolean
-    ) {
+    constructor(capacity: number) {
         this.capacity = capacity
-        this.isProtected = isProtected
+    }
+
+    public clear() {
+        this.pages = new Map<number, T[]>()
     }
 
     public get size(): number {
@@ -119,18 +114,10 @@ export class LruPageCache<T> implements PageCache<T> {
 
     private evict(): void {
         while (this.pages.size > this.capacity) {
-            let evictedKey: number | undefined
-
-            for (const k of this.pages.keys()) {
-                if (!this.isProtected || !this.isProtected(k)) {
-                    evictedKey = k
-                    break
-                }
-            }
-
-            if (evictedKey === undefined) break
-
-            this.pages.delete(evictedKey)
+            // LRU: grab the first key in Map iteration order (the oldest/least recently used)
+            const oldestKey = this.pages.keys().next().value
+            if (oldestKey === undefined) break
+            this.pages.delete(oldestKey)
         }
     }
 
