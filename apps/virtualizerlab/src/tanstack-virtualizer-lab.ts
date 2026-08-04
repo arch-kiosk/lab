@@ -8,8 +8,10 @@ import { createRef, ref, Ref } from "lit/directives/ref.js"
 import { VirtualizerController } from "@tanstack/lit-virtual"
 import type { VirtualItem } from "@tanstack/virtual-core"
 
-import {DataNotification, DataProvider} from "./dataprovider"
+import {DataProvider} from "./dataprovider"
+
 import local_css from "./styles/tanstack-virtualizerlab.sass?inline"
+import {DataNotification} from "#src/sharedtypes";
 
 export type RowRenderer = (
     rowNr: number,
@@ -49,19 +51,23 @@ export class VirtualScrollLayout extends LitElement {
 
     public notifyDataReady = (notification?: DataNotification): void => {
         console.log("notified:", notification)
+        let updateRequired = true
+
         if (notification) {
             if ("currentRecord" in notification) {
                 this.activeRecordIndex = notification.currentRecord
-                return
+                updateRequired = false
             }
 
             if ("countChanged" in notification) {
                 this.recordCount = this.dataProvider!.recordCount() ?? 0
                 this.updateVirtualizerCount(this.recordCount)
+                updateRequired = false
             }
+
         }
 
-        this.requestUpdate()
+        if (updateRequired) this.requestUpdate()
     }
 
     public init(dataProvider: DataProvider, rowRenderer: RowRenderer): void {

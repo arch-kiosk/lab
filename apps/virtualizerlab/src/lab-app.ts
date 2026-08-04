@@ -4,14 +4,14 @@ import local_css from "./styles/lab-app.sass?inline"
 import {createRef, Ref, ref} from 'lit/directives/ref.js';
 import {VirtualScrollLayout} from "./tanstack-virtualizer-lab"
 import "./tanstack-virtualizer-lab"
-import {ConcreteDataProvider} from "#src/dataprovider"
+import {ConcreteDataProvider} from "#src/teststaticdataprovider"
 
 @customElement("lab-app")
 export class LabApp extends LitElement {
     static styles = unsafeCSS(local_css)
     virtualLayoutRef: Ref<VirtualScrollLayout> = createRef();
     virtualLayoutRef2: Ref<VirtualScrollLayout> = createRef();
-    private dataProvider = new ConcreteDataProvider(10, 2)
+    private dataProvider = new ConcreteDataProvider(10, 3)
     private dataProvider2 = new ConcreteDataProvider()
 
 
