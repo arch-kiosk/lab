@@ -7,3 +7,9 @@ export type DataNotification = {
 }
 
 export type DataNotifier = (notification?: DataNotification) => void
+
+export interface DomainKeyHelper<T> {
+    extractKey(record: DataRecord): T,
+    compareKeys(key1: T, key2: T): number
+}
+

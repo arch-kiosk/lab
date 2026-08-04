@@ -1,5 +1,5 @@
 import { DraftStore } from "./draftstore"
-import type { DataRecord } from "./sharedtypes"
+import type {DataRecord, DomainKeyHelper} from "./sharedtypes"
 import {DataProviderBasis} from "./dataprovider"
 
 
@@ -9,9 +9,15 @@ import {DataProviderBasis} from "./dataprovider"
 export abstract class BufferedDataProvider extends DataProviderBasis {
     protected draftStore = new DraftStore()
     protected abstract deleteRecordsFromDb(uids: string[]) : Promise<void>
+    protected domainKeyHelper?: DomainKeyHelper<unknown>
 
     public override recordCount(): number {
         return (this.getDbRecordCount() ?? 0) + this.draftStore.newCount
+    }
+
+    public constructor(pageSize?:number, cacheCapacity?: number, domainKeyHelper?: DomainKeyHelper<unknown>) {
+        super(pageSize, cacheCapacity);
+        this.domainKeyHelper = domainKeyHelper
     }
 
     public override getRecord(
@@ -24,7 +30,7 @@ export abstract class BufferedDataProvider extends DataProviderBasis {
 
         if (index >= dbCount) {
             const creationOffset = index - dbCount
-            return this.draftStore.getNewAt(creationOffset)
+            return this.draftStore.getNewAt(creationOffset, this.domainKeyHelper)
         }
 
         const rawRecord = super.getRecord(index, bufferedOnly, notify)
@@ -52,19 +58,18 @@ export abstract class BufferedDataProvider extends DataProviderBasis {
         if (!rawRecord) throw Error("Can't access target record for draft mutation")
 
         const uid = rawRecord.uid
-        const existingDraft = this.draftStore.getRecord(uid)
+        const existingDraftRecord = this.draftStore.getRecord(uid)
 
-        const draftToUpdate: DataRecord = existingDraft
-            ? { ...existingDraft }
-            : { ...rawRecord }
-
-        draftToUpdate[fieldId] = value
-
-        if (this.draftStore.isNew(uid)) {
-            this.draftStore.updateDraft(draftToUpdate)
+        let updatedDraftRecord: DataRecord
+        if (existingDraftRecord) {
+            updatedDraftRecord = existingDraftRecord
+            updatedDraftRecord[fieldId] = value
+            this.draftStore.updateDraft(updatedDraftRecord)
         } else {
-            this.draftStore.setModification(draftToUpdate)
+            updatedDraftRecord = {...rawRecord, fieldId: value}
+            this.draftStore.addModification(updatedDraftRecord, this.domainKeyHelper)
         }
+        console.log(this.draftStore)
     }
 
     public override addRecord(record: DataRecord): void {
@@ -119,7 +124,7 @@ export abstract class BufferedDataProvider extends DataProviderBasis {
 
     protected applyDraftOverlay(rawRecord: DataRecord | undefined): DataRecord | undefined {
         if (!rawRecord?.uid) return rawRecord
-        const draft = this.draftStore.getRecord(rawRecord.uid)
+        const draft = this.draftStore.getRecord(rawRecord.uid, this.domainKeyHelper)
         if (draft) {
             console.log(`Using draft for ${draft.uid}`)
         }

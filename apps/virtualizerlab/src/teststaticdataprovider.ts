@@ -3,8 +3,13 @@ import delay from "delay"
 import {DataRecord} from "#src/sharedtypes";
 const MAX_RECORDS = 10000
 
+interface MyDataRecord extends DataRecord {
+    textInput: string
+    data: any
+}
+
 export class ConcreteDataProvider extends BufferedDataProvider {
-    private records: Array<DataRecord> = Array.from({ length: MAX_RECORDS }, (_v, k) => ({
+    private records: Array<MyDataRecord> = Array.from({ length: MAX_RECORDS }, (_v, k) => ({
         uid: crypto.randomUUID() as string,
         textInput: `value ${k}`,
         data: {},
@@ -16,7 +21,16 @@ export class ConcreteDataProvider extends BufferedDataProvider {
     }
 
     constructor(pageSize = 50, cacheCapacity = 10) {
-        super(pageSize, cacheCapacity)
+        super(pageSize, cacheCapacity,
+            {
+                extractKey: (record:MyDataRecord) => {
+                    console.log(`extracting Key for ${record.uid}`, record)
+                    return record.textInput
+                },
+                compareKeys: (key1: string, key2: string) => {
+                    return key1.localeCompare(key2)
+                }
+            })
     }
 
     public async deleteRecordsFromDb(uids: string[]): Promise<void> {

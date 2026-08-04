@@ -50,9 +50,11 @@ export abstract class DataProviderBasis implements DataProvider {
    */
   protected abstract fetchRecordsFromDb(fromRecord: number, count: number): Promise<DataRecord[]>
 
+
   abstract recordCount(): number
   abstract addRecord(record: DataRecord): void
   abstract deleteRecords(uids: string[]): Promise<void>
+  abstract dataChanged(recordIndex: number, fieldId: string, value: unknown): void
 
   public constructor(pageSize = 50, cacheCapacity = 10) {
     this.pageSize = pageSize
@@ -97,13 +99,13 @@ export abstract class DataProviderBasis implements DataProvider {
     }
   }
 
-  public dataChanged(recordIndex: number, fieldId: string, value: unknown) {
-    if (this.activeRecordIndex != recordIndex) throw Error("record is not the active record")
-    const record = this.getRecord(this.activeRecordIndex, true)
-    if (record) {
-      record[fieldId] = value
-    } else throw Error("Can't access active Record")
-  }
+  // public dataChanged(recordIndex: number, fieldId: string, value: unknown) {
+  //   if (this.activeRecordIndex != recordIndex) throw Error("record is not the active record")
+  //   const record = this.getRecord(this.activeRecordIndex, true)
+  //   if (record) {
+  //     record[fieldId] = value
+  //   } else throw Error("Can't access active Record")
+  // }
 
   public setActiveRecord(index: number) {
     this.pendingActiveIndex = index
