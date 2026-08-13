@@ -375,9 +375,6 @@ export class PageMerger {
       }
     }
 
-    //todo: I am not sure this is still a valid exit
-    // if (this.dbRecordCount == 0) return
-
     const firstDbRow = idx
     let lastDbRow = recordWindow.length - 1
 
