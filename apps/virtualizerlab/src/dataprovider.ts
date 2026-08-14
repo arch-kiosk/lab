@@ -1,6 +1,6 @@
 // noinspection TypeScriptAbstractClassConstructorCanBeMadeProtected
 
-import type { DataRecord,DataNotifier } from "./sharedtypes"
+import type { DataRecord,DataNotifier,RecordState } from "./sharedtypes"
 import { LruPageCache, PageCache } from "./cache"
 
 export interface DataProvider {
@@ -10,12 +10,14 @@ export interface DataProvider {
       bufferedOnly?: boolean,
       notify?: (index: number) => void,
   ): DataRecord | undefined
+  getRecordState(uid: string) : RecordState
   setActiveRecord(index: number): void
   setNotifier(notifier: DataNotifier): void
   dataChanged(recordIndex: number, fieldId: string, value: unknown): void
   addRecord(record: DataRecord): void
   deleteRecords(uids: string[]) : Promise<void>
   getTelemetry?(): { cached: number; capacity: number }
+  logTelemetry?(): void
 }
 
 export abstract class DataProviderBasis implements DataProvider {
@@ -50,7 +52,7 @@ export abstract class DataProviderBasis implements DataProvider {
    */
   protected abstract fetchRecordsFromDb(fromRecord: number, count: number): Promise<DataRecord[]>
 
-
+  abstract getRecordState(uid: string): RecordState
   abstract recordCount(): number
   abstract addRecord(record: DataRecord): void
   abstract deleteRecords(uids: string[]): Promise<void>
@@ -176,7 +178,11 @@ export abstract class DataProviderBasis implements DataProvider {
     }
   }
 
-  private async fetchPage(
+  public logTelemetry() {
+    console.log(this.pageCache)
+  }
+
+  protected async fetchPage(
       pageIndex: number,
       currentRetries: number,
       notify = true,

@@ -1,7 +1,24 @@
 import { test, expect } from "vite-plus/test"
-import { DataRecord, MergeWindowItem, PageMerger, RecordStore } from "./pagemerger"
+import { DataRecord, MergeWindowItem, PageMerger, type RecordStore as RS } from "./pagemerger"
 import { DomainKeyHelper } from "../src/sharedtypes"
 import { DraftStore } from "../src/draftstore"
+
+export class RecordStore implements RS {
+  records?: DataRecord[]
+  constructor(values: Array<string>) {
+    this.records = values.map((v, index) => {
+      return { uid: index.toString(), data: v }
+    })
+  }
+
+  getRecordsFromDb(from: number, count: number): DataRecord[] {
+    console.log(`fetching records ${from} to ${from + count - 1}`)
+    return this.records?.slice(from, from + count) ?? []
+  }
+  getRecordCount() {
+    return this.records?.length ?? 0
+  }
+}
 
 const domainKeyHelper: DomainKeyHelper<string> = {
   compareKeys(key1, key2) {

@@ -1,5 +1,5 @@
 import { DomainKeyHelper, DataRecord as D} from "../src/sharedtypes"
-import { DraftEntry, DraftStore } from "../src/draftstore"
+import { DraftStore } from "../src/draftstore"
 
 export type DataRecord = D | { uid: string; data: string }
 export type MergeWindowItem = {
@@ -9,154 +9,14 @@ export type MergeWindowItem = {
   record: DataRecord
 }
 
-export class RecordStore {
-  records?: DataRecord[]
-  constructor(values: Array<string>) {
-    this.records = values.map((v, index) => {
-      return { uid: index.toString(), data: v }
-    })
-  }
-
-  getRecordsFromDb(from: number, count: number): DataRecord[] {
-    console.log(`fetching records ${from} to ${from + count - 1}`)
-    return this.records?.slice(from, from + count) ?? []
-  }
-  getRecordCount() {
-    return this.records?.length ?? 0
-  }
-}
-
-export class SimpleDraftStore {
-  draftStore = new DraftStore()
-  /**
-   * adds a new draft that modifies an existing db record
-   * (unlike addNew, which creates a draft that represents a new, not yet existing db record)
-   * @param record
-   */
-  public addModification(
-    updatedRecord: DataRecord,
-    rawDbRecord: DataRecord | undefined,
-    domainKeyHelper: DomainKeyHelper<unknown>,
-    pinIfNecessary = true,
-  ): void {
-    this.draftStore.addModification(updatedRecord, rawDbRecord, domainKeyHelper, pinIfNecessary)
-  }
-
-  public pinDraft(draft: DraftEntry, pinToKey: undefined) {
-    this.draftStore.pinDraft(draft, pinToKey)
-  }
-
-  public getPosKey(
-    draft: DraftEntry,
-    domainKeyHelper: DomainKeyHelper<unknown>,
-  ): unknown | undefined {
-    return this.draftStore.getPosKey(draft, domainKeyHelper)
-  }
-
-  public getDraftCount() {
-    return this.draftStore.count
-  }
-
-  public getDraft(uid: string): DraftEntry | undefined {
-    return this.draftStore.getDraft(uid)
-  }
-
-  public sortDrafts(drafts: DraftEntry[], domainKeyHelper: DomainKeyHelper<unknown>) {
-    return this.draftStore.sortDrafts(drafts, domainKeyHelper)
-  }
-
-  getAllDrafts(domainKeyHelper: DomainKeyHelper<unknown>, excludePinned = false) {
-    let drafts = this.draftStore.getAllDrafts(excludePinned)
-    this.sortDrafts(drafts, domainKeyHelper)
-    return drafts
-  }
-
-  /**
-   * Not returning drafts that are new and pinned to the end
-   * @param key1 - can be undefined
-   * @param key2 - can be undefined
-   * @param domainKeyHelper
-   * @returns list of drafts between the two keys
-   */
-  public getDraftsBetween(
-    key1: string | undefined,
-    key2: string | undefined,
-    domainKeyHelper: DomainKeyHelper<unknown>,
-  ) {
-    const result = []
-    for (const draft of this.draftStore.getDraftMap.values()) {
-      const draftKey = this.getPosKey(draft, domainKeyHelper) //.extractKey(draft.record)
-
-      //a new draft that is pinned to the end
-      if (draftKey === undefined) continue
-
-      if (
-        (!key1 || domainKeyHelper.compareKeys(key1, draftKey) <= 0) &&
-        (!key2 || domainKeyHelper.compareKeys(draftKey, key2) <= 0)
-      ) {
-        result.push(draft)
-      }
-    }
-    this.sortDrafts(result, domainKeyHelper)
-    return result
-  }
-
-  public getRecord(uid: string) {
-    return this.draftStore.getRecord(uid)
-  }
-
-  public get newCount() {
-    return this.draftStore.newCount
-  }
-
-  public addNew(record: DataRecord): DraftEntry {
-    return this.draftStore.addNew(record)
-  }
-
-  public unPinDraft(draft: DraftEntry) {
-    this.draftStore.unPinDraft(draft)
-  }
-
-
-  public getDraftsInsertedBeforeRecord(
-    record: DataRecord,
-    domainKeyHelper: DomainKeyHelper<unknown>,
-  ) {
-    // console.log(this.draftStore.getAllDrafts())
-    return this.draftStore
-      .getAllDrafts(false, true)
-      .filter(
-        (draft) =>
-          domainKeyHelper.compareKeys(
-            this.draftStore.getPosKey(draft, domainKeyHelper),
-            record.data,
-          ) < 0,
-      ) //draft.record.data
-      .map((draft) => draft.record)
-  }
-
-  public getModifiedRecordsBeforeRecord(
-    record: DataRecord,
-    domainKeyHelper: DomainKeyHelper<unknown>,
-  ) {
-    return this.draftStore
-      .getAllDrafts()
-      .filter((draft) => {
-        return (
-          draft.originalDbKey && domainKeyHelper.compareKeys(draft.originalDbKey, record.data) < 0
-        )
-      })
-      .map((draft) => draft.record)
-  }
-
-  unpinAll() {
-    this.draftStore.unpinAll()
-  }
+export type RecordStore = {
+  getRecordsFromDb(from: number, count: number): DataRecord[]
+  getRecordCount(): number
 }
 
 export class PageMerger {
   db: RecordStore
-  draftStore: SimpleDraftStore
+  draftStore: DraftStore
   pageSize: number
   domainKeyHelper: DomainKeyHelper<unknown>
 
@@ -176,7 +36,7 @@ export class PageMerger {
 
   constructor(
     db: RecordStore,
-    ds: SimpleDraftStore,
+    ds: DraftStore,
     domainKeyHelper: DomainKeyHelper<unknown>,
     pageSize = 5,
   ) {
@@ -416,7 +276,6 @@ export class PageMerger {
       }
     }
 
-
     // all drafts that are between the first and last row in the window
     idx = firstDbRow
     while (idx < lastDbRow) {
@@ -448,7 +307,7 @@ export class PageMerger {
     const keyTop = recordWindow[0].key
     const keyBottom = recordWindow[recordWindow.length - 1].key
 
-    for (const draft of this.draftStore.getAllDrafts(this.domainKeyHelper, false)) {
+    for (const draft of this.draftStore.getAllDrafts(this.domainKeyHelper)) {
       let origin = undefined
       if (draft.isNew && draft.pinned && draft.pinnedKey === undefined) continue
       // an origin is always calculated on the basis of the record in the database
@@ -477,7 +336,7 @@ export class PageMerger {
           if (origin !== undefined && origin < 1) bottomMovement++
           if (origin !== undefined && origin < 0) topMovement++
         } else {
-          // draft target is INto the page
+          // draft target is Into the page
           if (origin === undefined || origin > 0) bottomMovement--
           if (origin !== undefined && origin < 0) topMovement++
         }
