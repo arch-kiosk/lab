@@ -92,7 +92,7 @@ export class DraftStore {
   ) {
     // console.log(this.draftStore.getAllDrafts())
     return this
-        .getAllDrafts(domainKeyHelper, false, true)
+        .getAllDraftsExceptNewPinned()  //(domainKeyHelper, true)
         .filter(
             (draft: DraftEntry) =>
                 domainKeyHelper.compareKeys(
@@ -276,23 +276,27 @@ export class DraftStore {
 
   /**
    * returns all raw draft records freshly sorted
-   * excludePinned: excludes drafts that are pinned from the list
-   * excludeNewPinned: excludes drafts that are entirely new (drafts that must appear at the end of the list)
-   * todo: refactor - excludePinned is not required and excludeNewPinned is so weird that it might be better
-   *        to filter these out by the caller
-   * @returns drafts
+   * @domainKeyHelper - the usual domain key helper
+   * @returns ordered drafts
    */
-  public getAllDrafts(domainKeyHelper: DomainKeyHelper<unknown>,
-                      excludePinned = false,
-                      excludeNewPinned = false): DraftEntry[] {
+  public getAllDrafts(domainKeyHelper: DomainKeyHelper<unknown>): DraftEntry[] {
     let drafts: DraftEntry[]
-    if (excludePinned) {
-      drafts= Array.from(this.#drafts.values()).filter((draft) => !draft.pinned)
-    } else if (excludeNewPinned) {
-      drafts= Array.from(this.#drafts.values()).filter((draft) => !(draft.isNew && draft.pinned && draft.pinnedKey === undefined))
-      } else drafts= Array.from(this.#drafts.values())
+    drafts= Array.from(this.#drafts.values())
 
     this.sortDrafts(drafts, domainKeyHelper)
+    return drafts
+  }
+
+  /**
+   * returns draft records that are not new and pinned to undefined
+   * (the drafts that should appear according to creation order at the end)
+   * @returns unordered drafts
+   */
+  public getAllDraftsExceptNewPinned(): DraftEntry[] {
+    let drafts: DraftEntry[]
+    drafts= Array.from(this.#drafts.values()).filter((draft) => !(draft.isNew && draft.pinned && draft.pinnedKey === undefined))
+
+    // this.sortDrafts(drafts, domainKeyHelper)
     return drafts
   }
 
