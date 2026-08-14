@@ -1,12 +1,7 @@
 import { test, expect } from "vite-plus/test"
-import {
-  DataRecord,
-  MergeWindowItem,
-  PageMerger,
-  RecordStore,
-  SimpleDraftStore,
-} from "./pagemerger"
+import { DataRecord, MergeWindowItem, PageMerger, RecordStore } from "./pagemerger"
 import { DomainKeyHelper } from "../src/sharedtypes"
+import { DraftStore } from "../src/draftstore"
 
 const domainKeyHelper: DomainKeyHelper<string> = {
   compareKeys(key1, key2) {
@@ -28,7 +23,7 @@ test("test adding and getting records from the record store", () => {
 })
 
 test("test adding and getting a modification from the draft store", () => {
-  const ds = new SimpleDraftStore()
+  const ds = new DraftStore()
   ds.addModification({ uid: "0", data: "BA" }, { uid: "0", data: "A" }, domainKeyHelper, false)
   expect(ds.getRecord("0")).toEqual({ uid: "0", data: "BA" })
   ds.addModification({ uid: "1", data: "ZA" }, { uid: "1", data: "B" }, domainKeyHelper, false)
@@ -50,7 +45,7 @@ const testRecordStore = (recordCount: number) => {
 
 test("PageMerger init", () => {
   const db = testRecordStore(17)
-  const ds = new SimpleDraftStore()
+  const ds = new DraftStore()
   const pageMerger = new PageMerger(db, ds, domainKeyHelper)
   const page = pageMerger.getPage(0)
   expect(page).toEqual([
@@ -65,7 +60,7 @@ test("PageMerger init", () => {
 
 test("virtual index test", () => {
   const db = testRecordStore(17)
-  const ds = new SimpleDraftStore()
+  const ds = new DraftStore()
   const pageMerger = new PageMerger(db, ds, domainKeyHelper)
   expect(pageMerger.getVirtualIndex(1, { uid: "1", data: "B" })).toBe(1)
   expect(pageMerger.getVirtualIndex(2, { uid: "2", data: "C" })).toBe(2)
@@ -76,7 +71,7 @@ test("virtual index test", () => {
 
 test("merge drafts into window", () => {
   const db = testRecordStore(17)
-  const ds = new SimpleDraftStore()
+  const ds = new DraftStore()
   const pageMerger = new PageMerger(db, ds, domainKeyHelper)
   ds.unPinDraft(ds.addNew({ uid: "N3", data: "E" }))
   ds.unPinDraft(ds.addNew({ uid: "N1", data: "CB" }))
@@ -111,7 +106,7 @@ test("merge drafts into window", () => {
 
 test("move records before window", () => {
   const db = testRecordStore(17)
-  const ds = new SimpleDraftStore()
+  const ds = new DraftStore()
   const pageMerger = new PageMerger(db, ds, domainKeyHelper)
   ds.addModification({ uid: "0", data: "BA" }, { uid: "0", data: "A" }, domainKeyHelper, false)
   ds.addModification({ uid: "5", data: "CA" }, { uid: "5", data: "F" }, domainKeyHelper, false)
@@ -132,7 +127,7 @@ test("move records before window", () => {
 
 test("move records behind window", () => {
   const db = testRecordStore(17)
-  const ds = new SimpleDraftStore()
+  const ds = new DraftStore()
   const pageMerger = new PageMerger(db, ds, domainKeyHelper)
   ds.addModification({ uid: "0", data: "BA" }, { uid: "0", data: "A" }, domainKeyHelper, false)
   ds.addModification({ uid: "5", data: "GA" }, { uid: "5", data: "F" }, domainKeyHelper, false)
@@ -154,7 +149,7 @@ test("move records behind window", () => {
 
 test("merge drafts into window and shuffle", () => {
   const db = testRecordStore(17)
-  const ds = new SimpleDraftStore()
+  const ds = new DraftStore()
   const pageMerger = new PageMerger(db, ds, domainKeyHelper)
   ds.unPinDraft(ds.addNew({ uid: "N3", data: "E" }))
   ds.unPinDraft(ds.addNew({ uid: "N1", data: "CB" }))
@@ -215,7 +210,7 @@ test("merge drafts into window and shuffle", () => {
 
 test("move, reshuffle and virtualize", () => {
   const db = testRecordStore(17)
-  const ds = new SimpleDraftStore()
+  const ds = new DraftStore()
   const pageMerger = new PageMerger(db, ds, domainKeyHelper)
   ds.addModification({ uid: "6", data: "DA" }, { uid: "6", data: "G" }, domainKeyHelper, false)
   ds.addModification({ uid: "5", data: "HA" }, { uid: "5", data: "F" }, domainKeyHelper, false)
@@ -313,7 +308,7 @@ test("recalc windows boundaries", () => {
   ]
 
   for (const test of tests) {
-    const ds = new SimpleDraftStore()
+    const ds = new DraftStore()
     const pageMerger = new PageMerger(db, ds, domainKeyHelper)
     ds.addModification(test.target, test.origin, domainKeyHelper, false)
     let recordWindow = pageMerger.initRecordWindow(db.getRecordsFromDb(5, 5), 5)
@@ -326,7 +321,7 @@ test("recalc windows boundaries", () => {
 
 test("getPage 1", () => {
   const db = testRecordStore(17)
-  const ds = new SimpleDraftStore()
+  const ds = new DraftStore()
   const pageMerger = new PageMerger(db, ds, domainKeyHelper)
   ds.addModification({ uid: "6", data: "DA" }, { uid: "6", data: "G" }, domainKeyHelper, false)
   ds.addModification({ uid: "5", data: "HA" }, { uid: "5", data: "F" }, domainKeyHelper, false)
@@ -368,7 +363,7 @@ test("getPage 1", () => {
 
 test("getPage 2", () => {
   const db = testRecordStore(17)
-  const ds = new SimpleDraftStore()
+  const ds = new DraftStore()
   const pageMerger = new PageMerger(db, ds, domainKeyHelper)
   ds.addModification({ uid: "6", data: "DA" }, { uid: "6", data: "G" }, domainKeyHelper, false)
   ds.addModification({ uid: "5", data: "HA" }, { uid: "5", data: "F" }, domainKeyHelper, false)
@@ -385,7 +380,7 @@ test("getPage 2", () => {
 
 test("getPage records at page seams", () => {
   const db = testRecordStore(17)
-  const ds = new SimpleDraftStore()
+  const ds = new DraftStore()
   const pageMerger = new PageMerger(db, ds, domainKeyHelper)
   let page: Array<DataRecord> | undefined
 
@@ -419,7 +414,7 @@ test("getPage records at page seams", () => {
 
 test("getPage move record between pages", () => {
   const db = testRecordStore(17)
-  const ds = new SimpleDraftStore()
+  const ds = new DraftStore()
   const pageMerger = new PageMerger(db, ds, domainKeyHelper)
   let page: Array<DataRecord> | undefined
 
@@ -448,7 +443,7 @@ test("getPage move record between pages", () => {
 
 test("getPage move whole page between next page plus 1", () => {
   const db = testRecordStore(17)
-  const ds = new SimpleDraftStore()
+  const ds = new DraftStore()
   const pageMerger = new PageMerger(db, ds, domainKeyHelper)
   let page: Array<DataRecord> | undefined
 
@@ -457,7 +452,8 @@ test("getPage move whole page between next page plus 1", () => {
     ds.addModification(
       { uid: r.uid, data: "K" + r.data },
       { uid: r.uid, data: r.data },
-      domainKeyHelper, false
+      domainKeyHelper,
+      false,
     )
   }
 
@@ -484,7 +480,7 @@ test("getPage move whole page between next page plus 1", () => {
 
 test("getPage move whole page between next page", () => {
   const db = testRecordStore(17)
-  const ds = new SimpleDraftStore()
+  const ds = new DraftStore()
   const pageMerger = new PageMerger(db, ds, domainKeyHelper)
   let page: Array<DataRecord> | undefined
 
@@ -493,7 +489,8 @@ test("getPage move whole page between next page", () => {
     ds.addModification(
       { uid: r.uid, data: "I" + r.data },
       { uid: r.uid, data: r.data },
-      domainKeyHelper, false
+      domainKeyHelper,
+      false,
     )
   }
 
@@ -520,7 +517,7 @@ test("getPage move whole page between next page", () => {
 
 test("getPage move whole page between two pages", () => {
   const db = testRecordStore(17)
-  const ds = new SimpleDraftStore()
+  const ds = new DraftStore()
   const pageMerger = new PageMerger(db, ds, domainKeyHelper)
   let page: Array<DataRecord> | undefined
 
@@ -529,7 +526,8 @@ test("getPage move whole page between two pages", () => {
     ds.addModification(
       { uid: r.uid, data: "J" + r.data },
       { uid: r.uid, data: r.data },
-      domainKeyHelper,false
+      domainKeyHelper,
+      false,
     )
   }
 
@@ -556,7 +554,7 @@ test("getPage move whole page between two pages", () => {
 
 test("getPage move last 5 records between two pages", () => {
   const db = testRecordStore(17)
-  const ds = new SimpleDraftStore()
+  const ds = new DraftStore()
   const pageMerger = new PageMerger(db, ds, domainKeyHelper)
   let page: Array<DataRecord> | undefined
 
@@ -565,7 +563,8 @@ test("getPage move last 5 records between two pages", () => {
     ds.addModification(
       { uid: r.uid, data: "J" + r.data },
       { uid: r.uid, data: r.data },
-      domainKeyHelper,false
+      domainKeyHelper,
+      false,
     )
   }
 
@@ -609,7 +608,7 @@ test("getPage move last 5 records between two pages", () => {
 
 test("getPage move last short page records between two pages", () => {
   const db = testRecordStore(17)
-  const ds = new SimpleDraftStore()
+  const ds = new DraftStore()
   const pageMerger = new PageMerger(db, ds, domainKeyHelper)
   let page: Array<DataRecord> | undefined
 
@@ -618,7 +617,8 @@ test("getPage move last short page records between two pages", () => {
     ds.addModification(
       { uid: r.uid, data: "J" + r.data },
       { uid: r.uid, data: r.data },
-      domainKeyHelper,false
+      domainKeyHelper,
+      false,
     )
   }
 
@@ -662,7 +662,7 @@ test("getPage move last short page records between two pages", () => {
 
 test("getPage short and empty pages", () => {
   let db = testRecordStore(3)
-  let ds = new SimpleDraftStore()
+  let ds = new DraftStore()
   let pageMerger = new PageMerger(db, ds, domainKeyHelper)
   let page: Array<DataRecord> | undefined
 
@@ -678,7 +678,7 @@ test("getPage short and empty pages", () => {
   ])
 
   db = testRecordStore(0)
-  ds = new SimpleDraftStore()
+  ds = new DraftStore()
   pageMerger = new PageMerger(db, ds, domainKeyHelper)
   page = pageMerger.getPage(0)
   expect(page).not.toBeUndefined()
@@ -689,12 +689,11 @@ test("getPage short and empty pages", () => {
   page = pageMerger.getPage(0)
   expect(page).not.toBeUndefined()
   expect(page).toEqual([{ uid: "X", data: "0" }])
-
 })
 
-test("getPage with only drafts in last page", ()=> {
+test("getPage with only drafts in last page", () => {
   const db = testRecordStore(5)
-  const ds = new SimpleDraftStore()
+  const ds = new DraftStore()
   const pageMerger = new PageMerger(db, ds, domainKeyHelper)
   ds.unPinDraft(ds.addNew({ uid: "X", data: "F" }))
   let page = pageMerger.getPage(1)
@@ -702,34 +701,31 @@ test("getPage with only drafts in last page", ()=> {
   expect(page).toEqual([{ uid: "X", data: "F" }])
 })
 
-test("getPage with a whole page of drafts at the end", ()=> {
+test("getPage with a whole page of drafts at the end", () => {
   const db = testRecordStore(5)
-  const ds = new SimpleDraftStore()
+  const ds = new DraftStore()
   const pageMerger = new PageMerger(db, ds, domainKeyHelper)
-  for (let i = 0; i<6; i++) ds.unPinDraft(ds.addNew({ uid: `X${i}`, data: "ZZ" + String.fromCharCode(65 + i),
-  }))
+  for (let i = 0; i < 6; i++)
+    ds.unPinDraft(ds.addNew({ uid: `X${i}`, data: "ZZ" + String.fromCharCode(65 + i) }))
 
   let page = pageMerger.getPage(2)
   expect(page).not.toBeUndefined()
-  expect(page).toEqual([
-    { uid: "X5", data: "ZZF" },
-  ])
+  expect(page).toEqual([{ uid: "X5", data: "ZZF" }])
 
   page = pageMerger.getPage(1)
   expect(page).not.toBeUndefined()
   expect(page).toEqual([
-      { uid: "X0", data: "ZZA" },
-      { uid: "X1", data: "ZZB" },
-      { uid: "X2", data: "ZZC" },
-      { uid: "X3", data: "ZZD" },
-      { uid: "X4", data: "ZZE" },
+    { uid: "X0", data: "ZZA" },
+    { uid: "X1", data: "ZZB" },
+    { uid: "X2", data: "ZZC" },
+    { uid: "X3", data: "ZZD" },
+    { uid: "X4", data: "ZZE" },
   ])
 })
 
-
 test("getPage with repeatedly modified record and draft", () => {
   const db = testRecordStore(17)
-  const ds = new SimpleDraftStore()
+  const ds = new DraftStore()
 
   const pageMerger = new PageMerger(db, ds, domainKeyHelper)
   ds.addModification({ uid: "11", data: "BA" }, db.records![11], pageMerger.domainKeyHelper)
@@ -802,16 +798,18 @@ test("getPage with repeatedly modified record and draft", () => {
 
 test("getPage with new drafts on last page and one db record inserted", () => {
   const db = testRecordStore(3)
-  const ds = new SimpleDraftStore()
+  const ds = new DraftStore()
 
   const pageMerger = new PageMerger(db, ds, domainKeyHelper)
-  for (let i = 0; i<5; i++) {
-    ds.unPinDraft(ds.addNew(
-        {
-          uid: `X${i}`, data: String.fromCharCode(68 + i),
-        }))
+  for (let i = 0; i < 5; i++) {
+    ds.unPinDraft(
+      ds.addNew({
+        uid: `X${i}`,
+        data: String.fromCharCode(68 + i),
+      }),
+    )
   }
-  ds.addModification({uid: "1", data: "FA"}, {uid: "1", data: "B"}, domainKeyHelper, false)
+  ds.addModification({ uid: "1", data: "FA" }, { uid: "1", data: "B" }, domainKeyHelper, false)
   let page = pageMerger.getPage(1)
   expect(page).not.toBeUndefined()
   expect(page).toEqual([
@@ -833,13 +831,12 @@ test("getPage with new drafts on last page and one db record inserted", () => {
 
 test("getPage with new drafts on last page and one db record inserted #2", () => {
   const db = testRecordStore(6)
-  const ds = new SimpleDraftStore()
+  const ds = new DraftStore()
 
   const pageMerger = new PageMerger(db, ds, domainKeyHelper)
-  for (let i = 0; i<2; i++) ds.unPinDraft(ds.addNew(
-      { uid: `X${i}`, data: String.fromCharCode(71 + i),
-      }))
-  ds.addModification({uid: "1", data: "I"}, {uid: "1", data: "B"}, domainKeyHelper, false)
+  for (let i = 0; i < 2; i++)
+    ds.unPinDraft(ds.addNew({ uid: `X${i}`, data: String.fromCharCode(71 + i) }))
+  ds.addModification({ uid: "1", data: "I" }, { uid: "1", data: "B" }, domainKeyHelper, false)
   let page = pageMerger.getPage(1)
   expect(page).not.toBeUndefined()
   expect(page).toEqual([
@@ -861,12 +858,10 @@ test("getPage with new drafts on last page and one db record inserted #2", () =>
 
 test("getPage with empty db and more than a page of drafts", () => {
   const db = testRecordStore(0)
-  const ds = new SimpleDraftStore()
+  const ds = new DraftStore()
 
   const pageMerger = new PageMerger(db, ds, domainKeyHelper)
-  for (let i = 7; i >= 0; i--) ds.addNew(
-      { uid: `X${i}`, data: String.fromCharCode(65 + i),
-      })
+  for (let i = 7; i >= 0; i--) ds.addNew({ uid: `X${i}`, data: String.fromCharCode(65 + i) })
 
   let page = pageMerger.getPage(1)
   expect(page).not.toBeUndefined()
@@ -889,14 +884,12 @@ test("getPage with empty db and more than a page of drafts", () => {
 
 test("getPage with empty db and more than a page of drafts, some pinned", () => {
   const db = testRecordStore(0)
-  const ds = new SimpleDraftStore()
+  const ds = new DraftStore()
 
   const pageMerger = new PageMerger(db, ds, domainKeyHelper)
   for (let i = 7; i >= 0; i--) {
-    const draft = ds.addNew(
-      { uid: `X${i}`, data: String.fromCharCode(65 + i),
-      })
-    if ((i % 2) == 0) ds.unPinDraft(draft)
+    const draft = ds.addNew({ uid: `X${i}`, data: String.fromCharCode(65 + i) })
+    if (i % 2 == 0) ds.unPinDraft(draft)
   }
 
   let page = pageMerger.getPage(1)
@@ -920,7 +913,7 @@ test("getPage with empty db and more than a page of drafts, some pinned", () => 
 
 test("getPage with new drafts", () => {
   const db = testRecordStore(17)
-  const ds = new SimpleDraftStore()
+  const ds = new DraftStore()
 
   const pageMerger = new PageMerger(db, ds, domainKeyHelper)
   ds.addNew({ uid: "18", data: "ZZ" })
@@ -948,7 +941,7 @@ test("getPage with new drafts", () => {
 
 test("getPage with new drafts, then pin and modify them", () => {
   const db = testRecordStore(17)
-  const ds = new SimpleDraftStore()
+  const ds = new DraftStore()
 
   const pageMerger = new PageMerger(db, ds, domainKeyHelper)
   ds.addNew({ uid: "18", data: "ZZ" })
@@ -1027,5 +1020,4 @@ test("getPage with new drafts, then pin and modify them", () => {
     { uid: "2", data: "C" },
     { uid: "18", data: "CA" },
   ])
-
 })
