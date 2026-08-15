@@ -10,8 +10,8 @@ export type MergeWindowItem = {
 }
 
 export type RecordStore = {
-  getRecordsFromDb(from: number, count: number): DataRecord[]
-  getRecordCount(): number
+  getRecordsFromDb(from: number, count: number): Promise<DataRecord[]>
+  getDbRecordCount(): number
 }
 
 export class PageMerger {
@@ -51,41 +51,41 @@ export class PageMerger {
   }
 
   getDbRecordCount() {
-    return this.db.getRecordCount()
+    return this.db.getDbRecordCount()
   }
 
   getRecordCount() {
     return this.dbRecordCount + this.draftStore.newCount
   }
 
-  getPage(pageIndex: number): DataRecord[] | undefined {
+  async getPage(pageIndex: number): Promise<DataRecord[] | undefined> {
     // if (pageIndex * this.pageSize >= this.dbRecordCount) return []
     try {
       const toIndex = pageIndex * this.pageSize + this.pageSize - 1
       const pageSize =
         this.dbRecordCount - toIndex < 1 ? this.dbRecordCount % this.pageSize : this.pageSize
       console.log(`getPage ${pageIndex}`)
-      let page = this.dbRecordCount?this.db.getRecordsFromDb(pageIndex * this.pageSize, pageSize):[]
+      let page = this.dbRecordCount?await this.db.getRecordsFromDb(pageIndex * this.pageSize, pageSize):[]
 
       if (this.draftStore.getDraftCount() == 0) {
         return page
       }
-      return this.getVirtualPage(pageIndex, page)
+      return await this.getVirtualPage(pageIndex, page)
     } catch (e) {
       console.error(e)
     }
     return undefined
   }
 
-  protected getVirtualPage(
+  protected async getVirtualPage(
     pageIndex: number,
     initialRecords: DataRecord[],
-  ): DataRecord[] | undefined {
-    const _getVirtualPage = (startIndex: number, endIndex: number, dbRecords: DataRecord[]) => {
+  ): Promise<DataRecord[] | undefined> {
+    const _getVirtualPage = async (startIndex: number, endIndex: number, dbRecords: DataRecord[]) => {
       if (startIndex > this.dbRecordCount - 1) {
         //no db record in this page -> extend currentStart to last dbRecord
         startIndex = this.dbRecordCount - 1
-        dbRecords = this.db.getRecordsFromDb(startIndex, endIndex)
+        dbRecords = await this.db.getRecordsFromDb(startIndex, endIndex)
       }
       let currentStart = startIndex
       let currentEnd = endIndex
@@ -113,7 +113,7 @@ export class PageMerger {
           // return _getVirtualPage(newStart, newEnd, dbRecords)
           let from = Math.max(0, newStart - 1)
           let c = Math.min(newEnd + 2 - newStart, this.dbRecordCount - from)
-          const dbRecords = this.db.getRecordsFromDb(from, c)
+          const dbRecords = await this.db.getRecordsFromDb(from, c)
           newStart = Math.max(0, newStart - 1)
           if (newStart == startIndex && newEnd === endIndex)
             throw "_getVirtualPage recursion with same boundaries prohibited."
@@ -132,7 +132,7 @@ export class PageMerger {
       this.getRecordCount() - 1,
     )
     if (this.dbRecordCount > 0) {
-      return _getVirtualPage(startIndex, endIndex, initialRecords)
+      return await _getVirtualPage(startIndex, endIndex, initialRecords)
     }
     if (this.getRecordCount() > 0) {
       return this.compileDraftPage(pageIndex)

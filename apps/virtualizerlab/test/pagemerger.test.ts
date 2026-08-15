@@ -1,5 +1,5 @@
 import { test, expect } from "vite-plus/test"
-import { DataRecord, MergeWindowItem, PageMerger, type RecordStore as RS } from "./pagemerger"
+import { DataRecord, MergeWindowItem, PageMerger, type RecordStore as RS } from "../src/pagemerger"
 import { DomainKeyHelper } from "../src/sharedtypes"
 import { DraftStore } from "../src/draftstore"
 
@@ -11,11 +11,11 @@ export class RecordStore implements RS {
     })
   }
 
-  getRecordsFromDb(from: number, count: number): DataRecord[] {
+  getRecordsFromDb(from: number, count: number): Promise<DataRecord[]> {
     console.log(`fetching records ${from} to ${from + count - 1}`)
-    return this.records?.slice(from, from + count) ?? []
+    return Promise.resolve(this.records?.slice(from, from + count) ?? [])
   }
-  getRecordCount() {
+  getDbRecordCount() {
     return this.records?.length ?? 0
   }
 }
@@ -29,11 +29,11 @@ const domainKeyHelper: DomainKeyHelper<string> = {
   },
 }
 
-test("test adding and getting records from the record store", () => {
+test("test adding and getting records from the record store", async () => {
   const db = new RecordStore(["A", "B", "C"])
-  expect(db.getRecordsFromDb(0, 1)).toEqual([{ uid: "0", data: "A" }])
-  expect(db.getRecordsFromDb(2, 1)).toEqual([{ uid: "2", data: "C" }])
-  expect(db.getRecordsFromDb(1, 2)).toEqual([
+  expect(await db.getRecordsFromDb(0, 1)).toEqual([{ uid: "0", data: "A" }])
+  expect(await db.getRecordsFromDb(2, 1)).toEqual([{ uid: "2", data: "C" }])
+  expect(await db.getRecordsFromDb(1, 2)).toEqual([
     { uid: "1", data: "B" },
     { uid: "2", data: "C" },
   ])
@@ -60,11 +60,11 @@ const testRecordStore = (recordCount: number) => {
   return new RecordStore(records)
 }
 
-test("PageMerger init", () => {
+test("PageMerger init", async () => {
   const db = testRecordStore(17)
   const ds = new DraftStore()
   const pageMerger = new PageMerger(db, ds, domainKeyHelper)
-  const page = pageMerger.getPage(0)
+  const page = await pageMerger.getPage(0)
   expect(page).toEqual([
     { uid: "0", data: "A" },
     { uid: "1", data: "B" },
@@ -310,7 +310,7 @@ test("move, reshuffle and virtualize", () => {
   ])
 })
 
-test("recalc windows boundaries", () => {
+test("recalc windows boundaries", async () => {
   const db = testRecordStore(17)
   const tests = [
     { origin: { uid: "5", data: "F" }, target: { uid: "5", data: "G" }, expected: [0, 0] }, // IN -> IN
@@ -328,7 +328,7 @@ test("recalc windows boundaries", () => {
     const ds = new DraftStore()
     const pageMerger = new PageMerger(db, ds, domainKeyHelper)
     ds.addModification(test.target, test.origin, domainKeyHelper, false)
-    let recordWindow = pageMerger.initRecordWindow(db.getRecordsFromDb(5, 5), 5)
+    let recordWindow = pageMerger.initRecordWindow(await db.getRecordsFromDb(5, 5), 5)
     expect(
       pageMerger.recalcWindowBoundaries(recordWindow),
       `${test.origin.data} -> ${test.target.data}`,
@@ -336,14 +336,14 @@ test("recalc windows boundaries", () => {
   }
 })
 
-test("getPage 1", () => {
+test("getPage 1", async () => {
   const db = testRecordStore(17)
   const ds = new DraftStore()
   const pageMerger = new PageMerger(db, ds, domainKeyHelper)
   ds.addModification({ uid: "6", data: "DA" }, { uid: "6", data: "G" }, domainKeyHelper, false)
   ds.addModification({ uid: "5", data: "HA" }, { uid: "5", data: "F" }, domainKeyHelper, false)
   ds.addModification({ uid: "9", data: "KA" }, { uid: "9", data: "J" }, domainKeyHelper, false)
-  let page = pageMerger.getPage(1)
+  let page = await pageMerger.getPage(1)
   expect(page).not.toBeUndefined()
   expect(page).toEqual([
     { uid: "4", data: "E" },
@@ -352,7 +352,7 @@ test("getPage 1", () => {
     { uid: "8", data: "I" },
     { uid: "10", data: "K" },
   ])
-  page = pageMerger.getPage(0)
+  page = await pageMerger.getPage(0)
   expect(page).not.toBeUndefined()
   expect(page).toEqual([
     { uid: "0", data: "A" },
@@ -361,7 +361,7 @@ test("getPage 1", () => {
     { uid: "3", data: "D" },
     { uid: "6", data: "DA" },
   ])
-  page = pageMerger.getPage(2)
+  page = await pageMerger.getPage(2)
   expect(page).not.toBeUndefined()
   expect(page).toEqual([
     { uid: "9", data: "KA" },
@@ -370,7 +370,7 @@ test("getPage 1", () => {
     { uid: "13", data: "N" },
     { uid: "14", data: "O" },
   ])
-  page = pageMerger.getPage(3)
+  page = await pageMerger.getPage(3)
   expect(page).not.toBeUndefined()
   expect(page).toEqual([
     { uid: "15", data: "P" },
@@ -378,7 +378,7 @@ test("getPage 1", () => {
   ])
 })
 
-test("getPage 2", () => {
+test("getPage 2", async () => {
   const db = testRecordStore(17)
   const ds = new DraftStore()
   const pageMerger = new PageMerger(db, ds, domainKeyHelper)
@@ -387,7 +387,7 @@ test("getPage 2", () => {
   ds.addModification({ uid: "9", data: "KA" }, { uid: "9", data: "J" }, domainKeyHelper, false)
   ds.addModification({ uid: "16", data: "A" }, { uid: "16", data: "Q" }, domainKeyHelper, false)
   ds.addModification({ uid: "0", data: "R" }, { uid: "0", data: "A" }, domainKeyHelper, false)
-  let page = pageMerger.getPage(3)
+  let page = await pageMerger.getPage(3)
   expect(page).not.toBeUndefined()
   expect(page).toEqual([
     { uid: "15", data: "P" },
@@ -395,7 +395,7 @@ test("getPage 2", () => {
   ])
 })
 
-test("getPage records at page seams", () => {
+test("getPage records at page seams", async () => {
   const db = testRecordStore(17)
   const ds = new DraftStore()
   const pageMerger = new PageMerger(db, ds, domainKeyHelper)
@@ -403,7 +403,7 @@ test("getPage records at page seams", () => {
 
   ds.addModification({ uid: "16", data: "0" }, { uid: "16", data: "Q" }, domainKeyHelper, false)
 
-  page = pageMerger.getPage(1)
+  page = await pageMerger.getPage(1)
   expect(page).not.toBeUndefined()
   expect(page).toEqual([
     { uid: "4", data: "E" },
@@ -412,7 +412,7 @@ test("getPage records at page seams", () => {
     { uid: "7", data: "H" },
     { uid: "8", data: "I" },
   ])
-  page = pageMerger.getPage(0)
+  page = await pageMerger.getPage(0)
   expect(page).not.toBeUndefined()
   expect(page).toEqual([
     { uid: "16", data: "0" },
@@ -421,7 +421,7 @@ test("getPage records at page seams", () => {
     { uid: "2", data: "C" },
     { uid: "3", data: "D" },
   ])
-  page = pageMerger.getPage(3)
+  page = await pageMerger.getPage(3)
   expect(page).not.toBeUndefined()
   expect(page).toEqual([
     { uid: "14", data: "O" },
@@ -429,7 +429,7 @@ test("getPage records at page seams", () => {
   ])
 })
 
-test("getPage move record between pages", () => {
+test("getPage move record between pages", async () => {
   const db = testRecordStore(17)
   const ds = new DraftStore()
   const pageMerger = new PageMerger(db, ds, domainKeyHelper)
@@ -437,7 +437,7 @@ test("getPage move record between pages", () => {
 
   ds.addModification({ uid: "1", data: "JA" }, { uid: "1", data: "B" }, domainKeyHelper, false)
 
-  page = pageMerger.getPage(1)
+  page = await pageMerger.getPage(1)
   expect(page).not.toBeUndefined()
   expect(page).toEqual([
     { uid: "6", data: "G" },
@@ -447,7 +447,7 @@ test("getPage move record between pages", () => {
     { uid: "1", data: "JA" },
   ])
 
-  page = pageMerger.getPage(0)
+  page = await pageMerger.getPage(0)
   expect(page).not.toBeUndefined()
   expect(page).toEqual([
     { uid: "0", data: "A" },
@@ -458,7 +458,7 @@ test("getPage move record between pages", () => {
   ])
 })
 
-test("getPage move whole page between next page plus 1", () => {
+test("getPage move whole page between next page plus 1", async () => {
   const db = testRecordStore(17)
   const ds = new DraftStore()
   const pageMerger = new PageMerger(db, ds, domainKeyHelper)
@@ -474,7 +474,7 @@ test("getPage move whole page between next page plus 1", () => {
     )
   }
 
-  page = pageMerger.getPage(1)
+  page = await pageMerger.getPage(1)
   expect(page).not.toBeUndefined()
   expect(page).toEqual([
     { uid: "10", data: "K" },
@@ -484,7 +484,7 @@ test("getPage move whole page between next page plus 1", () => {
     { uid: "3", data: "KD" },
   ])
 
-  page = pageMerger.getPage(0)
+  page = await pageMerger.getPage(0)
   expect(page).not.toBeUndefined()
   expect(page).toEqual([
     { uid: "5", data: "F" },
@@ -495,7 +495,7 @@ test("getPage move whole page between next page plus 1", () => {
   ])
 })
 
-test("getPage move whole page between next page", () => {
+test("getPage move whole page between next page", async () => {
   const db = testRecordStore(17)
   const ds = new DraftStore()
   const pageMerger = new PageMerger(db, ds, domainKeyHelper)
@@ -511,7 +511,7 @@ test("getPage move whole page between next page", () => {
     )
   }
 
-  page = pageMerger.getPage(1)
+  page = await pageMerger.getPage(1)
   expect(page).not.toBeUndefined()
   expect(page).toEqual([
     { uid: "1", data: "IB" },
@@ -521,7 +521,7 @@ test("getPage move whole page between next page", () => {
     { uid: "9", data: "J" },
   ])
 
-  page = pageMerger.getPage(0)
+  page = await pageMerger.getPage(0)
   expect(page).not.toBeUndefined()
   expect(page).toEqual([
     { uid: "5", data: "F" },
@@ -532,7 +532,7 @@ test("getPage move whole page between next page", () => {
   ])
 })
 
-test("getPage move whole page between two pages", () => {
+test("getPage move whole page between two pages", async () => {
   const db = testRecordStore(17)
   const ds = new DraftStore()
   const pageMerger = new PageMerger(db, ds, domainKeyHelper)
@@ -548,7 +548,7 @@ test("getPage move whole page between two pages", () => {
     )
   }
 
-  page = pageMerger.getPage(1)
+  page = await pageMerger.getPage(1)
   expect(page).not.toBeUndefined()
   expect(page).toEqual([
     { uid: "0", data: "JA" },
@@ -558,7 +558,7 @@ test("getPage move whole page between two pages", () => {
     { uid: "4", data: "JE" },
   ])
 
-  page = pageMerger.getPage(0)
+  page = await pageMerger.getPage(0)
   expect(page).not.toBeUndefined()
   expect(page).toEqual([
     { uid: "5", data: "F" },
@@ -569,7 +569,7 @@ test("getPage move whole page between two pages", () => {
   ])
 })
 
-test("getPage move last 5 records between two pages", () => {
+test("getPage move last 5 records between two pages", async () => {
   const db = testRecordStore(17)
   const ds = new DraftStore()
   const pageMerger = new PageMerger(db, ds, domainKeyHelper)
@@ -585,14 +585,14 @@ test("getPage move last 5 records between two pages", () => {
     )
   }
 
-  page = pageMerger.getPage(3)
+  page = await pageMerger.getPage(3)
   expect(page).not.toBeUndefined()
   expect(page).toEqual([
     { uid: "10", data: "K" },
     { uid: "11", data: "L" },
   ])
 
-  page = pageMerger.getPage(2)
+  page = await pageMerger.getPage(2)
   expect(page).not.toBeUndefined()
   expect(page).toEqual([
     { uid: "12", data: "JM" },
@@ -602,7 +602,7 @@ test("getPage move last 5 records between two pages", () => {
     { uid: "16", data: "JQ" },
   ])
 
-  page = pageMerger.getPage(1)
+  page = await pageMerger.getPage(1)
   expect(page).not.toBeUndefined()
   expect(page).toEqual([
     { uid: "5", data: "F" },
@@ -612,7 +612,7 @@ test("getPage move last 5 records between two pages", () => {
     { uid: "9", data: "J" },
   ])
 
-  page = pageMerger.getPage(0)
+  page = await pageMerger.getPage(0)
   expect(page).not.toBeUndefined()
   expect(page).toEqual([
     { uid: "0", data: "A" },
@@ -623,7 +623,7 @@ test("getPage move last 5 records between two pages", () => {
   ])
 })
 
-test("getPage move last short page records between two pages", () => {
+test("getPage move last short page records between two pages", async () => {
   const db = testRecordStore(17)
   const ds = new DraftStore()
   const pageMerger = new PageMerger(db, ds, domainKeyHelper)
@@ -639,14 +639,14 @@ test("getPage move last short page records between two pages", () => {
     )
   }
 
-  page = pageMerger.getPage(3)
+  page = await pageMerger.getPage(3)
   expect(page).not.toBeUndefined()
   expect(page).toEqual([
     { uid: "13", data: "N" },
     { uid: "14", data: "O" },
   ])
 
-  page = pageMerger.getPage(2)
+  page = await pageMerger.getPage(2)
   expect(page).not.toBeUndefined()
   expect(page).toEqual([
     { uid: "15", data: "JP" },
@@ -656,7 +656,7 @@ test("getPage move last short page records between two pages", () => {
     { uid: "12", data: "M" },
   ])
 
-  page = pageMerger.getPage(1)
+  page = await pageMerger.getPage(1)
   expect(page).not.toBeUndefined()
   expect(page).toEqual([
     { uid: "5", data: "F" },
@@ -666,7 +666,7 @@ test("getPage move last short page records between two pages", () => {
     { uid: "9", data: "J" },
   ])
 
-  page = pageMerger.getPage(0)
+  page = await pageMerger.getPage(0)
   expect(page).not.toBeUndefined()
   expect(page).toEqual([
     { uid: "0", data: "A" },
@@ -677,7 +677,7 @@ test("getPage move last short page records between two pages", () => {
   ])
 })
 
-test("getPage short and empty pages", () => {
+test("getPage short and empty pages", async () => {
   let db = testRecordStore(3)
   let ds = new DraftStore()
   let pageMerger = new PageMerger(db, ds, domainKeyHelper)
@@ -685,7 +685,7 @@ test("getPage short and empty pages", () => {
 
   ds.unPinDraft(ds.addNew({ uid: "X", data: "0" }))
 
-  page = pageMerger.getPage(0)
+  page = await pageMerger.getPage(0)
   expect(page).not.toBeUndefined()
   expect(page).toEqual([
     { uid: "X", data: "0" },
@@ -697,39 +697,39 @@ test("getPage short and empty pages", () => {
   db = testRecordStore(0)
   ds = new DraftStore()
   pageMerger = new PageMerger(db, ds, domainKeyHelper)
-  page = pageMerger.getPage(0)
+  page = await pageMerger.getPage(0)
   expect(page).not.toBeUndefined()
   expect(page).toEqual([])
 
   ds.unPinDraft(ds.addNew({ uid: "X", data: "0" }))
 
-  page = pageMerger.getPage(0)
+  page = await pageMerger.getPage(0)
   expect(page).not.toBeUndefined()
   expect(page).toEqual([{ uid: "X", data: "0" }])
 })
 
-test("getPage with only drafts in last page", () => {
+test("getPage with only drafts in last page", async () => {
   const db = testRecordStore(5)
   const ds = new DraftStore()
   const pageMerger = new PageMerger(db, ds, domainKeyHelper)
   ds.unPinDraft(ds.addNew({ uid: "X", data: "F" }))
-  let page = pageMerger.getPage(1)
+  let page = await pageMerger.getPage(1)
   expect(page).not.toBeUndefined()
   expect(page).toEqual([{ uid: "X", data: "F" }])
 })
 
-test("getPage with a whole page of drafts at the end", () => {
+test("getPage with a whole page of drafts at the end", async () => {
   const db = testRecordStore(5)
   const ds = new DraftStore()
   const pageMerger = new PageMerger(db, ds, domainKeyHelper)
   for (let i = 0; i < 6; i++)
     ds.unPinDraft(ds.addNew({ uid: `X${i}`, data: "ZZ" + String.fromCharCode(65 + i) }))
 
-  let page = pageMerger.getPage(2)
+  let page = await pageMerger.getPage(2)
   expect(page).not.toBeUndefined()
   expect(page).toEqual([{ uid: "X5", data: "ZZF" }])
 
-  page = pageMerger.getPage(1)
+  page = await pageMerger.getPage(1)
   expect(page).not.toBeUndefined()
   expect(page).toEqual([
     { uid: "X0", data: "ZZA" },
@@ -740,14 +740,14 @@ test("getPage with a whole page of drafts at the end", () => {
   ])
 })
 
-test("getPage with repeatedly modified record and draft", () => {
+test("getPage with repeatedly modified record and draft", async () => {
   const db = testRecordStore(17)
   const ds = new DraftStore()
 
   const pageMerger = new PageMerger(db, ds, domainKeyHelper)
   ds.addModification({ uid: "11", data: "BA" }, db.records![11], pageMerger.domainKeyHelper)
 
-  let page = pageMerger.getPage(2)
+  let page = await pageMerger.getPage(2)
   expect(page).not.toBeUndefined()
   expect(page).toEqual([
     { uid: "10", data: "K" },
@@ -758,7 +758,7 @@ test("getPage with repeatedly modified record and draft", () => {
   ])
   ds.unpinAll()
 
-  page = pageMerger.getPage(2)
+  page = await pageMerger.getPage(2)
   expect(page).not.toBeUndefined()
   expect(page).toEqual([
     { uid: "9", data: "J" },
@@ -767,7 +767,7 @@ test("getPage with repeatedly modified record and draft", () => {
     { uid: "13", data: "N" },
     { uid: "14", data: "O" },
   ])
-  page = pageMerger.getPage(0)
+  page = await pageMerger.getPage(0)
   expect(page).not.toBeUndefined()
   expect(page).toEqual([
     { uid: "0", data: "A" },
@@ -777,7 +777,7 @@ test("getPage with repeatedly modified record and draft", () => {
     { uid: "3", data: "D" },
   ])
   ds.addModification({ uid: "11", data: "Trallala" }, db.records![11], pageMerger.domainKeyHelper)
-  page = pageMerger.getPage(0)
+  page = await pageMerger.getPage(0)
   expect(page).not.toBeUndefined()
   expect(page).toEqual([
     { uid: "0", data: "A" },
@@ -787,7 +787,7 @@ test("getPage with repeatedly modified record and draft", () => {
     { uid: "3", data: "D" },
   ])
   ds.unpinAll()
-  page = pageMerger.getPage(0)
+  page = await pageMerger.getPage(0)
   expect(page).not.toBeUndefined()
   expect(page).toEqual([
     { uid: "0", data: "A" },
@@ -796,7 +796,7 @@ test("getPage with repeatedly modified record and draft", () => {
     { uid: "3", data: "D" },
     { uid: "4", data: "E" },
   ])
-  page = pageMerger.getPage(2)
+  page = await pageMerger.getPage(2)
   expect(page).not.toBeUndefined()
   expect(page).toEqual([
     { uid: "10", data: "K" },
@@ -805,7 +805,7 @@ test("getPage with repeatedly modified record and draft", () => {
     { uid: "14", data: "O" },
     { uid: "15", data: "P" },
   ])
-  page = pageMerger.getPage(3)
+  page = await pageMerger.getPage(3)
   expect(page).not.toBeUndefined()
   expect(page).toEqual([
     { uid: "16", data: "Q" },
@@ -813,7 +813,7 @@ test("getPage with repeatedly modified record and draft", () => {
   ])
 })
 
-test("getPage with new drafts on last page and one db record inserted", () => {
+test("getPage with new drafts on last page and one db record inserted", async () => {
   const db = testRecordStore(3)
   const ds = new DraftStore()
 
@@ -827,7 +827,7 @@ test("getPage with new drafts on last page and one db record inserted", () => {
     )
   }
   ds.addModification({ uid: "1", data: "FA" }, { uid: "1", data: "B" }, domainKeyHelper, false)
-  let page = pageMerger.getPage(1)
+  let page = await pageMerger.getPage(1)
   expect(page).not.toBeUndefined()
   expect(page).toEqual([
     { uid: "1", data: "FA" },
@@ -835,7 +835,7 @@ test("getPage with new drafts on last page and one db record inserted", () => {
     { uid: "X4", data: "H" },
   ])
 
-  page = pageMerger.getPage(0)
+  page = await pageMerger.getPage(0)
   expect(page).not.toBeUndefined()
   expect(page).toEqual([
     { uid: "0", data: "A" },
@@ -846,7 +846,7 @@ test("getPage with new drafts on last page and one db record inserted", () => {
   ])
 })
 
-test("getPage with new drafts on last page and one db record inserted #2", () => {
+test("getPage with new drafts on last page and one db record inserted #2", async () => {
   const db = testRecordStore(6)
   const ds = new DraftStore()
 
@@ -854,7 +854,7 @@ test("getPage with new drafts on last page and one db record inserted #2", () =>
   for (let i = 0; i < 2; i++)
     ds.unPinDraft(ds.addNew({ uid: `X${i}`, data: String.fromCharCode(71 + i) }))
   ds.addModification({ uid: "1", data: "I" }, { uid: "1", data: "B" }, domainKeyHelper, false)
-  let page = pageMerger.getPage(1)
+  let page = await pageMerger.getPage(1)
   expect(page).not.toBeUndefined()
   expect(page).toEqual([
     { uid: "X0", data: "G" },
@@ -862,7 +862,7 @@ test("getPage with new drafts on last page and one db record inserted #2", () =>
     { uid: "1", data: "I" },
   ])
 
-  page = pageMerger.getPage(0)
+  page = await pageMerger.getPage(0)
   expect(page).not.toBeUndefined()
   expect(page).toEqual([
     { uid: "0", data: "A" },
@@ -873,14 +873,14 @@ test("getPage with new drafts on last page and one db record inserted #2", () =>
   ])
 })
 
-test("getPage with empty db and more than a page of drafts", () => {
+test("getPage with empty db and more than a page of drafts", async () => {
   const db = testRecordStore(0)
   const ds = new DraftStore()
 
   const pageMerger = new PageMerger(db, ds, domainKeyHelper)
   for (let i = 7; i >= 0; i--) ds.addNew({ uid: `X${i}`, data: String.fromCharCode(65 + i) })
 
-  let page = pageMerger.getPage(1)
+  let page = await pageMerger.getPage(1)
   expect(page).not.toBeUndefined()
   expect(page).toEqual([
     { uid: "X2", data: "C" },
@@ -888,7 +888,7 @@ test("getPage with empty db and more than a page of drafts", () => {
     { uid: "X0", data: "A" },
   ])
 
-  page = pageMerger.getPage(0)
+  page = await pageMerger.getPage(0)
   expect(page).not.toBeUndefined()
   expect(page).toEqual([
     { uid: "X7", data: "H" },
@@ -899,7 +899,7 @@ test("getPage with empty db and more than a page of drafts", () => {
   ])
 })
 
-test("getPage with empty db and more than a page of drafts, some pinned", () => {
+test("getPage with empty db and more than a page of drafts, some pinned", async () => {
   const db = testRecordStore(0)
   const ds = new DraftStore()
 
@@ -909,7 +909,7 @@ test("getPage with empty db and more than a page of drafts, some pinned", () => 
     if (i % 2 == 0) ds.unPinDraft(draft)
   }
 
-  let page = pageMerger.getPage(1)
+  let page = await pageMerger.getPage(1)
   expect(page).not.toBeUndefined()
   expect(page).toEqual([
     { uid: "X5", data: "F" },
@@ -917,7 +917,7 @@ test("getPage with empty db and more than a page of drafts, some pinned", () => 
     { uid: "X1", data: "B" },
   ])
 
-  page = pageMerger.getPage(0)
+  page = await pageMerger.getPage(0)
   expect(page).not.toBeUndefined()
   expect(page).toEqual([
     { uid: "X0", data: "A" },
@@ -928,7 +928,7 @@ test("getPage with empty db and more than a page of drafts, some pinned", () => 
   ])
 })
 
-test("getPage with new drafts", () => {
+test("getPage with new drafts", async () => {
   const db = testRecordStore(17)
   const ds = new DraftStore()
 
@@ -936,7 +936,7 @@ test("getPage with new drafts", () => {
   ds.addNew({ uid: "18", data: "ZZ" })
   ds.addNew({ uid: "17", data: "BA" })
 
-  let page = pageMerger.getPage(3)
+  let page = await pageMerger.getPage(3)
   expect(page).not.toBeUndefined()
   expect(page).toEqual([
     { uid: "15", data: "P" },
@@ -945,7 +945,7 @@ test("getPage with new drafts", () => {
     { uid: "17", data: "BA" },
   ])
 
-  page = pageMerger.getPage(0)
+  page = await pageMerger.getPage(0)
   expect(page).not.toBeUndefined()
   expect(page).toEqual([
     { uid: "0", data: "A" },
@@ -956,7 +956,7 @@ test("getPage with new drafts", () => {
   ])
 })
 
-test("getPage with new drafts, then pin and modify them", () => {
+test("getPage with new drafts, then pin and modify them", async () => {
   const db = testRecordStore(17)
   const ds = new DraftStore()
 
@@ -964,7 +964,7 @@ test("getPage with new drafts, then pin and modify them", () => {
   ds.addNew({ uid: "18", data: "ZZ" })
   ds.addNew({ uid: "17", data: "BA" })
 
-  let page = pageMerger.getPage(3)
+  let page = await pageMerger.getPage(3)
   expect(page).not.toBeUndefined()
   expect(page).toEqual([
     { uid: "15", data: "P" },
@@ -973,7 +973,7 @@ test("getPage with new drafts, then pin and modify them", () => {
     { uid: "17", data: "BA" },
   ])
   ds.addModification({ uid: "18", data: "AB" }, undefined, domainKeyHelper)
-  page = pageMerger.getPage(3)
+  page = await pageMerger.getPage(3)
   expect(page).not.toBeUndefined()
   expect(page).toEqual([
     { uid: "15", data: "P" },
@@ -982,7 +982,7 @@ test("getPage with new drafts, then pin and modify them", () => {
     { uid: "17", data: "BA" },
   ])
   ds.unpinAll()
-  page = pageMerger.getPage(3)
+  page = await pageMerger.getPage(3)
   expect(page).not.toBeUndefined()
   expect(page).toEqual([
     { uid: "13", data: "N" },
@@ -990,7 +990,7 @@ test("getPage with new drafts, then pin and modify them", () => {
     { uid: "15", data: "P" },
     { uid: "16", data: "Q" },
   ])
-  page = pageMerger.getPage(0)
+  page = await pageMerger.getPage(0)
   expect(page).not.toBeUndefined()
   expect(page).toEqual([
     { uid: "0", data: "A" },
@@ -999,7 +999,7 @@ test("getPage with new drafts, then pin and modify them", () => {
     { uid: "17", data: "BA" },
     { uid: "2", data: "C" },
   ])
-  page = pageMerger.getPage(1)
+  page = await pageMerger.getPage(1)
   expect(page).not.toBeUndefined()
   expect(page).toEqual([
     { uid: "3", data: "D" },
@@ -1008,7 +1008,7 @@ test("getPage with new drafts, then pin and modify them", () => {
     { uid: "6", data: "G" },
     { uid: "7", data: "H" },
   ])
-  page = pageMerger.getPage(2)
+  page = await pageMerger.getPage(2)
   expect(page).not.toBeUndefined()
   expect(page).toEqual([
     { uid: "8", data: "I" },
@@ -1018,7 +1018,7 @@ test("getPage with new drafts, then pin and modify them", () => {
     { uid: "12", data: "M" },
   ])
   ds.addModification({ uid: "18", data: "CA" }, undefined, domainKeyHelper)
-  page = pageMerger.getPage(0)
+  page = await pageMerger.getPage(0)
   expect(page).not.toBeUndefined()
   expect(page).toEqual([
     { uid: "0", data: "A" },
@@ -1028,7 +1028,7 @@ test("getPage with new drafts, then pin and modify them", () => {
     { uid: "2", data: "C" },
   ])
   ds.unpinAll()
-  page = pageMerger.getPage(0)
+  page = await pageMerger.getPage(0)
   expect(page).not.toBeUndefined()
   expect(page).toEqual([
     { uid: "0", data: "A" },
