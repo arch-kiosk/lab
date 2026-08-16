@@ -1,11 +1,11 @@
-// oxlint-disable typescript/no-explicit-any typescript/no-redundant-type-constituents
+// oxlint-disable typescript/no-redundant-type-constituents
 import { DataRecord, DomainKeyHelper } from "./sharedtypes"
 
 export interface DraftEntry {
   record: DataRecord
   isNew: boolean
   pinned: boolean
-  pinnedKey?: string //originalDbKey if changed existing db Record within session, record.key if already sorted in
+  pinnedKey?: unknown //originalDbKey if changed existing db Record within session, record.key if already sorted in
   originalDbKey?: unknown
 }
 
@@ -24,7 +24,7 @@ export class DraftStore {
   /**
    * returns the index of a new draft in the creation order of new drafts
    * @param draftEntry
-   * @returns -1 if draft not found in the creation order. Otherwise position starting with 0
+   * @returns -1 if draft not found in the creation order, otherwise position starting with 0
    */
   public newIndex(draftEntry: DraftEntry) {
     return this.#newUids.findIndex((uid) => uid === draftEntry.record.uid)
@@ -43,8 +43,8 @@ export class DraftStore {
       if (newIndexA >= 0 && newIndexB == -1) return 1
       if (newIndexA > -1 && newIndexB > -1) return Math.sign(newIndexA - newIndexB)
       return domainKeyHelper.compareKeys(
-            domainKeyHelper.extractKey(a.record),
-            domainKeyHelper.extractKey(b.record),
+        domainKeyHelper.extractKey(a.record),
+        domainKeyHelper.extractKey(b.record),
       )
     })
   }
@@ -57,9 +57,9 @@ export class DraftStore {
    * @returns list of drafts between the two keys
    */
   public getDraftsBetween(
-      key1: string | undefined,
-      key2: string | undefined,
-      domainKeyHelper: DomainKeyHelper<unknown>,
+    key1: unknown | undefined,
+    key2: unknown | undefined,
+    domainKeyHelper: DomainKeyHelper<unknown>,
   ) {
     const result = []
     for (const draft of this.#drafts.values()) {
@@ -69,8 +69,8 @@ export class DraftStore {
       if (draftKey === undefined) continue
 
       if (
-          (!key1 || domainKeyHelper.compareKeys(key1, draftKey) <= 0) &&
-          (!key2 || domainKeyHelper.compareKeys(draftKey, key2) <= 0)
+        (!key1 || domainKeyHelper.compareKeys(key1, draftKey) <= 0) &&
+        (!key2 || domainKeyHelper.compareKeys(draftKey, key2) <= 0)
       ) {
         result.push(draft)
       }
@@ -79,7 +79,6 @@ export class DraftStore {
     return result
   }
 
-
   /**
    * returns the drafts that should appear before the given record's key
    * @param record
@@ -87,20 +86,19 @@ export class DraftStore {
    * @returns Array of all DraftRecord, can be empty
    */
   public getDraftsInsertedBeforeRecord(
-      record: DataRecord,
-      domainKeyHelper: DomainKeyHelper<unknown>,
+    record: DataRecord,
+    domainKeyHelper: DomainKeyHelper<unknown>,
   ) {
     // console.log(this.draftStore.getAllDrafts())
-    return this
-        .getAllDraftsExceptNewPinned()  //(domainKeyHelper, true)
-        .filter(
-            (draft: DraftEntry) =>
-                domainKeyHelper.compareKeys(
-                    this.getPosKey(draft, domainKeyHelper),
-                    record.data,
-                ) < 0,
-        ) //draft.record.data
-        .map((draft: DraftEntry) => draft.record)
+    return this.getAllDraftsExceptNewPinned() //(domainKeyHelper, true)
+      .filter(
+        (draft: DraftEntry) =>
+          domainKeyHelper.compareKeys(
+            this.getPosKey(draft, domainKeyHelper),
+            domainKeyHelper.extractKey(record),
+          ) < 0,
+      ) //draft.record.data
+      .map((draft: DraftEntry) => draft.record)
   }
 
   /**
@@ -111,17 +109,17 @@ export class DraftStore {
    * @returns array of DataRecord or an empty array
    */
   public getModifiedRecordsBeforeRecord(
-      record: DataRecord,
-      domainKeyHelper: DomainKeyHelper<unknown>,
+    record: DataRecord,
+    domainKeyHelper: DomainKeyHelper<unknown>,
   ) {
-    return this
-        .getAllDrafts(domainKeyHelper)
-        .filter((draft) => {
-          return (
-              draft.originalDbKey && domainKeyHelper.compareKeys(draft.originalDbKey, record.data) < 0
-          )
-        })
-        .map((draft) => draft.record)
+    return this.getAllDrafts(domainKeyHelper)
+      .filter((draft) => {
+        return (
+          draft.originalDbKey &&
+          domainKeyHelper.compareKeys(draft.originalDbKey, domainKeyHelper.extractKey(record)) < 0
+        )
+      })
+      .map((draft) => draft.record)
   }
 
   /**
@@ -149,7 +147,10 @@ export class DraftStore {
    * @param domainKeyHelper
    * @returns the key
    */
-  public getPosKey(draft: DraftEntry, domainKeyHelper: DomainKeyHelper<unknown>): unknown | undefined {
+  public getPosKey(
+    draft: DraftEntry,
+    domainKeyHelper: DomainKeyHelper<unknown>,
+  ): unknown | undefined {
     return draft.pinnedKey ?? domainKeyHelper.extractKey(draft.record)
   }
 
@@ -169,16 +170,20 @@ export class DraftStore {
     return this.count
   }
 
-  // public getNewAt(offset: number, domainKeyHelper?: DomainKeyHelper<unknown>): DataRecord | undefined {
-  //     const uid = this.#newUids[offset]
-  //     return this.getRecord(uid, domainKeyHelper)
-  //     // return uid ? this.#drafts.get(uid)?.record : undefined
-  // }
-
+  /**
+   * checks if there is a new draft for the given uid
+   * @param uid
+   * @returns true if there is one, false if there isn't or the draft isn't new
+   */
   public isNew(uid: string): boolean {
     return this.#drafts.get(uid)?.isNew ?? false
   }
 
+  /**
+   * checks if there is a modified draft for the given uid
+   * @param uid
+   * @returns true if there is one, false if there isn't or the draft is a new draft
+   */
   public isModification(uid: string): boolean {
     const draft = this.#drafts.get(uid)
     return !(!draft || draft?.isNew)
@@ -199,7 +204,7 @@ export class DraftStore {
 
   /**
    * adds a new draft that modifies an existing db record
-   * (unlike addNew, which creates a draft that represents a new, not yet existing db record)
+   * (unlike addNew, which creates a draft that represents a new, not yet existing db record).
    * If there is already a draft for that uid the method throws an error
    * @param updatedRecord - The modified record
    * @param rawDbRecord - The original record as stored in the db
@@ -209,11 +214,20 @@ export class DraftStore {
     updatedRecord: DataRecord,
     rawDbRecord: DataRecord | undefined,
     domainKeyHelper: DomainKeyHelper<unknown>,
-    pinIfNecessary=true
+    pinIfNecessary = true,
   ): void {
+    console.log(`DraftStore.addModification`, updatedRecord)
     const uid = String(updatedRecord.uid)
-    if (!this.#drafts.has(uid)) {
-      if (!rawDbRecord) throw("DraftStore.addModification: Can't modify a record without knowing the original db record")
+    let draft = this.#drafts.get(uid)
+    if (draft) {
+      if (pinIfNecessary) {
+        this.pinDraft(draft, domainKeyHelper.extractKey(draft.record))
+      }
+      draft.record = updatedRecord
+    } else {
+      if (!rawDbRecord) {
+        throw "DraftStore.addModification: Can't modify a record without knowing the original db record"
+      }
 
       const originalDbKey = domainKeyHelper ? domainKeyHelper.extractKey(rawDbRecord) : undefined
       const newDraft = {
@@ -224,31 +238,9 @@ export class DraftStore {
         originalDbKey: originalDbKey,
       }
       this.#drafts.set(uid, newDraft)
-      if (pinIfNecessary) this.pinDraft(newDraft, originalDbKey)
-    } else {
-      this.updateDraft(updatedRecord, domainKeyHelper, pinIfNecessary)
-    }
-  }
-
-  // public getUnpinnedModifications(): Array<{ uid: string; originalDbKey: unknown }> {
-  //     const result: Array<{ uid: string; originalDbKey: unknown }> = []
-  //     for (const entry of this.#drafts.values()) {
-  //         if (!entry.isNew && entry.pinnedDbKey === undefined && entry.originalDbKey !== undefined) {
-  //             result.push({ uid: String(entry.record.uid), originalDbKey: entry.originalDbKey })
-  //         }
-  //     }
-  //     return result
-  // }
-
-  public updateDraft(record: DataRecord, domainKeyHelper: DomainKeyHelper<unknown>, pinIfNecessary=true): void {
-    const existing = this.#drafts.get(record.uid)
-    if (existing) {
-      if (!existing.pinned && pinIfNecessary) {
-        //this case should not occur under normal circumstances: A user can only modify an existing
-        //draft if the draft appeared on a page, which should make it a pinned draft.
-        this.pinDraft(existing, domainKeyHelper.extractKey(existing.record))
+      if (pinIfNecessary) {
+        this.pinDraft(newDraft, originalDbKey)
       }
-      existing.record = record
     }
   }
 
@@ -265,7 +257,7 @@ export class DraftStore {
 
   /** returns the number of drafts that are tied to a record in the database
    *
-   * @returns number of drafts tied to record in database
+   * @returns number of drafts tied to a record in database
    */
   public get modifiedCount(): number {
     return this.#drafts
@@ -281,7 +273,7 @@ export class DraftStore {
    */
   public getAllDrafts(domainKeyHelper: DomainKeyHelper<unknown>): DraftEntry[] {
     let drafts: DraftEntry[]
-    drafts= Array.from(this.#drafts.values())
+    drafts = Array.from(this.#drafts.values())
 
     this.sortDrafts(drafts, domainKeyHelper)
     return drafts
@@ -294,7 +286,9 @@ export class DraftStore {
    */
   public getAllDraftsExceptNewPinned(): DraftEntry[] {
     let drafts: DraftEntry[]
-    drafts= Array.from(this.#drafts.values()).filter((draft) => !(draft.isNew && draft.pinned && draft.pinnedKey === undefined))
+    drafts = Array.from(this.#drafts.values()).filter(
+      (draft) => !(draft.isNew && draft.pinned && draft.pinnedKey === undefined),
+    )
 
     // this.sortDrafts(drafts, domainKeyHelper)
     return drafts
@@ -326,29 +320,12 @@ export class DraftStore {
     }
   }
 
-  // public getUnpinnedDrafts(): DataRecord[] {
-  //     const unpinned: DataRecord[] = []
-  //     for (const entry of this.#drafts.values()) {
-  //         if (entry.pinnedDbKey === undefined) {
-  //             unpinned.push(entry.record)
-  //         }
-  //     }
-  //     return unpinned
-  // }
-
-  // public pinDraft(uid: string, key: unknown): void {
-  //     const entry = this.#drafts.get(uid)
-  //     if (entry && entry.pinnedDbKey === undefined) {
-  //         entry.pinnedDbKey = key
-  //     }
-  // }
-
   /** pins the draft to a key
    *  does not check if the draft is already pinned!
    * @param draft
    * @param pinToKey
    */
-  public pinDraft(draft: DraftEntry, pinToKey: any) {
+  public pinDraft(draft: DraftEntry, pinToKey: unknown) {
     draft.pinned = true
     draft.pinnedKey = pinToKey
   }
