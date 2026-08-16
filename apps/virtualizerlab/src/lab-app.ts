@@ -60,6 +60,12 @@ export class LabApp extends LitElement {
         }
     }
 
+    refresh(layoutNr: number) {
+        console.log(`refreshing ${layoutNr}`)
+        if (layoutNr == 0) this.dataProvider.relocateDrafts()
+        if (layoutNr == 1) this.dataProvider2.relocateDrafts()
+    }
+
     // oxlint-disable-next-line typescript/no-explicit-any
     renderRow(_rowNr: number, _: string, record: Record<string, any>) {
         return html`
@@ -74,14 +80,16 @@ export class LabApp extends LitElement {
             <div class="outer-form">
                 <div style="min-height: 5em;background-color: papayawhip">1 record form </div>
                 <button @click="${() => this.addRow(0)}">add row</button>
+                <button @click="${() => this.refresh(0)}">refresh</button>
                 <div style="height: 35vh;border: 2px solid darkred">
                     ${this.renderVirtualLayout()}
                 </div>
             </div>
             <div style="height: 2em"></div>
             <button @click="${() => this.addRow(1)}">add row</button>
+            <button @click="${() => this.refresh(1)}">refresh</button>
             <div style="height: 25vh;border: 2px solid green">
-                ${this.renderVirtualLayout2()}
+<!--                ${this.renderVirtualLayout2()}-->
             </div>
         `
     }

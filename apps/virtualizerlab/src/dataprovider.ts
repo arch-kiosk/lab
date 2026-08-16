@@ -153,9 +153,9 @@ export abstract class DataProviderBasis implements DataProvider {
   }
 
   private ensurePage(pageIndex: number, notifyAfterFetch = true): Promise<boolean> {
-    if (this.pageCache.has(pageIndex)) {
-      return Promise.resolve(true)
-    }
+    // if (this.pageCache.has(pageIndex)) {
+    //   return Promise.resolve(true)
+    // }
 
     const status = this.pendingPages.get(pageIndex)
     if (status instanceof Promise) {
@@ -190,7 +190,10 @@ export abstract class DataProviderBasis implements DataProvider {
     const fetchPromise = (async () => {
       try {
         const dbRecordCount = this.getDbRecordCount()
-        if (!dbRecordCount) return false
+        if (!dbRecordCount) {
+          this.pendingPages.delete(pageIndex)
+          return false
+        }
 
         const from = pageIndex * this.pageSize
         const count = Math.min(this.pageSize, Math.max(0, dbRecordCount - from))

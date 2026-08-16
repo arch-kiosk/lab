@@ -56,15 +56,14 @@ export class VirtualScrollLayout extends LitElement {
         if (notification) {
             if ("currentRecord" in notification) {
                 this.activeRecordIndex = notification.currentRecord
-                updateRequired = false
+                // updateRequired = true
             }
 
             if ("countChanged" in notification) {
                 this.recordCount = this.dataProvider!.recordCount() ?? 0
                 this.updateVirtualizerCount(this.recordCount)
-                updateRequired = false
+                // updateRequired = false
             }
-
         }
 
         if (updateRequired) this.requestUpdate()
@@ -142,8 +141,11 @@ export class VirtualScrollLayout extends LitElement {
 
     private updateTelemetry() {
         if (import.meta.env?.DEV && this.devTelemetryRef.value) {
+            const dpTelemetry = this.dataProvider?.getTelemetry?.() ?? {_: ""}
+            let dpTelemetryText = ("cached" in dpTelemetry && "capacity" in dpTelemetry)?`\ncache ${dpTelemetry.cached}/${dpTelemetry.capacity}`:''
+            dpTelemetryText += ("newDrafts" in dpTelemetry && "modDrafts" in dpTelemetry)?`\ndrafts +${dpTelemetry.newDrafts as string}/#${dpTelemetry.modDrafts as string}`: ''
             const domRows = this.shadowRoot?.querySelectorAll(".virtual-row").length ?? 0
-            this.devTelemetryRef.value.textContent = `${domRows} rows in DOM`
+            this.devTelemetryRef.value.textContent = `${domRows} rows in DOM, ${dpTelemetryText}`
         }
     }
 
@@ -170,7 +172,9 @@ export class VirtualScrollLayout extends LitElement {
     private renderVirtualRow(row: VirtualItem, record?: Record<string, any>) {
         return this.rowRenderer && record
             ? html`
-                    <div class="row-selector ${this.activeRecordIndex === row.index ? " active" : ""}"></div>
+                    <div class="row-selector ${this.activeRecordIndex === row.index ? " active" : ""}">
+                        ${record?this.dataProvider?.getRecordState(record.uid) as string:""}
+                    </div>
                     <div class="row-content" style="flex: 1; height: 100%; display: flex;">
                         ${this.rowRenderer(row.index, row.key as string, record)}
                     </div>
@@ -182,7 +186,11 @@ export class VirtualScrollLayout extends LitElement {
         if (!this.dataProvider) {
             return html`
                 ${when(import.meta.env?.DEV, () => html`
-                    <div id="dev-row-count" ${ref(this.devTelemetryRef)}>no data</div>`)
+                    <div class="dev-telemetry">
+                        <div id="dev-row-count" ${ref(this.devTelemetryRef)}>no data</div>
+                    </div>
+                    `
+                )
                 }
                 <div class="scroll-container empty-state" part="scroll-container empty-state">please wait ...</div>
             `
@@ -194,10 +202,15 @@ export class VirtualScrollLayout extends LitElement {
 
         const virtualizer = this.virtualizerController.getVirtualizer()
 
+        const visibleItems = virtualizer.getVirtualItems().map((row) => ({
+            row,
+            record: this.dataProvider!.getRecord(row.index, virtualizer.isScrolling),
+        }))
         return html`
             ${when(import.meta.env?.DEV, () => html`
-                
-                <div id="dev-row-count" ${ref(this.devTelemetryRef)}>
+                <div class="dev-telemetry">
+                    <div id="dev-row-count" ${ref(this.devTelemetryRef)}></div>
+                    <button @click="${() => this.dataProvider?.logTelemetry?.()}">log</button>
                 </div>`
             )}
             <div
@@ -207,12 +220,12 @@ export class VirtualScrollLayout extends LitElement {
                     style="height: 100%; overflow: auto; position: relative;">
                 <div class="scroll-track" part="scroll-track" style="position: relative; width: 100%; height: ${virtualizer.getTotalSize()}px;">
                     ${repeat(
-                            virtualizer.getVirtualItems(),
-                            (row: VirtualItem) => row.key as string,
-                            (row: VirtualItem) => {
+                            visibleItems,
+                            (item) => item.record?.uid,
+                            (item) => {
                                 // While scrolling, only get cached records (don't trigger fetches).
                                 // When scrolling stops, fetch missing records for visible rows.
-                                let record = this.dataProvider!.getRecord(row.index, virtualizer.isScrolling)
+                                const {row, record } = item
                                 const renderedRow = this.renderVirtualRow(row, record)
                                 const isLoaded = Boolean(renderedRow)
 
