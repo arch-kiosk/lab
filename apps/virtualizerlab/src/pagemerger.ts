@@ -4,7 +4,7 @@ import { DraftStore } from "../src/draftstore"
 export type DataRecord = D | { uid: string; data: string }
 export type MergeWindowItem = {
   dbIndex: number
-  key: string
+  key: unknown
   virtualIndex: number
   record: DataRecord
 }
@@ -14,20 +14,43 @@ export type RecordStore = {
   getDbRecordCount(): number
 }
 
+/**
+ * compiles pages from db records and drafts
+ */
 export class PageMerger {
   db: RecordStore
   draftStore: DraftStore
   pageSize: number
   domainKeyHelper: DomainKeyHelper<unknown>
 
-  insertAfter<T>(array: T[], index: number, ...newElements: T[]): T[] {
+  /**
+   * helper method to insert an element after an element in an array in situ.
+   * Works with the last element or an empty array, too.
+   * @param array
+   * @param index
+   * @param newElements
+   * @returns the same array that was given as parameter
+   *
+   * @private
+   */
+  private insertAfter<T>(array: T[], index: number, ...newElements: T[]): T[] {
     if (index >= -1 && index <= array.length) {
       array.splice(index + 1, 0, ...newElements)
     }
     return array
   }
 
-  insertBefore<T>(array: T[], index: number, ...newElements: T[]): T[] {
+  /**
+   * helper method to insert an element before an element in an array in situ.
+   * Works with the first element or an empty array, too.
+   * @param array
+   * @param index
+   * @param newElements
+   * @returns the same array that was given as parameter
+   *
+   * @private
+   */
+  private insertBefore<T>(array: T[], index: number, ...newElements: T[]): T[] {
     if (index >= 0 && index <= array.length) {
       array.splice(index, 0, ...newElements)
     }
@@ -46,51 +69,96 @@ export class PageMerger {
     this.domainKeyHelper = domainKeyHelper
   }
 
+  /**
+   * returns the count of records actually in the database. Calls an external provider
+   *
+   * @returns
+   */
   get dbRecordCount() {
     return this.getDbRecordCount()
   }
 
+  /**
+   * returns the count of records actually in the database. Calls an external provider
+   *
+   * @returns
+   */
   getDbRecordCount() {
     return this.db.getDbRecordCount()
   }
 
+  /**
+   * returns the overall count of records including database records and new draft records.
+   * Calls an external provider for the database records
+   *
+   * @returns
+   */
   getRecordCount() {
     return this.dbRecordCount + this.draftStore.newCount
   }
 
+  /**
+   * the main interface method of the class: this returns the compiled page for pageIndex
+   * @param pageIndex: the number of the page (zero-based)
+   * @returns the page or undefined in case of an error or if the page does not exist
+   */
   async getPage(pageIndex: number): Promise<DataRecord[] | undefined> {
-    // if (pageIndex * this.pageSize >= this.dbRecordCount) return []
     try {
       const toIndex = pageIndex * this.pageSize + this.pageSize - 1
       const pageSize =
         this.dbRecordCount - toIndex < 1 ? this.dbRecordCount % this.pageSize : this.pageSize
       console.log(`getPage ${pageIndex}`)
-      let page = this.dbRecordCount?await this.db.getRecordsFromDb(pageIndex * this.pageSize, pageSize):[]
+      let page: Array<DataRecord>|undefined = []
+      if (pageIndex * this.pageSize < this.dbRecordCount) {
+        page = this.dbRecordCount ? await this.db.getRecordsFromDb(
+            pageIndex * this.pageSize,
+            Math.min(this.dbRecordCount - pageIndex * this.pageSize, pageSize)) : []
+      }
 
       if (this.draftStore.getDraftCount() == 0) {
         return page
       }
-      return await this.getVirtualPage(pageIndex, page)
+      page = await this.getVirtualPage(pageIndex, page)
+      if (page) {
+        for (const draft of this.draftStore.getAllDraftsExceptNewPinned()) {
+          if (!draft.pinned) {
+            if (page.find((record) => record.uid === draft.record.uid)) {
+              this.draftStore.pinDraft(draft, this.domainKeyHelper.extractKey(draft.record))
+            }
+          }
+        }
+      }
+      return page
     } catch (e) {
       console.error(e)
     }
     return undefined
   }
 
+  /**
+   * compiles and returns the virtual page if there are drafts
+   * @param pageIndex
+   * @param initialRecords
+   * @returns the page or undefined
+   * @protected
+   */
   protected async getVirtualPage(
     pageIndex: number,
     initialRecords: DataRecord[],
   ): Promise<DataRecord[] | undefined> {
+    let recursionLevel = 0
     const _getVirtualPage = async (startIndex: number, endIndex: number, dbRecords: DataRecord[]) => {
       if (startIndex > this.dbRecordCount - 1) {
         //no db record in this page -> extend currentStart to last dbRecord
         startIndex = this.dbRecordCount - 1
-        dbRecords = await this.db.getRecordsFromDb(startIndex, endIndex)
+        dbRecords = await this.db.getRecordsFromDb(startIndex, 1)
       }
+      if (++recursionLevel > 5) throw "_getVirtualPage encountered too high recursion level."
+      console.log(`starting _getVirtualPage with startIndex ${startIndex}, endIndex ${endIndex}`)
       let currentStart = startIndex
       let currentEnd = endIndex
-      let startKey = dbRecords.length > 0 ? dbRecords[0].data : undefined
-      let endKey = dbRecords.length > 0 ? dbRecords[dbRecords.length - 1].data : undefined
+      let startKey = dbRecords.length > 0 ? this.domainKeyHelper.extractKey(dbRecords[0]) : undefined
+      let endKey = dbRecords.length > 0 ? this.domainKeyHelper.extractKey(dbRecords[dbRecords.length - 1]) : undefined
       const recordWindow = this.initRecordWindow(dbRecords, currentStart)
       const [moveNewStart, moveNewEnd] =
         dbRecords.length > 0 ? this.recalcWindowBoundaries(recordWindow) : [0, 0]
@@ -104,7 +172,12 @@ export class PageMerger {
       }
       this.removeShuffledRecords(recordWindow)
       this.assignVirtualIndexes(recordWindow)
-      this.completeVirtualIndexes(recordWindow, pageIndex)
+      try {
+        this.completeVirtualIndexes(recordWindow, pageIndex)
+      } catch(e) {
+        console.log(recordWindow)
+        throw e
+      }
       if (this.pageComplete(recordWindow, pageIndex)) {
         return this.compilePage(recordWindow, pageIndex)
       } else {
@@ -117,7 +190,7 @@ export class PageMerger {
           newStart = Math.max(0, newStart - 1)
           if (newStart == startIndex && newEnd === endIndex)
             throw "_getVirtualPage recursion with same boundaries prohibited."
-          return _getVirtualPage(newStart, newEnd, dbRecords)
+          return await _getVirtualPage(newStart, newEnd, dbRecords)
         } else {
           return undefined
         }
@@ -140,6 +213,11 @@ export class PageMerger {
     return []
   }
 
+  /**
+   * If there are only drafts on a page, this compiles such a page
+   * @param {number} pageIndex
+   * @returns {Array<DataRecord>}
+   */
   public compileDraftPage(pageIndex: number): Array<DataRecord> {
     let drafts = this.draftStore.getAllDrafts(this.domainKeyHelper)
     let firstRecord = pageIndex * this.pageSize
@@ -151,12 +229,18 @@ export class PageMerger {
     return page
   }
 
+  /**
+   * initializes the first record window from the database records
+   * @param dbRecords
+   * @param baseIndex
+   * @returns an array of MergeWindowItem items
+   */
   public initRecordWindow(dbRecords: DataRecord[], baseIndex: number) {
     const recordWindow: Array<MergeWindowItem> = []
     for (let idx = 0; idx < dbRecords.length; idx++) {
       recordWindow.push({
         dbIndex: baseIndex + idx,
-        key: dbRecords[idx].data,
+        key: this.domainKeyHelper.extractKey(dbRecords[idx]),
         virtualIndex: -1,
         record: dbRecords[idx],
       })
@@ -164,6 +248,12 @@ export class PageMerger {
     return recordWindow
   }
 
+  /**
+   * checks if a page is complete and has all the rows of the page that was fetched originally
+   * @param recordWindow
+   * @param pageIndex
+   * @returns true or false
+   */
   public pageComplete(recordWindow: Array<MergeWindowItem>, pageIndex: number): boolean {
     let c = -1
     for (const record of recordWindow) {
@@ -185,6 +275,13 @@ export class PageMerger {
     return false
   }
 
+  /**
+   * compiles the page after it is clear that the page is complete
+   * @param recordWindow
+   * @param pageIndex
+   * @returns the page.
+   * @throws an Error if something goes wrong
+   */
   public compilePage(
     recordWindow: Array<MergeWindowItem>,
     pageIndex: number,
@@ -210,6 +307,11 @@ export class PageMerger {
     return page
   }
 
+  /**
+   * merges drafts into the current MergeWindowItem window
+   * @param recordWindow
+   * @param pageIndex
+   */
   public mergeDraftsIntoWindow(recordWindow: Array<MergeWindowItem>, pageIndex: number) {
     let idx = 0
     const draftsInserted: string[] = []
@@ -239,7 +341,7 @@ export class PageMerger {
     let lastDbRow = recordWindow.length - 1
 
     // all drafts that are after the last db row
-    if (pageIndex >= Math.trunc(this.dbRecordCount / this.pageSize)) {
+    if (pageIndex * this.pageSize + recordWindow.length-1 >= this.dbRecordCount-1) {  //-1
       for (const draft of this.draftStore.getDraftsBetween(
         recordWindow[recordWindow.length - 1]?.key,
         undefined,
@@ -260,7 +362,7 @@ export class PageMerger {
     }
 
     //all drafts that are pinned to the end
-    if (pageIndex >= Math.trunc(this.dbRecordCount / this.pageSize)) {
+    if (pageIndex >= Math.trunc(this.dbRecordCount / this.pageSize)-1) {
       for (const draft of this.draftStore.getAllDrafts(this.domainKeyHelper)) {
         if (draftsInserted.find((uid) => uid === draft.record.uid) === undefined) {
           if (draft.isNew && draft.pinned && draft.pinnedKey === undefined) {
@@ -279,28 +381,38 @@ export class PageMerger {
     // all drafts that are between the first and last row in the window
     idx = firstDbRow
     while (idx < lastDbRow) {
-      for (const draft of this.draftStore.getDraftsBetween(
-        recordWindow[idx].key,
-        recordWindow[idx + 1].key,
-        this.domainKeyHelper,
-      )) {
-        if (draft.isNew && draft.pinned && draft.pinnedKey === undefined) continue
-        if (draftsInserted.find((uid) => uid === draft.record.uid) === undefined) {
-          this.insertAfter(recordWindow, idx, {
-            dbIndex: -1,
-            key: this.draftStore.getPosKey(draft, this.domainKeyHelper), //draft.record.data as string,
-            virtualIndex: -1,
-            record: draft.record,
-          })
-          draftsInserted.push(draft.record.uid)
-          idx++
-          lastDbRow++
+      try {
+        for (const draft of this.draftStore.getDraftsBetween(
+            recordWindow[idx].key,
+            recordWindow[idx + 1].key,
+            this.domainKeyHelper,
+        )) {
+          if (draft.isNew && draft.pinned && draft.pinnedKey === undefined) continue
+          if (draftsInserted.find((uid) => uid === draft.record.uid) === undefined) {
+            this.insertAfter(recordWindow, idx, {
+              dbIndex: -1,
+              key: this.draftStore.getPosKey(draft, this.domainKeyHelper),
+              virtualIndex: -1,
+              record: draft.record,
+            })
+            draftsInserted.push(draft.record.uid)
+            idx++
+            lastDbRow++
+          }
         }
+        idx++
+      } catch(e) {
+        console.log(recordWindow)
+        throw e
       }
-      idx++
     }
   }
 
+  /**
+   * calculates new boundaries for a subsequent fetch
+   * @param recordWindow
+   * @returns a tuple [from-change, to-change] with the expected change to from and to
+   */
   recalcWindowBoundaries(recordWindow: Array<MergeWindowItem>) {
     let topMovement: number = 0,
       bottomMovement: number = 0
@@ -345,8 +457,15 @@ export class PageMerger {
     return [topMovement, bottomMovement]
   }
 
+  /**
+   * moves records out of the MergeWindowItem window that are not supposed to be within the page boundaries
+   * @param refKey
+   * @param recordWindow
+   * @param direction - {"before" | "behind"}
+   * @returns number of removed records
+   */
   public moveRecordsOutOfWindow(
-    refKey: string,
+    refKey: unknown,
     recordWindow: Array<MergeWindowItem>,
     direction: "before" | "behind",
   ) {
@@ -374,14 +493,31 @@ export class PageMerger {
     return removedItems
   }
 
-  public moveRecordsBeforeWindow(startKey: string, recordWindow: Array<MergeWindowItem>) {
+  /**
+   * removes records that belong before the current window
+   * @param startKey
+   * @param recordWindow
+   * @returns number of removed records
+   */
+  public moveRecordsBeforeWindow(startKey: unknown, recordWindow: Array<MergeWindowItem>) {
     return this.moveRecordsOutOfWindow(startKey, recordWindow, "before")
   }
 
-  public moveRecordsBehindWindow(endKey: string, recordWindow: Array<MergeWindowItem>) {
+  /**
+   * removes records that belong behind the current window
+   * @param startKey
+   * @param recordWindow
+   * @returns number of removed records
+   */
+  public moveRecordsBehindWindow(endKey: unknown, recordWindow: Array<MergeWindowItem>) {
     return this.moveRecordsOutOfWindow(endKey, recordWindow, "behind")
   }
 
+  /**
+   * removes records that were added at some different position to the current window
+   * and are now in the window twice.
+   * @param recordWindow
+   */
   public removeShuffledRecords(recordWindow: Array<MergeWindowItem>) {
     let idx = 0
     while (idx < recordWindow.length) {
@@ -396,6 +532,11 @@ export class PageMerger {
     }
   }
 
+  /**
+   * fills the gaps between virtual indexes in the current record window if possible
+   * @param recordWindow
+   * @param pageIndex
+   */
   public completeVirtualIndexes(recordWindow: Array<MergeWindowItem>, pageIndex: number) {
     let succeedingIndex: number = -1
     let hasDbRow = false
@@ -433,6 +574,11 @@ export class PageMerger {
     }
   }
 
+  /**
+   * calculates the virtual index (the index at which a record appears for an outside caller)
+   * for every row that comes from the database in the current window
+   * @param recordWindow
+   */
   public assignVirtualIndexes(recordWindow: Array<MergeWindowItem>) {
     for (let item of recordWindow) {
       if (item.virtualIndex == -1 && item.dbIndex > -1) {
@@ -441,6 +587,11 @@ export class PageMerger {
     }
   }
 
+  /**
+   * calculates the virtual index (the index at which a record appears for an outside caller)
+   * for a single row that comes from the database in the current window
+   * @param recordWindow
+   */
   public getVirtualIndex(baseIndex: number, record: DataRecord) {
     let draftsMovedInBefore = this.draftStore.getDraftsInsertedBeforeRecord(
       record,
