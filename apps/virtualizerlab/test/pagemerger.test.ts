@@ -13,6 +13,8 @@ export class RecordStore implements RS {
 
   getRecordsFromDb(from: number, count: number): Promise<DataRecord[]> {
     console.log(`fetching records ${from} to ${from + count - 1}`)
+    if (from > this.records!.length) throw Error(`Can't fetch records starting with ${from} when db has only ${this.records!.length} records`)
+    if (from + count > this.records!.length) throw Error(`Can't fetch ${count} records starting with ${from} when db has only ${this.records!.length} records`)
     return Promise.resolve(this.records?.slice(from, from + count) ?? [])
   }
   getDbRecordCount() {
@@ -1037,4 +1039,82 @@ test("getPage with new drafts, then pin and modify them", async () => {
     { uid: "2", data: "C" },
     { uid: "18", data: "CA" },
   ])
+})
+
+test("getPage get last page after moving record to end", async () => {
+  const db = testRecordStore(15)
+  const ds = new DraftStore()
+  const pageMerger = new PageMerger(db, ds, domainKeyHelper)
+  ds.addModification({ uid: "1", data: "PA" }, { uid: "1", data: "B" }, domainKeyHelper, false)
+
+  let page = await pageMerger.getPage(2)
+  expect(page).not.toBeUndefined()
+  expect(page).toEqual([
+    { uid: "11", data: "L" },
+    { uid: "12", data: "M" },
+    { uid: "13", data: "N" },
+    { uid: "14", data: "O" },
+    { uid: "1", data: "PA" },
+  ])
+
+  page = await pageMerger.getPage(0)
+  expect(page).not.toBeUndefined()
+  expect(page).toEqual([
+    { uid: "0", data: "A" },
+    { uid: "2", data: "C" },
+    { uid: "3", data: "D" },
+    { uid: "4", data: "E" },
+    { uid: "5", data: "F" },
+  ])
+
+  page = await pageMerger.getPage(1)
+  expect(page).not.toBeUndefined()
+  expect(page).toEqual([
+    { uid: "6", data: "G" },
+    { uid: "7", data: "H" },
+    { uid: "8", data: "I" },
+    { uid: "9", data: "J" },
+    { uid: "10", data: "K" },
+  ])
+})
+
+test("getPage moving new record twice", async () => {
+  const db = testRecordStore(10)
+  const ds = new DraftStore()
+  const pageMerger = new PageMerger(db, ds, domainKeyHelper)
+  ds.addNew({ uid: "10", data: "new value" })
+
+  let page = await pageMerger.getPage(2)
+  expect(page).not.toBeUndefined()
+  expect(page).toEqual([
+    { uid: "10", data: "new value" },
+  ])
+  ds.addModification({ uid: "10", data: "0a" }, undefined, domainKeyHelper)
+  ds.unpinAll()
+  page = await pageMerger.getPage(2)
+  expect(page).not.toBeUndefined()
+  expect(page).toEqual([
+    { uid: "9", data: "J" },
+  ])
+  page = await pageMerger.getPage(0)
+  expect(page).not.toBeUndefined()
+  expect(page).toEqual([
+    { uid: "10", data: "0a" },
+    { uid: "0", data: "A" },
+    { uid: "1", data: "B" },
+    { uid: "2", data: "C" },
+    { uid: "3", data: "D" },
+  ])
+  ds.addModification({ uid: "10", data: "CA" }, undefined, domainKeyHelper)
+  ds.unpinAll()
+  page = await pageMerger.getPage(0)
+  expect(page).not.toBeUndefined()
+  expect(page).toEqual([
+    { uid: "0", data: "A" },
+    { uid: "1", data: "B" },
+    { uid: "2", data: "C" },
+    { uid: "10", data: "CA" },
+    { uid: "3", data: "D" },
+  ])
+
 })
