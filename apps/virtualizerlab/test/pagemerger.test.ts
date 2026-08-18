@@ -22,12 +22,13 @@ export class RecordStore implements RS {
   }
 }
 
-const domainKeyHelper: DomainKeyHelper<string> = {
+const domainKeyHelper: DomainKeyHelper<{ uid: string, data:string}> = {
   compareKeys(key1, key2) {
-    return key1.localeCompare(key2)
+    let rc = key1.data.localeCompare(key2.data)
+    return rc ? rc : key1.uid.localeCompare(key2.uid)
   },
   extractKey(record) {
-    return record.data
+    return {uid: record.uid, data: record.data}
   },
 }
 
@@ -1117,4 +1118,105 @@ test("getPage moving new record twice", async () => {
     { uid: "3", data: "D" },
   ])
 
+})
+
+test("getPage with deviating sort orders", async () => {
+  const db = testRecordStore(6)
+  const ds = new DraftStore()
+  db.records!.sort(
+      (a,b) => Math.sign(
+          domainKeyHelper.compareKeys(
+              domainKeyHelper.extractKey(b),
+              domainKeyHelper.extractKey(a))
+      )
+  )
+
+  const pageMerger = new PageMerger(db, ds, domainKeyHelper)
+  for (let i = 0; i < 2; i++)
+    ds.unPinDraft(ds.addNew({ uid: `X${i}`, data: String.fromCharCode(71 + i) }))
+  ds.addModification({ uid: "1", data: "I" }, { uid: "1", data: "B" }, domainKeyHelper, false)
+  let thrown
+  try {
+    await pageMerger.getPage(0)
+    thrown = false
+  } catch{
+    thrown = true
+  }
+  expect(thrown).toBe(true)
+  let page = await pageMerger.getFallbackPage(0)
+  expect(page).not.toBeUndefined()
+  expect(page).toEqual([
+    { uid: "5", data: "F" },
+    { uid: "4", data: "E" },
+    { uid: "3", data: "D" },
+    { uid: "2", data: "C" },
+    { uid: "1", data: "I" },
+  ])
+
+  page = await pageMerger.getFallbackPage(1)
+  expect(page).not.toBeUndefined()
+  expect(page).toEqual([
+    { uid: "0", data: "A" },
+    { uid: "X0", data: "G" },
+    { uid: "X1", data: "H" },
+  ])
+})
+
+test("getPage with same key records", async () => {
+  const db = testRecordStore(6)
+  const ds = new DraftStore()
+  const pageMerger = new PageMerger(db, ds, domainKeyHelper)
+  for (let i = 0; i < 2; i++)
+    ds.unPinDraft(ds.addNew({ uid: `X${i}`, data: String.fromCharCode(71 + i) }))
+  ds.addModification({ uid: "1", data: "C" }, { uid: "1", data: "B" }, domainKeyHelper, false)
+
+  let page = await pageMerger.getPage(0)
+
+  expect(page).not.toBeUndefined()
+  expect(page!.map((p) => {
+    return {uid: p.uid, data: p.data}
+  })).toEqual([
+    { uid: "0", data: "A" },
+    { uid: "1", data: "C" },
+    { uid: "2", data: "C" },
+    { uid: "3", data: "D" },
+    { uid: "4", data: "E" },
+  ])
+
+  page = await pageMerger.getPage(1)
+  expect(page).not.toBeUndefined()
+  expect(page!.map((p) => {
+    return {uid: p.uid, data: p.data}
+  })).toEqual([
+    { uid: "5", data: "F" },
+    { uid: "X0", data: "G" },
+    { uid: "X1", data: "H" },
+  ])
+
+
+  db.records!.sort(
+      (a,b) => Math.sign(
+          domainKeyHelper.compareKeys(
+              domainKeyHelper.extractKey(b),
+              domainKeyHelper.extractKey(a))
+      )
+  )
+  await pageMerger.getPage(0)
+  page = await pageMerger.getFallbackPage(0)
+  expect(page).not.toBeUndefined()
+  expect(page).toEqual([
+    { uid: "5", data: "F" },
+    { uid: "4", data: "E" },
+    { uid: "3", data: "D" },
+    { uid: "2", data: "C" },
+    { uid: "1", data: "C" },
+  ])
+
+  page = await pageMerger.getFallbackPage(1)
+  expect(page).not.toBeUndefined()
+  expect(page).toEqual([
+    { uid: "0", data: "A" },
+    { uid: "X0", data: "G" },
+    { uid: "X1", data: "H" },
+  ])
 })

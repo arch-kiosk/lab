@@ -24,11 +24,12 @@ export class ConcreteDataProvider extends BufferedDataProvider {
     const domainKeyHelper = {
       extractKey: (record: MyDataRecord) => {
         // console.log(`extracting Key for ${record.uid}`, record)
-        return record.textInput
+        return {uid: record.uid, data: record.textInput}
       },
-      compareKeys: (key1: string, key2: string) => {
+      compareKeys: (key1: { uid: string, data: string }, key2: { uid: string, data: string }) => {
         try {
-          return key1.localeCompare(key2)
+          let rc = key1.data.localeCompare(key2.data)
+          return rc ? rc : key1.uid.localeCompare(key2.uid)
         } catch(e) {
           console.log(e, key1, key2)
           throw e
@@ -37,9 +38,9 @@ export class ConcreteDataProvider extends BufferedDataProvider {
     }
     super(pageSize, cacheCapacity, domainKeyHelper)
 
-    this.records.sort((r1, r2) => domainKeyHelper.compareKeys(r1.textInput, r2.textInput))
+    // this.records.sort((r1, r2) => domainKeyHelper.compareKeys(r1.textInput, r2.textInput))
 
-      // this.records.sort((a,b) => domainKeyHelper.compareKeys(domainKeyHelper.extractKey(a),domainKeyHelper.extractKey(b)))
+      this.records.sort((a,b) => domainKeyHelper.compareKeys(domainKeyHelper.extractKey(a),domainKeyHelper.extractKey(b)))
   }
 
   public async deleteRecordsFromDb(uids: string[]): Promise<void> {
@@ -48,7 +49,7 @@ export class ConcreteDataProvider extends BufferedDataProvider {
   }
 
   protected async fetchRecordsFromDb(fromRecord: number, count: number): Promise<DataRecord[]> {
-    await delay(Math.floor(Math.random() * 1201) + 50)
+    await delay(Math.floor(Math.random() * 50) + 10)
     if (
       fromRecord < this.records.length &&
       count > 0 &&

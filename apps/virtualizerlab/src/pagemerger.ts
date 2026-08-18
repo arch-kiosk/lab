@@ -1,4 +1,4 @@
-import { DomainKeyHelper, DataRecord as D} from "../src/sharedtypes"
+import { DomainKeyHelper, DataRecord as D } from "../src/sharedtypes"
 import { DraftStore } from "../src/draftstore"
 
 export type DataRecord = D | { uid: string; data: string }
@@ -100,39 +100,39 @@ export class PageMerger {
   /**
    * the main interface method of the class: this returns the compiled page for pageIndex
    * @param pageIndex: the number of the page (zero-based)
-   * @returns the page or undefined in case of an error or if the page does not exist
+   * @returns the page, undefined if the page does not exist
+   * @throws Error if something went wrong. In that case you want to try the getFallbackPage for ALL pages.
    */
   async getPage(pageIndex: number): Promise<DataRecord[] | undefined> {
-    try {
-      const toIndex = pageIndex * this.pageSize + this.pageSize - 1
-      const pageSize =
-        this.dbRecordCount - toIndex < 1 ? this.dbRecordCount % this.pageSize : this.pageSize
-      console.log(`getPage ${pageIndex}`)
-      let page: Array<DataRecord>|undefined = []
-      if (pageIndex * this.pageSize < this.dbRecordCount) {
-        page = this.dbRecordCount ? await this.db.getRecordsFromDb(
+    const toIndex = pageIndex * this.pageSize + this.pageSize - 1
+    const pageSize =
+      this.dbRecordCount - toIndex < 1 ? this.dbRecordCount % this.pageSize : this.pageSize
+    console.log(`getPage ${pageIndex}`)
+    let page: Array<DataRecord> | undefined = []
+    if (pageIndex * this.pageSize < this.dbRecordCount) {
+      page = this.dbRecordCount
+        ? await this.db.getRecordsFromDb(
             pageIndex * this.pageSize,
-            Math.min(this.dbRecordCount - pageIndex * this.pageSize, pageSize)) : []
-      }
+            Math.min(this.dbRecordCount - pageIndex * this.pageSize, pageSize),
+          )
+        : []
+    }
 
-      if (this.draftStore.getDraftCount() == 0) {
-        return page
-      }
-      page = await this.getVirtualPage(pageIndex, page)
-      if (page) {
-        for (const draft of this.draftStore.getAllDraftsExceptNewPinned()) {
-          if (!draft.pinned) {
-            if (page.find((record) => record.uid === draft.record.uid)) {
-              this.draftStore.pinDraft(draft, this.domainKeyHelper.extractKey(draft.record))
-            }
+    if (this.draftStore.getDraftCount() == 0) {
+      return page
+    }
+
+    page = await this.getVirtualPage(pageIndex, page)
+    if (page) {
+      for (const draft of this.draftStore.getAllDraftsExceptNewPinned()) {
+        if (!draft.pinned) {
+          if (page.find((record) => record.uid === draft.record.uid)) {
+            this.draftStore.pinDraft(draft, this.domainKeyHelper.extractKey(draft.record))
           }
         }
       }
-      return page
-    } catch (e) {
-      console.error(e)
     }
-    return undefined
+    return page
   }
 
   /**
@@ -147,7 +147,11 @@ export class PageMerger {
     initialRecords: DataRecord[],
   ): Promise<DataRecord[] | undefined> {
     let recursionLevel = 0
-    const _getVirtualPage = async (startIndex: number, endIndex: number, dbRecords: DataRecord[]) => {
+    const _getVirtualPage = async (
+      startIndex: number,
+      endIndex: number,
+      dbRecords: DataRecord[],
+    ) => {
       if (startIndex > this.dbRecordCount - 1) {
         //no db record in this page -> extend currentStart to last dbRecord
         startIndex = this.dbRecordCount - 1
@@ -157,8 +161,12 @@ export class PageMerger {
       console.log(`starting _getVirtualPage with startIndex ${startIndex}, endIndex ${endIndex}`)
       let currentStart = startIndex
       let currentEnd = endIndex
-      let startKey = dbRecords.length > 0 ? this.domainKeyHelper.extractKey(dbRecords[0]) : undefined
-      let endKey = dbRecords.length > 0 ? this.domainKeyHelper.extractKey(dbRecords[dbRecords.length - 1]) : undefined
+      let startKey =
+        dbRecords.length > 0 ? this.domainKeyHelper.extractKey(dbRecords[0]) : undefined
+      let endKey =
+        dbRecords.length > 0
+          ? this.domainKeyHelper.extractKey(dbRecords[dbRecords.length - 1])
+          : undefined
       const recordWindow = this.initRecordWindow(dbRecords, currentStart)
       const [moveNewStart, moveNewEnd] =
         dbRecords.length > 0 ? this.recalcWindowBoundaries(recordWindow) : [0, 0]
@@ -174,7 +182,7 @@ export class PageMerger {
       this.assignVirtualIndexes(recordWindow)
       try {
         this.completeVirtualIndexes(recordWindow, pageIndex)
-      } catch(e) {
+      } catch (e) {
         console.log(recordWindow)
         throw e
       }
@@ -223,7 +231,11 @@ export class PageMerger {
     let firstRecord = pageIndex * this.pageSize
     // if (firstRecord > drafts.length - 1) return []
     let page: Array<DataRecord> = []
-    for (let idx = firstRecord; idx < Math.min(pageIndex * this.pageSize + this.pageSize, drafts.length); idx++) {
+    for (
+      let idx = firstRecord;
+      idx < Math.min(pageIndex * this.pageSize + this.pageSize, drafts.length);
+      idx++
+    ) {
       page.push(drafts[idx].record)
     }
     return page
@@ -341,7 +353,8 @@ export class PageMerger {
     let lastDbRow = recordWindow.length - 1
 
     // all drafts that are after the last db row
-    if (pageIndex * this.pageSize + recordWindow.length-1 >= this.dbRecordCount-1) {  //-1
+    if (pageIndex * this.pageSize + recordWindow.length - 1 >= this.dbRecordCount - 1) {
+      //-1
       for (const draft of this.draftStore.getDraftsBetween(
         recordWindow[recordWindow.length - 1]?.key,
         undefined,
@@ -362,7 +375,7 @@ export class PageMerger {
     }
 
     //all drafts that are pinned to the end
-    if (pageIndex >= Math.trunc(this.dbRecordCount / this.pageSize)-1) {
+    if (pageIndex >= Math.trunc(this.dbRecordCount / this.pageSize) - 1) {
       for (const draft of this.draftStore.getAllDrafts(this.domainKeyHelper)) {
         if (draftsInserted.find((uid) => uid === draft.record.uid) === undefined) {
           if (draft.isNew && draft.pinned && draft.pinnedKey === undefined) {
@@ -383,9 +396,9 @@ export class PageMerger {
     while (idx < lastDbRow) {
       try {
         for (const draft of this.draftStore.getDraftsBetween(
-            recordWindow[idx].key,
-            recordWindow[idx + 1].key,
-            this.domainKeyHelper,
+          recordWindow[idx].key,
+          recordWindow[idx + 1].key,
+          this.domainKeyHelper,
         )) {
           if (draft.isNew && draft.pinned && draft.pinnedKey === undefined) continue
           if (draftsInserted.find((uid) => uid === draft.record.uid) === undefined) {
@@ -401,7 +414,7 @@ export class PageMerger {
           }
         }
         idx++
-      } catch(e) {
+      } catch (e) {
         console.log(recordWindow)
         throw e
       }
@@ -602,5 +615,47 @@ export class PageMerger {
       this.domainKeyHelper,
     ).length
     return baseIndex - recordsMovedOut + draftsMovedInBefore
+  }
+
+  public async getFallbackPage(pageIndex: number): Promise<DataRecord[] | undefined> {
+    let initialRecords: Array<DataRecord> = []
+    const toIndex = pageIndex * this.pageSize + this.pageSize - 1
+
+    if (pageIndex * this.pageSize < this.dbRecordCount) {
+      const maxPageSize =
+        this.dbRecordCount - toIndex < 1 ? this.dbRecordCount % this.pageSize : this.pageSize
+      initialRecords = this.dbRecordCount
+        ? await this.db.getRecordsFromDb(
+            pageIndex * this.pageSize,
+            Math.min(this.dbRecordCount - pageIndex * this.pageSize, maxPageSize),
+          )
+        : []
+    }
+
+    if (this.draftStore.getDraftCount() == 0) {
+      return initialRecords
+    }
+    const recordWindow: DataRecord[] = []
+    let drafts = this.draftStore.getSortedDrafts(this.domainKeyHelper)
+
+    for (const r of initialRecords) {
+      const draft = drafts.find((d) => d.record.uid === r.uid)
+      if (draft) {
+        recordWindow.push(draft.record)
+      } else {
+        recordWindow.push(r)
+      }
+    }
+
+    let firstDraft = 0
+    if (initialRecords.length == 0) {
+      firstDraft = pageIndex * this.pageSize
+    }
+
+    for (let i = firstDraft; i < drafts.length; i++) {
+      if (recordWindow.length == this.pageSize) break
+      if (drafts[i].isNew) recordWindow.push(drafts[i].record)
+    }
+    return recordWindow
   }
 }

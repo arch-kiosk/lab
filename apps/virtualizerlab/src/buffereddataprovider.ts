@@ -1,14 +1,19 @@
 import { DraftStore } from "./draftstore"
-import type {DataRecord, DomainKeyHelper, RecordState} from "./sharedtypes"
+import type { DataRecord, DomainKeyHelper, RecordState } from "./sharedtypes"
 import { DataProviderBasis } from "./dataprovider"
-import {PageMerger} from "./pagemerger";
+import { PageMerger } from "./pagemerger"
 
 export abstract class BufferedDataProvider extends DataProviderBasis {
     protected draftStore = new DraftStore()
     protected abstract deleteRecordsFromDb(uids: string[]): Promise<void>
     protected domainKeyHelper: DomainKeyHelper<unknown>
+    protected useFallBackPageMerger = false
 
-    public constructor(pageSize: number, cacheCapacity: number, domainKeyHelper: DomainKeyHelper<unknown>) {
+    public constructor(
+        pageSize: number,
+        cacheCapacity: number,
+        domainKeyHelper: DomainKeyHelper<unknown>,
+    ) {
         super(pageSize, cacheCapacity)
         this.domainKeyHelper = domainKeyHelper
     }
@@ -17,7 +22,8 @@ export abstract class BufferedDataProvider extends DataProviderBasis {
         return (this.getDbRecordCount() ?? 0) + this.draftStore.newCount
     }
 
-    public relocateDrafts(): void {
+    public relocateDrafts(resetFallBackRenderer = false): void {
+        if (resetFallBackRenderer) this.useFallBackPageMerger = false
         this.draftStore.unpinAll()
         this.pageCache.clear()
         this.pendingPages.clear()
@@ -28,12 +34,36 @@ export abstract class BufferedDataProvider extends DataProviderBasis {
         return {
             newDrafts: this.draftStore.newCount,
             modDrafts: this.draftStore.modifiedCount,
-            ...super.getTelemetry()}
+            ...super.getTelemetry(),
+        }
     }
 
     public logTelemetry() {
         super.logTelemetry()
         console.log(this.draftStore)
+    }
+
+    public getRecord(
+        index: number,
+        bufferedOnly = false,
+        notify?: (index: number) => void,
+    ): DataRecord | undefined {
+        const pageIndex = Math.floor(index / this.pageSize)
+        const offset = index % this.pageSize
+
+        if (this.pageCache.has(pageIndex)) {
+            let r = this.pageCache.get(pageIndex)?.[offset]
+            if (r) {
+                const draft = this.draftStore.getDraft(r.uid)
+                if (draft) {
+                    r = {...draft.record}
+                }
+                else r = {...r}
+            }
+            return r
+        }
+
+        return super.getRecord(index, bufferedOnly, notify)
     }
 
 
@@ -42,7 +72,7 @@ export abstract class BufferedDataProvider extends DataProviderBasis {
 
         if (this.draftStore.isNew(uid)) return "new"
         if (this.draftStore.isModification(uid)) return "draft"
-        return undefined;
+        return undefined
     }
 
     public override setActiveRecord(index: number): void {
@@ -75,6 +105,7 @@ export abstract class BufferedDataProvider extends DataProviderBasis {
             updatedDraftRecord = { ...rawRecord, [fieldId]: value }
         }
         this.draftStore.addModification(updatedDraftRecord, rawRecord, this.domainKeyHelper)
+        // rawRecord[fieldId] = value
     }
 
     public override addRecord(record: DataRecord): void {
@@ -125,7 +156,6 @@ export abstract class BufferedDataProvider extends DataProviderBasis {
         })
     }
 
-
     protected async fetchPage(
         pageIndex: number,
         currentRetries: number,
@@ -133,15 +163,19 @@ export abstract class BufferedDataProvider extends DataProviderBasis {
     ): Promise<boolean> {
         const bufferedDataProvider = this
         const dbBridge = {
-            async getRecordsFromDb(from:number, count: number) {
+            async getRecordsFromDb(from: number, count: number) {
                 return await bufferedDataProvider.fetchRecordsFromDb.bind(bufferedDataProvider)(from, count)
             },
             getDbRecordCount() {
                 return bufferedDataProvider.getDbRecordCount() ?? 0
-            }
-
+            },
         }
-        const pageMerger = new PageMerger(dbBridge, this.draftStore, this.domainKeyHelper, this.pageSize)
+        const pageMerger = new PageMerger(
+            dbBridge,
+            this.draftStore,
+            this.domainKeyHelper,
+            this.pageSize,
+        )
         const fetchPromise = (async () => {
             try {
                 const dbRecordCount = this.getDbRecordCount()
@@ -149,14 +183,25 @@ export abstract class BufferedDataProvider extends DataProviderBasis {
                     this.pendingPages.delete(pageIndex)
                     return false
                 }
-                let page = await pageMerger.getPage(pageIndex)
-                if (!page) return false
+                let page: DataRecord[] | undefined
+                try {
+                    if (this.useFallBackPageMerger) {
+                        page = await pageMerger.getFallbackPage(pageIndex)
+                    } else {
+                        page = await pageMerger.getPage(pageIndex)
+                    }
+                    if (!page) return false
+                } catch (e) {
+                    console.log("switching to fall back merger", e)
+                    this.useFallBackPageMerger = true
+                    this.relocateDrafts()
+                    return false
+                }
                 this.pageCache.set(pageIndex, page)
                 this.pendingPages.delete(pageIndex)
                 if (notify) this.notifier?.({})
                 return true
-
-            } catch(e) {
+            } catch (e) {
                 this.pendingPages.set(pageIndex, currentRetries + 1)
                 console.error(`[DataProviderBasis] Fetch page ${pageIndex} failed:`, e)
                 return false
