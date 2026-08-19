@@ -110,6 +110,8 @@ export abstract class BufferedDataProvider extends DataProviderBasis {
 
     public override addRecord(record: DataRecord): void {
         this.draftStore.addNew(record)
+        let lastPageIndex = Math.trunc(this.recordCount() / this.pageSize)
+        console.log("deleting", this.pageCache.delete(lastPageIndex))
         this.notifier?.({ countChanged: true })
     }
 
