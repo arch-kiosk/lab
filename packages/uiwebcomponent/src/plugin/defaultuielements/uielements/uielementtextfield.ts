@@ -23,7 +23,12 @@ export class UIElementTextField extends UIElement {
         if (!context.parentLayout)
             throw 'UIElementTextField.render: render context is missing parentLayout'
         try {
-            let value = this.resolve(context, context.elementDefinition.value, id)
+            let resolvedValues = this.batchResolve(
+                context, [
+                    context.elementDefinition.value,
+                    context.elementDefinition.text],
+                id) as Array<string|undefined>
+            let value = resolvedValues[0]
             let maskedValue = null
 
             if (!this.isVisible(context, value, id)) {
@@ -34,7 +39,7 @@ export class UIElementTextField extends UIElement {
             let errState = Boolean(validationInfo && validationInfo.find((v) => v.result === "error"))
 
             if (id.startsWith("uid")) console.error(`  textfield ${context.getScopedId(id)} still visible`)
-            let text = this.resolve(context, context.elementDefinition.text)
+            let text = resolvedValues[1]!
             let htmlClass = this.getStyleSetting(
                 context.elementDefinition,
                 'classes',

@@ -28,24 +28,28 @@ export class ConcreteDataProvider extends BufferedDataProvider implements UIComp
         return match ? match[1] ?? "" : null;
     }
 
-    public resolve(valueExpression: string, _?: string, recordIndex?: number): unknown {
-        const expression = this.getSingleExpressionContent(valueExpression)
-        if (!expression) {
-            return valueExpression
-        }
-        if (recordIndex !== undefined) {
-            const record = this.getRecord(recordIndex, true)
+    public resolve(valueExpression: string | Array<string|undefined>, _?: string, recordIndex?: number): unknown {
+        let valueExpressions = (typeof(valueExpression) === "string")?[valueExpression]:valueExpression
+        let result: unknown[] = []
+        let record: undefined | MyDataRecord = recordIndex === undefined ? undefined : this.getRecord(recordIndex, true) as MyDataRecord | undefined
+
+        for (const toResolve of valueExpressions) {
+            const expression = this.getSingleExpressionContent(toResolve??"")
+            if (!expression) {
+                result.push(toResolve)
+                continue
+            }
             if (record) {
                 if (expression in record) {
-                    // if (valueExpression === "${text_input}") console.log(`valueExpression ${valueExpression} for record ${recordIndex} resolves to ${expression} resolves to `, record[expression])
-                    return `${record[expression]}`
+                    result.push( `${record[expression]}`)
+                    continue
                 } else {
                     console.log(`unknown expression ${expression} in record`, record)
                 }
             }
+            result.push( undefined)
         }
-        return undefined
-
+        return (typeof(valueExpression) === "string")?result[0]:result
     }
 
     constructor(pageSize = 50, cacheCapacity = 10) {

@@ -11,18 +11,22 @@ import { UIElementRenderer } from '#src/sharedtypes'
 export abstract class UILayout implements ReactiveController {
     layoutDefinition: UISchemaLayoutElement
     _id: string = '?'
+    protected validation=false
     reactiveControllerHost: UIComponent
     abstract cssClass: string
     public renderElementLabels: boolean = true
+    public abstract cardinality: "1" | "N"
 
     constructor(
         id: string,
         reactiveControllerHost: UIComponent,
         layoutDefinition: UISchemaLayoutElement,
+        recordValidation = false
     ) {
         this._id = id
         this.reactiveControllerHost = reactiveControllerHost
         this.layoutDefinition = layoutDefinition
+        this.validation = recordValidation
         console.log(`instantiating layout ${id}`)
     }
 
@@ -81,6 +85,14 @@ export abstract class UILayout implements ReactiveController {
         event.stopPropagation()
     }
 
+    protected renderRecordValidation(_layoutId: string, renderContext: UILayoutRenderContext): unknown {
+        const validationInfo = renderContext.uicomponent.dataProvider?.getRecordValidationInformation(renderContext.dataContext.recordIndex)
+        return validationInfo && validationInfo.length > 0? html`
+            <div style="position: absolute; right: 0; left: auto; background-color: lightcoral" class="layout-validation">${validationInfo.map((vi) => html`${vi.result as string}`)}</div>
+        `:nothing
+    }
+
+
     public renderLayout(
         layoutId: string,
         renderContext: UILayoutRenderContext,
@@ -100,6 +112,7 @@ export abstract class UILayout implements ReactiveController {
         const recordUid = renderContext.dataContext?renderContext.dataContext.recordUID as string:undefined
         console.log(`rendering layout ${this._id} for`,renderContext.dataContext.record)
         return html`
+            ${this.validation && recordNr !== undefined?this.renderRecordValidation(layoutId, renderContext):nothing}
             <div id="${renderContext.getScopedId(layoutId)}" class="${this.cssClass}" 
                  style="${style}" 
                  data-record-nr="${recordNr ?? nothing}" 

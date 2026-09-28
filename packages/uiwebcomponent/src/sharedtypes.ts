@@ -9,7 +9,7 @@ import { RenderContextDataContext } from '#src/uielementrendercontext'
 import { DataProviderValidationResult } from '@arch-kiosk/virtualizerlab'
 
 export interface UIComponentDataProvider extends VirtualScrollContainerDataProvider {
-    resolve(expression?: string, id?: string, recordIndex?: number): unknown
+    resolve(expression?: string | Array<string|undefined>, id?: string, recordIndex?: number): unknown
     getFieldValidationInformation(recordIndex: number, fieldId:string): Array<DataProviderValidationResult>
     getRecordValidationInformation(recordIndex: number): Array<DataProviderValidationResult>
     // setNotifier(notifier: DataNotifier): void

@@ -4,9 +4,15 @@ import { UIElementRenderContext } from '#src/uielementrendercontext'
 
 export class UIElement {
     // eslint-disable-next-line typescript/no-explicit-any
-    static resolve(context: UIElementRenderContext, expression?: string, id?: string): any {
+    static resolve(context: UIElementRenderContext, expression?: string, id?: string): unknown {
         // return id ?? value
-        return context.resolve(expression, id)
+        return expression ? context.resolve(expression, id) : undefined
+
+    }
+
+    static batchResolve(context: UIElementRenderContext, expressions?: Array<string|undefined>, id?: string): Array<unknown> {
+        // return id ?? value
+        return expressions ? context.resolve(expressions, id) : undefined
     }
 
     static getTimeZoneInfo(
@@ -36,7 +42,7 @@ export class UIElement {
         const visible =
             context.elementDefinition.visible ??
             context.parentLayout?.defaultElementVisibility
-        if (visible) {
+        if (visible !== undefined) {
             if (visible === 'false' || visible == false) return false
             if (visible === 'true' || visible == true) return true
             if (visible === '.') {

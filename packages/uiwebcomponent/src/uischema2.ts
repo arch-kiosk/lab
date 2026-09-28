@@ -79,7 +79,7 @@ export declare interface UISchemaDSDDict {
 export declare interface UISchemaUIElement {
     layout?: UISchemaUIElementElementLayout
     enabled?: boolean
-    visible?: string
+    visible?: string | false | true
     style?: { [key: string]: string }
     extra_style?: string
     is_identifier?: boolean

@@ -18,6 +18,14 @@ export function configureTestSchemaVirtualScrollLayout(uiComponent: UIComponent)
         }
         return [rc, undefined] as ValidationResultsReturnType<typeof value>
     }
+    dataProvider.onValidateRecord = (recordIndex, _record) => {
+        const rc : Array<DataProviderValidationResult> = []
+
+        if (_record["text_input"] === "asdf") {
+            rc.push({ result: 'error', msg: 'This record is not valid!' })
+        }
+        return [rc, undefined] as ValidationResultsReturnType<typeof _record>
+    }
 }
 
 function getDataProvider() {

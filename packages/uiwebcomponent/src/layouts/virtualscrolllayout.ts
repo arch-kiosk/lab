@@ -23,6 +23,7 @@ export class UIVirtualScrollLayout extends UILayout {
     cssClass = 'ui-virtual-scroll-layout'
     renderElementLabels = false
     subLayoutId: string
+    public cardinality: "1" | "N" = "N"
     virtualLayoutRef: Ref<VirtualScrollContainer> = createRef()
     dataProvider?: VirtualScrollContainerDataProvider
     renderUIElement: UIElementRenderer
@@ -142,7 +143,8 @@ export class UIVirtualScrollLayout extends UILayout {
                                 this.reactiveControllerHost.getSchemaElement(
                                         this.subLayoutId,
                                 ),
-                                this, {
+                                this, 
+                                {
                                     recordIndex: rowNr,
                                     recordUID: record.uid,
                                     record: record

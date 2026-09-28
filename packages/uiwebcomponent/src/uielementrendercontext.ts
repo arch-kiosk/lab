@@ -42,11 +42,13 @@ export class RenderContext {
         return this.uicomponent.scopeId(id, this.dataContext.recordIndex)
     }
 
-    public resolve(expression?: string, id?: string): unknown {
+    public resolve(expression?: string | Array<string|undefined>, id?: string): unknown {
         if (expression === undefined) return ''
+        const expressions = typeof(expression) === "string" ? [expression] : expression
+
         // value = replaceData(value, this.data)
         if (this.uicomponent.dataProvider && expression != undefined) {
-            return this.uicomponent.dataProvider.resolve(expression, id, this.dataContext?.recordIndex)
+            return this.uicomponent.dataProvider.resolve(expressions, id, this.dataContext?.recordIndex)
         }
         return expression
     }

@@ -3,6 +3,7 @@ import { UILayout } from './uilayout'
 
 export class UIColumnLayoutClass extends UILayout {
     cssClass = 'ui-column-layout'
+    public cardinality: "1" | "N" = "1"
 
     renderLayoutStyles(layout?: UISchemaUIElementElementLayout): string {
         const min_width = layout?.min_width

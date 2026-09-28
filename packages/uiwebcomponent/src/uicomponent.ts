@@ -26,8 +26,6 @@ import {
 
 export type { UIComponentDataProvider, UIComponentTimeZoneInfoProvider } from './sharedtypes'
 
-// export type { ApiTimeZoneInfo } from "./uischema"
-
 import {
     RenderContextDataContext,
     UIElementRenderContext,
@@ -35,9 +33,6 @@ import {
 } from './uielementrendercontext'
 import { type AppContext, type EventCatalog } from '#src/apptypes'
 import { PluginManager } from '@arch-kiosk/appfoundation'
-// import { UIColumnLayoutClass } from "./layouts/layoutclasscolumn"
-// import { UIRightAlignLayoutClass } from "./layouts/layoutclassrightalign"
-// import { UIStackLayoutClass } from "./layouts/layoutclassstack"
 import { UIVirtualScrollLayout } from './layouts/virtualscrolllayout'
 import { UILayout } from '#src/layouts/uilayout'
 import { UIColumnLayoutClass } from '#src/layouts/layoutclasscolumn'
@@ -410,6 +405,7 @@ export class UIComponent extends LitElement {
         layoutSchema: UISchemaLayoutElement,
         inheritReadOnly = false,
         cardinality = '1',
+        parentCardinality?: '1' | 'N' | undefined
     ): UILayout {
         if (this.layouts.hasOwnProperty(layoutElementId)) {
             return this.layouts[layoutElementId]
@@ -422,9 +418,10 @@ export class UIComponent extends LitElement {
 
         if (layoutSchema.orchestration_strategy) {
             if (cardinality === '1') {
+                const doValidation = Boolean(parentCardinality && parentCardinality === 'N')
                 switch (layoutSchema.orchestration_strategy.toLowerCase()) {
                     case 'columns':
-                        newLayout = new UIColumnLayoutClass(layoutElementId, this, layoutSchema)
+                        newLayout = new UIColumnLayoutClass(layoutElementId, this, layoutSchema, doValidation)
                         break
                     // case "rightalign":
                     //   return new UIRightAlignLayoutClass(layoutElementId, layoutSettings)
@@ -556,8 +553,10 @@ export class UIComponent extends LitElement {
             elementLayout = this.getLayout(
                 id,
                 layoutDefinition,
-                parentLayout.layoutDefinition.readonly,
+                parentLayout.layoutDefinition.readonly,undefined,
+                parentLayout.cardinality
             )
+
         } catch (e) {
             return html`cannot create layout ${id}: ${e}`
         }
