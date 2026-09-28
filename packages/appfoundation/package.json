@@ -9,14 +9,7 @@
     "typescript"
   ],
   "homepage": "https://github.com/arch-kiosk/lab/appfoundation",
-  "bugs": {
-    "url": "https://github.com/author/library/issues"
-  },
   "license": "MIT",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/author/library.git"
-  },
   "files": [
     "dist"
   ],

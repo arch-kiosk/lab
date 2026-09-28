@@ -2,28 +2,28 @@ import {customElement} from "lit/decorators.js";
 import {html, LitElement, PropertyValues, unsafeCSS} from "lit";
 import local_css from "./styles/lab-app.sass?inline"
 import {createRef, Ref, ref} from 'lit/directives/ref.js';
-import {VirtualScrollLayout} from "./tanstack-virtualizer-lab"
-import "./tanstack-virtualizer-lab"
+import {VirtualScrollContainer} from "./virtualscrollcontainer"
+import "./virtualscrollcontainer"
 import {ConcreteDataProvider} from "#src/teststaticdataprovider"
 
 @customElement("lab-app")
 export class LabApp extends LitElement {
     static styles = unsafeCSS(local_css)
-    virtualLayoutRef: Ref<VirtualScrollLayout> = createRef();
-    virtualLayoutRef2: Ref<VirtualScrollLayout> = createRef();
+    virtualLayoutRef: Ref<VirtualScrollContainer> = createRef();
+    virtualLayoutRef2: Ref<VirtualScrollContainer> = createRef();
     private dataProvider = new ConcreteDataProvider(10, 3)
     private dataProvider2 = new ConcreteDataProvider()
 
 
     renderVirtualLayout () {
         return html`
-            <virtualizer-lab ${ref(this.virtualLayoutRef)} id="virtualizerLayout" rowheight="64"></virtualizer-lab>
+            <virtual-scroll-container ${ref(this.virtualLayoutRef)} id="virtualizerLayout" rowheight="64"></virtual-scroll-container>
         `
     }
 
     renderVirtualLayout2 () {
         return html`
-            <virtualizer-lab ${ref(this.virtualLayoutRef2)} id="virtualizerLayout2" rowheight="36"></virtualizer-lab>
+            <virtual-scroll-container ${ref(this.virtualLayoutRef2)} id="virtualizerLayout2" rowheight="36"></virtual-scroll-container>
         `
     }
 
@@ -89,7 +89,7 @@ export class LabApp extends LitElement {
             <button @click="${() => this.addRow(1)}">add row</button>
             <button @click="${() => this.refresh(1)}">refresh</button>
             <div style="height: 25vh;border: 2px solid green">
-<!--                ${this.renderVirtualLayout2()}-->
+                ${this.renderVirtualLayout2()}
             </div>
         `
     }

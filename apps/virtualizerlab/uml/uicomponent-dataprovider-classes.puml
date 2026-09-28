@@ -1,0 +1,61 @@
+@startuml
+'https://plantuml.com/class-diagram
+
+namespace VirtualScrollContainer {
+    interface VirtualScrollContainerDataProvider {
+        +recordCount()
+        +getRecord(index,bufferedOnly,notify)
+        +getRecordState(uid)
+        +setActiveRecord(index)
+        +dataChanged(recordIndex, fieldId, value)
+    }
+
+}
+
+namespace host {
+    abstract class DataProvider<<DataProvider>> {
+      setNotifier(notifier)
+      recordCount()
+      getRecord(index,bufferedOnly?,notify?)
+      getRecordState(uid)
+      setActiveRecord(index)
+      dataChanged(recordIndex, fieldId, value)
+      addRecord(record)
+      deleteRecords(uids)
+    }
+
+    abstract class BufferedDataProvider{
+        constructor(pageSize, cacheCapacity, domainKeyHelper)
+    }
+
+    class ConcreteDataProvider<<BufferedDataProvider>> {
+        constructor(pageSize, cacheCapacity)
+        async recalcDbRecordCount
+        async deleteRecordsFromDb(uids)
+        async fetchRecordsFromDb(fromRecord, count)
+    }
+
+    interface IDataProvider{
+        setNotifier(notifier)
+        getTelemetry?()
+        logTelemetry?()
+        addRecord(record)
+        deleteRecords(uids)
+    }
+    VirtualScrollContainerDataProvider <|-- IDataProvider
+
+}
+
+namespace UiComponent {
+    interface UIComponentDataProvider {
+        resolve(expression?: string, id?: string, recordIndex?: number): unknown
+    }
+    VirtualScrollContainerDataProvider <|-- UIComponentDataProvider
+}
+
+
+IDataProvider <-- DataProvider: <<implements>>
+DataProvider <|-- BufferedDataProvider
+BufferedDataProvider <|-- ConcreteDataProvider
+UIComponentDataProvider <-- ConcreteDataProvider: <<implements>>
+@enduml

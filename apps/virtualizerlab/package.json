@@ -1,19 +1,31 @@
 {
   "name": "@arch-kiosk/virtualizerlab",
+  "description": "components coming out of the virtualizer lab",
+  "keywords": [
+    "architecture",
+    "virtual scrolling",
+    "lit",
+    "web-component",
+    "typescript"
+  ],
   "version": "1.0.0-local",
-  "private": true,
+  "homepage": "https://github.com/arch-kiosk",
+  "bugs": {
+    "url": "https://github.com/arch-kiosk"
+  },
+  "license": "MIT",
   "files": [
     "./dist"
   ],
   "type": "module",
-  "main": "./dist/uicomponent.js",
-  "module": "./dist/uicomponent.js",
-  "types": "./dist/uicomponent.d.ts",
   "exports": {
-    ".": {
-      "types": "./dist/uicomponent.d.ts",
-      "import": "./dist/uicomponent.js"
-    }
+    ".": "./dist/index.mjs",
+    "./package.json": "./package.json"
+  },
+  "module": "./dist/virtualizerlab.js",
+  "types": "./dist/virtualizerlab.d.ts",
+  "publishConfig": {
+    "access": "public"
   },
   "imports": {
     "#src/*": "./src/*"
@@ -21,7 +33,7 @@
   "scripts": {
     "check types": "tsc",
     "dev": "vp dev -- --force --host 127.0.0.1",
-    "build-only": "tsc && vp build"
+    "build": "vp build && tsc -p tsconfig.build.json"
   },
   "dependencies": {
     "@lit-labs/virtualizer": "catalog:",

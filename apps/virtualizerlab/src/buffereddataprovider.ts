@@ -1,15 +1,21 @@
 import { DraftStore } from "./draftstore"
-import type { DataRecord, DomainKeyHelper, RecordState } from "./sharedtypes"
+import {
+    DataRecord, DomainKeyHelper, RecordState,
+    ValidationResultsReturnType, DataProviderValidationResults, DataProviderValidationStates,
+    DataProviderValidationResult,
+} from './sharedtypes'
 import { DataProviderBasis } from "./dataprovider"
 import { PageMerger } from "./pagemerger"
 
+/** todo: this does not belong in this package. AppFoundation? */
 export abstract class BufferedDataProvider extends DataProviderBasis {
     protected draftStore = new DraftStore()
     protected abstract deleteRecordsFromDb(uids: string[]): Promise<void>
     protected domainKeyHelper: DomainKeyHelper<unknown>
     protected useFallBackPageMerger = false
+    protected validationStore: Map<number, DataProviderValidationResults> = new Map()
 
-    public constructor(
+    protected constructor(
         pageSize: number,
         cacheCapacity: number,
         domainKeyHelper: DomainKeyHelper<unknown>,
@@ -88,6 +94,10 @@ export abstract class BufferedDataProvider extends DataProviderBasis {
     }
 
     public override dataChanged(recordIndex: number, fieldId: string, value: unknown): void {
+        const validationResult: DataProviderValidationResults = {
+            result: 'unknown',
+        }
+
         if (this.activeRecordIndex !== recordIndex) {
             throw Error("record is not the active record")
         }
@@ -98,14 +108,121 @@ export abstract class BufferedDataProvider extends DataProviderBasis {
         const uid = String(rawRecord.uid)
         const existingDraftRecord = this.draftStore.getRecord(uid)
 
+        const rc = this.runFieldValidation(recordIndex, fieldId, value)
+        let newValue
+        if (rc) {
+            let fv
+            [fv, newValue] = rc
+            if (!validationResult.fields) validationResult.fields = {}
+            validationResult.fields![fieldId] = fv
+        }
+
         let updatedDraftRecord: DataRecord
         if (existingDraftRecord) {
-            updatedDraftRecord = { ...existingDraftRecord, [fieldId]: value }
+            updatedDraftRecord = { ...existingDraftRecord, [fieldId]: newValue ?? value }
         } else {
-            updatedDraftRecord = { ...rawRecord, [fieldId]: value }
+            updatedDraftRecord = { ...rawRecord, [fieldId]: newValue ?? value }
         }
+
+        const rv = this.runRecordValidation(recordIndex, updatedDraftRecord)
+        if (rv) {
+            if (rv[1] !== undefined) {
+                updatedDraftRecord = rv[1]
+            }
+            validationResult.record = rv[0]
+        }
+
+        this.consolidateValidationResult(validationResult)
         this.draftStore.addModification(updatedDraftRecord, rawRecord, this.domainKeyHelper)
-        // rawRecord[fieldId] = value
+        this.validationStore.set(recordIndex, validationResult)
+
+        console.log("BufferedDataProvider.dataChanged: ", updatedDraftRecord)
+    }
+
+    private consolidateValidationResult(validationResult: DataProviderValidationResults) {
+        const priority: Record<DataProviderValidationStates, number> = {'unknown': 0, 'valid': 1, 'warning': 2, 'error': 3}
+        validationResult.result = 'valid'
+        if (validationResult.fields) {
+            for (let fv of Object.values(validationResult.fields)) {
+                for (let v of fv) {
+                    if (priority[v.result] > priority[validationResult.result]) {
+                        validationResult.result = v.result
+                    }
+                }
+            }
+        }
+        if (validationResult.record) {
+            for (let rv of Object.values(validationResult.record)) {
+                if (priority[rv.result] > priority[validationResult.result]) {
+                    validationResult.result = rv.result
+                }
+            }
+        }
+    }
+
+    private runRecordValidation(recordIndex: number, updatedDraftRecord: DataRecord): ValidationResultsReturnType<DataRecord> | undefined {
+        let rv: ValidationResultsReturnType<DataRecord> | undefined
+
+        if (this.onValidateRecord) {
+            rv = this.onValidateRecord(recordIndex, updatedDraftRecord)
+        }
+        console.log(`validating record ${recordIndex}:`, rv)
+        return rv
+    }
+
+    private runFieldValidation(recordIndex: number, fieldId: string, value: unknown): ValidationResultsReturnType<typeof value> | undefined {
+        let fv: ValidationResultsReturnType<typeof value> | undefined
+        if (this.onValidateField) {
+            fv = this.onValidateField(recordIndex, fieldId, value)
+        }
+        console.log(`validating field ${fieldId}:`, fv)
+
+        return fv
+    }
+
+    /** This runs validation without changing either record nor field values.
+     * It only creates the validationRecord in the validationStore and returns it
+     *
+     * @param recordIndex
+     * @returns DataProviderValidationResults
+     */
+    protected validateRecord(recordIndex: number) {
+        const record = this.getRecord(recordIndex, true)
+        const validationResult: DataProviderValidationResults = {result: 'unknown'}
+        console.log(`validating record ${recordIndex} again ...`)
+        if (!record) throw new Error(`BufferedDataProvider.validateRecord can't find record ${recordIndex}`)
+        for (const [fieldId, value] of Object.entries(record)) {
+            const fv = this.runFieldValidation(recordIndex, fieldId, value)
+            if (fv) {
+                if (!validationResult.fields) validationResult.fields = {}
+                validationResult.fields![fieldId] = fv[0]
+            }
+        }
+
+        const rv = this.runRecordValidation(recordIndex, record)
+        if (rv) {
+            validationResult.record = rv[0]
+        }
+
+        this.consolidateValidationResult(validationResult)
+        this.validationStore.set(recordIndex, validationResult)
+        return validationResult
+    }
+
+    public getFieldValidationInformation(recordIndex: number, fieldId:string): Array<DataProviderValidationResult> {
+        let vi = this.validationStore.get(recordIndex)
+        if (!vi) {
+            vi = this.validateRecord(recordIndex)
+        }
+        return vi?.fields?.[fieldId] ?? []
+    }
+
+    public getRecordValidationInformation(recordIndex: number): Array<DataProviderValidationResult> {
+        let vi = this.validationStore.get(recordIndex)
+        if (!vi) {
+            vi = this.validateRecord(recordIndex)
+        }
+        return vi?.record ?? []
     }
 
     public override addRecord(record: DataRecord): void {
@@ -163,6 +280,7 @@ export abstract class BufferedDataProvider extends DataProviderBasis {
         currentRetries: number,
         notify = true,
     ): Promise<boolean> {
+        // oxlint-disable-next-line typescript/no-this-alias
         const bufferedDataProvider = this
         const dbBridge = {
             async getRecordsFromDb(from: number, count: number) {

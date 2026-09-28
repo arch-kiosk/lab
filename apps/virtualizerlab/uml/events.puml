@@ -1,0 +1,58 @@
+@startuml
+'https://plantuml.com/class-diagram
+interface DataProvider {
+  recordCount(): number | undefined
+  getRecord(index,bufferedOnly,notify): DataRecord | undefined
+  getRecordState(uid) : RecordState
+  setActiveRecord(index): void
+  setNotifier(notifier: DataNotifier): void
+  dataChanged(recordIndex, fieldId, value): void
+  addRecord(DataRecord): void
+  deleteRecords(uids[]) : Promise<void>
+  getTelemetry?(): { cached: number; capacity: number }
+  logTelemetry?(): void
+  ---
+  afterLoadFromDb(r: DataRecord)
+  beforeSaveToDb(r: DataRecord)
+  onValidate(r: DataRecord)
+}
+
+
+class UIComponent {
+
+    afterRecordGotActive(DataRecord))
+    afterRecordGotInactive(DataRecord))
+    onValidate(DataRecord, dbRecord: DataRecord | undefined)
+    afterLoadFromDb(DataRecord)
+    beforeSaveToDb(DataRecord)
+    beforeNewRecord(DataRecord)
+    afterNewRecord(DataRecord)
+    afterFetchRecord(DataRecord)
+    beforeDeleteRecord(DataRecord)
+    afterDeleteRecord(DataRecord)
+}
+
+'abstract class AbstractList
+'abstract AbstractCollection
+'interface List
+'interface Collection
+'
+'List <|-- AbstractList
+'Collection <|-- AbstractCollection
+'
+'Collection <|- List
+'AbstractCollection <|- AbstractList
+'AbstractList <|-- ArrayList
+'
+'class ArrayList {
+'Object[] elementData
+'size()
+'}
+'
+'enum TimeUnit {
+'DAYS
+'HOURS
+'MINUTES
+'}
+
+@enduml

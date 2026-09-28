@@ -1,0 +1,126 @@
+@startuml
+'https://plantuml.com/class-diagram
+skinparam linetype ortho
+skinparam nodesep 60
+skinparam ranksep 80
+
+class UIComponent {
+    pluginManager
+    dataProvider
+    uiSchema
+    timeZoneInfoProvider
+    data
+    dataProvider
+    scopeId(id, recordIndex)
+    unScopeId(scopedId)
+    moveToNextRow()
+    setSortOrder()
+    fetchFileProvider()
+    gotoRecord(uid)
+}
+
+interface RenderContextDataContext {
+    recordIndex: number
+    recordUID?: string
+    record?: unknown
+}
+
+class RenderContext {
+    uicomponent: UIComponent
+    parentLayout?: UILayout
+    dataContext: RenderContextDataContext
+
+}
+RenderContext "<<dataContext>>" -o RenderContextDataContext
+
+class UILayoutRenderContext {
+    layoutDefinition: UISchemaLayoutElement
+
+}
+class UIElementRenderContext {
+    elementDefinition: UISchemaUIElements
+
+}
+
+RenderContext <|-- UILayoutRenderContext
+RenderContext <|-- UIElementRenderContext
+
+class VirtualScrollContainer {
+
+}
+
+class DraftStore {
+
+}
+
+class PageMerger {
+}
+
+abstract class DataProvider<<DataProvider>> {
+  setNotifier(notifier)
+  recordCount()
+  getRecord(index,bufferedOnly?,notify?)
+  getRecordState(uid)
+  setActiveRecord(index)
+  dataChanged(recordIndex, fieldId, value)
+  addRecord(record)
+  deleteRecords(uids)
+}
+
+abstract class BufferedDataProvider{
+    constructor(pageSize, cacheCapacity, domainKeyHelper)
+}
+interface VirtualScrollContainerDataProvider {
+    +recordCount()
+    +getRecord(index,bufferedOnly,notify)
+    +getRecordState(uid)
+    +setActiveRecord(index)
+    +dataChanged(recordIndex, fieldId, value)
+
+}
+
+interface UIComponentDataProvider {
+    resolve(expression?: string, id?: string, recordIndex?: number): unknown
+}
+class ConcreteDataProvider {
+    constructor(pageSize, cacheCapacity)
+    async recalcDbRecordCount
+    async deleteRecordsFromDb(uids)
+    async fetchRecordsFromDb(fromRecord, count)
+}
+
+
+class LruPageCache<<PageCache>> {
+}
+
+class Host {
+}
+
+struct ConcreteDataRecord <<DataRecord>> {
+ uid: string
+}
+
+ConcreteDataProvider --> UIComponentDataProvider: <<implements>>
+BufferedDataProvider <|-- ConcreteDataProvider
+VirtualScrollContainerDataProvider <|- UIComponentDataProvider
+Host --> ConcreteDataProvider
+Host --> UIComponent
+Host --> ConcreteDataRecord
+DataProvider <|-- BufferedDataProvider
+BufferedDataProvider ..o LruPageCache
+BufferedDataProvider --o PageMerger
+DataProvider ..> ConcreteDataRecord
+BufferedDataProvider -o DraftStore
+'BufferedDataProvider <|-- ConcreteDataProvider
+'PageMerger <-- BufferedDataProvider
+PageMerger --> DraftStore
+'PageMerger --> DataProvider
+'VirtualScrollContainer --> DataProvider
+VirtualScrollLayout --o VirtualScrollContainer
+UIComponent --> UIComponentDataProvider
+ConcreteDataProvider <. UIComponent
+UIComponent "<<creates>>" --> UILayoutRenderContext
+UIComponent "<<creates>>" --> UIElementRenderContext
+VirtualScrollLayout "<<creates>>" --> RenderContextDataContext
+UIComponent --> VirtualScrollLayout
+@enduml

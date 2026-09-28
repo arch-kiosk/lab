@@ -36,35 +36,19 @@ export default defineConfig(({ command, mode }) => {
       emptyOutDir: true,
       minify: true,
       lib: {
-        entry: resolve(__dirname, "src/ui-component.ts"),
-        name: "UIComponent",
-        filename: "uicomponent",
+        entry: resolve(__dirname, "src/virtualizerlab.ts"),
+        name: "virtualizerlab",
+        filename: (format: string) => `virtualizerlab.${format}.js`,
         formats: ["es"],
       },
       rolldownOptions: {
         // external: [/^lit/,"@polymer/polymer",/^polymer/,/^@polymer/,/^@vaadin/]
         external: /^[^./](?!:[/\\])/,
         output: {
-          minify:
-            command === "build"
-              ? {
-                  compress: {
-                    dropConsole: true,
-                    dropDebugger: true,
-                  },
-                }
-              : undefined,
+          minifyInternalExports: true,
         },
-        //   external: (id) =>
-        //       // Externalize all npm packages but keep local files
-        //       !id.startsWith('.') && !id.startsWith('/') && !id.startsWith('\0') && !id.match(/^[A-Za-z]:/)
       },
-      // sourcemap: 'inline'
     },
-    // Gemini addition, not sure it is necessary:
-    // css: {
-    //   devSourcemap: true
-    // },
     server: {
       // sourcemap: true,
       port: 5174,

@@ -1,25 +1,15 @@
 // noinspection TypeScriptAbstractClassConstructorCanBeMadeProtected
 
-import type { DataRecord,DataNotifier,RecordState } from "./sharedtypes"
+import {
+  DataRecord,
+  DataNotifier,
+  RecordState,
+  DataProvider,
+  ValidationResultsReturnType,
+} from './sharedtypes'
 import { LruPageCache, PageCache } from "./cache"
 
-export interface DataProvider {
-  recordCount(): number | undefined
-  getRecord(
-      index: number,
-      bufferedOnly?: boolean,
-      notify?: (index: number) => void,
-  ): DataRecord | undefined
-  getRecordState(uid: string) : RecordState
-  setActiveRecord(index: number): void
-  setNotifier(notifier: DataNotifier): void
-  dataChanged(recordIndex: number, fieldId: string, value: unknown): void
-  addRecord(record: DataRecord): void
-  deleteRecords(uids: string[]) : Promise<void>
-  getTelemetry?(): { cached: number; capacity: number }
-  logTelemetry?(): void
-}
-
+/** todo: this does not belong in this package. AppFoundation? */
 export abstract class DataProviderBasis implements DataProvider {
   protected pageSize: number
   protected pageCache: PageCache<DataRecord>
@@ -32,6 +22,11 @@ export abstract class DataProviderBasis implements DataProvider {
   protected notifier?: DataNotifier
 
   protected cachedDbRecordCount?: number
+
+
+  public onValidateField?: <T>(recordIndex: number, fieldId: string, value: T) => undefined | ValidationResultsReturnType<T>
+  public onValidateRecord?: <T extends DataRecord>(recordIndex: number, record: T) => undefined | ValidationResultsReturnType<T>
+
 
   /**
    * actually goes to the database and calculates the number of records.
@@ -77,7 +72,7 @@ export abstract class DataProviderBasis implements DataProvider {
    */
   public findIndexByUid(uid: string): number | undefined {
     const match = this.pageCache.findPageAndOffset((page) =>
-        page.findIndex((record) => record?.uid === uid),
+      page.findIndex((record) => record?.uid === uid),
     )
 
     if (!match) return undefined
@@ -128,9 +123,9 @@ export abstract class DataProviderBasis implements DataProvider {
   }
 
   public getRecord(
-      index: number,
-      bufferedOnly = false,
-      notify?: (index: number) => void,
+    index: number,
+    bufferedOnly = false,
+    notify?: (index: number) => void,
   ): DataRecord | undefined {
     const pageIndex = Math.floor(index / this.pageSize)
     const offset = index % this.pageSize
@@ -183,9 +178,9 @@ export abstract class DataProviderBasis implements DataProvider {
   }
 
   protected async fetchPage(
-      pageIndex: number,
-      currentRetries: number,
-      notify = true,
+    pageIndex: number,
+    currentRetries: number,
+    notify = true,
   ): Promise<boolean> {
     const fetchPromise = (async () => {
       try {
@@ -215,4 +210,3 @@ export abstract class DataProviderBasis implements DataProvider {
     return fetchPromise
   }
 }
-

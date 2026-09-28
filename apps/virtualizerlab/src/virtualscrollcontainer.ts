@@ -1,40 +1,46 @@
 // oxlint-disable typescript/no-explicit-any
-import { LitElement, html, PropertyValues, unsafeCSS, HTMLTemplateResult } from "lit"
-import { when } from "lit/directives/when.js"
-import { customElement, property, state } from "lit/decorators.js"
-import { repeat } from "lit/directives/repeat.js"
-import { createRef, ref, Ref } from "lit/directives/ref.js"
+import { LitElement, html, PropertyValues, unsafeCSS, HTMLTemplateResult } from 'lit'
+import { when } from 'lit/directives/when.js'
+import { customElement, property, state } from 'lit/decorators.js'
+import { repeat } from 'lit/directives/repeat.js'
+import { createRef, ref, Ref } from 'lit/directives/ref.js'
+import { VirtualizerController } from '@tanstack/lit-virtual'
+import type { VirtualItem } from '@tanstack/virtual-core'
 
-import { VirtualizerController } from "@tanstack/lit-virtual"
-import type { VirtualItem } from "@tanstack/virtual-core"
+import local_css from './styles/virtualscrollcontainer.sass?inline'
+import { VirtualScrollContainerDataProvider } from '#src/sharedtypes'
 
-import {DataProvider} from "./dataprovider"
 
-import local_css from "./styles/tanstack-virtualizerlab.sass?inline"
-import {DataNotification} from "#src/sharedtypes";
+export type VirtualScrollContainerDataNotification = {
+    currentRecord?: number
+    countChanged?: boolean
+}
 
 export type RowRenderer = (
     rowNr: number,
     rowKey: string,
-    record: Record<string, any>
+    record: Record<string, any>,
 ) => HTMLTemplateResult
 
-@customElement("virtualizer-lab")
-export class VirtualScrollLayout extends LitElement {
+@customElement('virtual-scroll-container')
+export class VirtualScrollContainer extends LitElement {
     static styles = unsafeCSS(local_css)
-
+    static {
+        // Runs once when the class is defined, BEFORE any instances are created
+        this.disableWarning?.('change-in-update')
+    }
     DEFAULT_ROW_HEIGHT = 42
 
-    @property({ type: Number, attribute: "rowheight" })
+    @property({ type: Number, attribute: 'rowheight' })
     rowHeight = this.DEFAULT_ROW_HEIGHT
 
     @state()
     private recordCount = 0
 
-    @property({reflect: true, type: Number })
+    @property({ reflect: true, type: Number })
     private activeRecordIndex?: number
 
-    private dataProvider?: DataProvider
+    private dataProvider?: VirtualScrollContainerDataProvider
     private rowRenderer?: RowRenderer
 
     private scrollContainerRef: Ref<HTMLDivElement> = createRef()
@@ -49,17 +55,17 @@ export class VirtualScrollLayout extends LitElement {
         overscan: 5,
     })
 
-    public notifyDataReady = (notification?: DataNotification): void => {
-        console.log("notified:", notification)
+    public notifyDataReady = (notification?: VirtualScrollContainerDataNotification): void => {
+        console.log('notified:', notification)
         let updateRequired = true
 
         if (notification) {
-            if ("currentRecord" in notification) {
+            if ('currentRecord' in notification) {
                 this.activeRecordIndex = notification.currentRecord
                 // updateRequired = true
             }
 
-            if ("countChanged" in notification) {
+            if ('countChanged' in notification) {
                 this.recordCount = this.dataProvider!.recordCount() ?? 0
                 this.updateVirtualizerCount(this.recordCount)
                 // updateRequired = false
@@ -69,7 +75,7 @@ export class VirtualScrollLayout extends LitElement {
         if (updateRequired) this.requestUpdate()
     }
 
-    public init(dataProvider: DataProvider, rowRenderer: RowRenderer): void {
+    public init(dataProvider: VirtualScrollContainerDataProvider, rowRenderer: RowRenderer): void {
         if (this.dataProvider === dataProvider) {
             this.rowRenderer = rowRenderer
             return
@@ -92,7 +98,7 @@ export class VirtualScrollLayout extends LitElement {
         this.updateVirtualizerCount(0)
 
         if (this.devTelemetryRef.value) {
-            this.devTelemetryRef.value.textContent = "No data"
+            this.devTelemetryRef.value.textContent = 'No data'
         }
     }
 
@@ -103,7 +109,7 @@ export class VirtualScrollLayout extends LitElement {
 
     protected willUpdate(changedProperties: PropertyValues) {
         super.willUpdate(changedProperties)
-        if (changedProperties.has("rowHeight")) {
+        if (changedProperties.has('rowHeight')) {
             const virtualizer = this.virtualizerController.getVirtualizer()
             virtualizer.setOptions({ ...virtualizer.options, estimateSize: () => this.rowHeight })
         }
@@ -123,13 +129,16 @@ export class VirtualScrollLayout extends LitElement {
         if (!this.dataProvider) return
 
         if (this.recalcRowHeight) {
-            const firstLoadedRow = this.shadowRoot?.querySelector<HTMLElement>(".virtual-row[data-loaded]")
+            const firstLoadedRow = this.shadowRoot?.querySelector<HTMLElement>('.virtual-row[data-loaded]')
             if (firstLoadedRow?.offsetHeight) {
                 const measuredHeight = firstLoadedRow.offsetHeight
                 if (measuredHeight !== this.rowHeight) {
                     this.rowHeight = measuredHeight
                     const virtualizer = this.virtualizerController.getVirtualizer()
-                    virtualizer.setOptions({ ...virtualizer.options, estimateSize: () => this.rowHeight })
+                    virtualizer.setOptions({
+                        ...virtualizer.options,
+                        estimateSize: () => this.rowHeight,
+                    })
                     virtualizer.measure()
                 }
                 this.recalcRowHeight = false
@@ -140,24 +149,27 @@ export class VirtualScrollLayout extends LitElement {
     }
 
     private updateTelemetry() {
-        if (import.meta.env?.DEV && this.devTelemetryRef.value) {
-            const dpTelemetry = this.dataProvider?.getTelemetry?.() ?? {_: ""}
-            let dpTelemetryText = ("cached" in dpTelemetry && "capacity" in dpTelemetry)?`\ncache ${dpTelemetry.cached}/${dpTelemetry.capacity}`:''
-            dpTelemetryText += ("newDrafts" in dpTelemetry && "modDrafts" in dpTelemetry)?`\ndrafts +${dpTelemetry.newDrafts as string}/#${dpTelemetry.modDrafts as string}`: ''
-            const domRows = this.shadowRoot?.querySelectorAll(".virtual-row").length ?? 0
+        if (this.dataProvider && import.meta.env?.DEV && this.devTelemetryRef.value && typeof (this.dataProvider as any)?.getTelemetry === 'function') {
+            const dataProvider = this.dataProvider as VirtualScrollContainerDataProvider & {
+                getTelemetry(): any
+            }
+            const dpTelemetry = dataProvider.getTelemetry() ?? { _: '' }
+            let dpTelemetryText = ('cached' in dpTelemetry && 'capacity' in dpTelemetry) ? `\ncache ${dpTelemetry.cached}/${dpTelemetry.capacity}` : ''
+            dpTelemetryText += ('newDrafts' in dpTelemetry && 'modDrafts' in dpTelemetry) ? `\ndrafts +${dpTelemetry.newDrafts as string}/#${dpTelemetry.modDrafts as string}` : ''
+            const domRows = this.shadowRoot?.querySelectorAll('.virtual-row').length ?? 0
             this.devTelemetryRef.value.textContent = `${domRows} rows in DOM, ${dpTelemetryText}`
         }
     }
 
     public activateRecord = (index: number | string) => {
-        this.dataProvider?.setActiveRecord(typeof index === "number" ? index : Number(index))
+        this.dataProvider?.setActiveRecord(typeof index === 'number' ? index : Number(index))
     }
 
     private focusChange = (event: FocusEvent) => {
-        if (event.type === "focusin" && event.currentTarget && event.currentTarget instanceof HTMLElement) {
+        if (event.type === 'focusin' && event.currentTarget && event.currentTarget instanceof HTMLElement) {
             console.log(`Got focus for record ${event.currentTarget.id}`)
             if (event.currentTarget.dataset.index) this.activateRecord(event.currentTarget.dataset.index)
-        } else if (event.type === "focusout" && event.currentTarget && event.currentTarget instanceof HTMLElement) {
+        } else if (event.type === 'focusout' && event.currentTarget && event.currentTarget instanceof HTMLElement) {
             console.log(`Lost focus for record ${event.currentTarget.id}`)
         }
     }
@@ -172,8 +184,8 @@ export class VirtualScrollLayout extends LitElement {
     private renderVirtualRow(row: VirtualItem, record?: Record<string, any>) {
         return this.rowRenderer && record
             ? html`
-                    <div class="row-selector ${this.activeRecordIndex === row.index ? " active" : ""}">
-                        ${record?this.dataProvider?.getRecordState(record.uid) as string:""}
+                    <div class="row-selector ${this.activeRecordIndex === row.index ? ' active' : ''}">
+                        ${record ? this.dataProvider?.getRecordState(record.uid) as string : ''}
                     </div>
                     <div class="row-content" style="flex: 1; height: 100%; display: flex;">
                         ${this.rowRenderer(row.index, row.key as string, record)}
@@ -186,13 +198,15 @@ export class VirtualScrollLayout extends LitElement {
         if (!this.dataProvider) {
             return html`
                 ${when(import.meta.env?.DEV, () => html`
-                    <div class="dev-telemetry">
-                        <div id="dev-row-count" ${ref(this.devTelemetryRef)}>no data</div>
-                    </div>
-                    `
+                            <div class="dev-telemetry">
+                                <div id="dev-row-count" ${ref(this.devTelemetryRef)}>no data</div>
+                            </div>
+                        `,
                 )
                 }
-                <div class="scroll-container empty-state" part="scroll-container empty-state">please wait ...</div>
+                <div class="scroll-container empty-state" part="scroll-container empty-state">please
+                    wait ...
+                </div>
             `
         }
 
@@ -210,22 +224,24 @@ export class VirtualScrollLayout extends LitElement {
             ${when(import.meta.env?.DEV, () => html`
                 <div class="dev-telemetry">
                     <div id="dev-row-count" ${ref(this.devTelemetryRef)}></div>
-                    <button @click="${() => this.dataProvider?.logTelemetry?.()}">log</button>
-                </div>`
+                    <button @click="${() => (this.dataProvider as any)?.logTelemetry?.()}">log
+                    </button>
+                </div>`,
             )}
             <div
                     class="scroll-container"
                     part="scroll-container"
                     ${ref(this.scrollContainerRef)}
                     style="height: 100%; overflow: auto; position: relative;">
-                <div class="scroll-track" part="scroll-track" style="position: relative; width: 100%; height: ${virtualizer.getTotalSize()}px;">
+                <div class="scroll-track" part="scroll-track"
+                     style="position: relative; width: 100%; height: ${virtualizer.getTotalSize()}px;">
                     ${repeat(
                             visibleItems,
                             (item) => item.record?.uid,
                             (item) => {
                                 // While scrolling, only get cached records (don't trigger fetches).
                                 // When scrolling stops, fetch missing records for visible rows.
-                                const {row, record } = item
+                                const { row, record } = item
                                 const renderedRow = this.renderVirtualRow(row, record)
                                 const isLoaded = Boolean(renderedRow)
 
@@ -243,10 +259,12 @@ export class VirtualScrollLayout extends LitElement {
                                     >
                                         ${isLoaded
                                                 ? renderedRow
-                                                : html`<div class="sk-wave-bar" part="skeleton"></div>`}
+                                                : html`
+                                                    <div class="sk-wave-bar"
+                                                         part="skeleton"></div>`}
                                     </div>
                                 `
-                            }
+                            },
                     )}
                 </div>
             </div>

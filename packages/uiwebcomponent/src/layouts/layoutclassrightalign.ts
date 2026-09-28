@@ -1,9 +1,9 @@
-import { UILayoutClass } from "./uilayoutclass"
+import { UILayout } from './uilayout'
 
-export class UIRightAlignLayoutClass extends UILayoutClass {
-  cssClass = "ui-right-align-layout"
+export class UIRightAlignLayoutClass extends UILayout {
+    cssClass = 'ui-right-align-layout'
 
-  renderLayoutStyles(): string {
-    return ""
-  }
+    renderLayoutStyles(): string {
+        return ''
+    }
 }

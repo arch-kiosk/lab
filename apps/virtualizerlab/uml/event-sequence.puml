@@ -1,0 +1,29 @@
+@startuml
+'https://plantuml.com/sequence-diagram
+
+'autonumber
+actor User
+participant UIComponent
+participant DataProvider
+participant Host
+
+== Initialization ==
+User -> Host: start
+Host -> DataProvider: instantiate
+Host -> UIComponent: instantiate
+== interaction ==
+User -> UIComponent: scroll to page 0
+UIComponent -> DataProvider: getRecord
+DataProvider -> UIComponent: notify: Page
+UIComponent -> DataProvider: getRecord
+User -> UIComponent: focus input field
+UIComponent -> DataProvider: set active record
+'
+'Alice -> Bob: Authentication Request
+'Bob --> Alice: Authentication Response
+'
+'== Repetition ==
+'
+'Alice -> Bob: Another authentication Request
+'Alice <-- Bob: another authentication Response
+@enduml

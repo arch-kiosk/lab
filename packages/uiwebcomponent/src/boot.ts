@@ -1,11 +1,11 @@
-import {createPluginManager, type PluginManager} from "@arch-kiosk/appfoundation"
+import { createPluginManager, type PluginManager } from '@arch-kiosk/appfoundation'
 import configFunction from '../uicomponent.config'
-import {type EventCatalog, type AppContext} from "#src/apptypes";
+import { type EventCatalog, type AppContext } from '#src/apptypes'
 
-let bootPromise: Promise<PluginManager<AppContext, EventCatalog>> | null = null;
+let bootPromise: Promise<PluginManager<AppContext, EventCatalog>> | null = null
 
-export default async () : Promise<PluginManager<AppContext, EventCatalog>> => {
-    if (bootPromise) return bootPromise;
+export default async (): Promise<PluginManager<AppContext, EventCatalog>> => {
+    if (bootPromise) return bootPromise
 
     bootPromise = (async () => {
         const pluginManager = createPluginManager<AppContext, EventCatalog>()
@@ -14,9 +14,8 @@ export default async () : Promise<PluginManager<AppContext, EventCatalog>> => {
             pluginManager.registerPlugin(plugin)
         }
 
-        await pluginManager.fireTimeSafe("boot", 1000, {})
+        await pluginManager.fireTimeSafe('boot', 1000, {})
         return pluginManager
-
     })()
     return bootPromise
 }

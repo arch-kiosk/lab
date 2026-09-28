@@ -3,25 +3,19 @@
     "target": "esnext",
     "sourceMap": true,
     "module": "esnext",
-    "moduleResolution": "Bundler",
+    "moduleResolution": "bundler",
+    "noEmit": true,
     "lib": [
       "esnext",
       "DOM",
       "DOM.Iterable"
     ],
-    //    "declaration": false,
-    //    "emitDeclarationOnly": true,
-    //    "outDir": "./types",
-    "noEmit": true,
     "strict": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
-    "noImplicitReturns": true,
-    "noFallthroughCasesInSwitch": true,
     "isolatedModules": true,
     "allowSyntheticDefaultImports": true,
     "experimentalDecorators": true,
-    "forceConsistentCasingInFileNames": true,
     "useDefineForClassFields": false,
     "skipLibCheck": true,
     "allowJs": true,
@@ -30,22 +24,15 @@
       "vite-plus/client"
     ],
     "paths": {
-      "@arch-kiosk/appfoundation": ["../appfoundation/src/index.ts"],
       "#src/*": ["./src/*"]
     }
   },
   "include": [
-    "src/**/*.ts", "bootkiosklogger.js"
+    "src/**/*.ts"
   ],
   "exclude": [
     "node_modules",
     "dist",
-    "old"
-  ],
-//  "references": [
-//    {
-//      "path": "./tsconfig.node.json"
-//    }
-//  ]
+    "src/old/**"
+  ]
 }
-

@@ -5,9 +5,9 @@ export default defineConfig({
   run: {
     cache: true,
   },
-  fmt: {
-    semi: false,
-  },
+  // fmt: {
+  //   semi: false,
+  // },
   lint: {
     jsPlugins: [{ name: "vite-plus", specifier: "vite-plus/oxlint-plugin" }],
     options: { typeAware: true, typeCheck: true },

@@ -1,20 +1,20 @@
-import { UIElement } from "./uielement"
+import { UIElement } from './uielement'
 
 export interface UIElementFactory {
-  getUIElementClass(elementTypeName: string): typeof UIElement
+    getUIElementClass(elementTypeName: string): typeof UIElement
 }
 
 export class UIConfigurableElementFactory implements UIElementFactory {
-  private _elementClasses: { [key: string]: typeof UIElement } = {}
+    private _elementClasses: { [key: string]: typeof UIElement } = {}
 
-  addUIElementClass(elementTypeName: string, elementClass: typeof UIElement) {
-    this._elementClasses[elementTypeName.toLowerCase()] = elementClass
-  }
-  getUIElementClass(elementTypeName: string): typeof UIElement {
-    const elementClass = this._elementClasses[elementTypeName.toLowerCase()]
-    if (!elementClass)
-      throw `UIConfigurableElementFactory.getUIElementClass: no element class for ${elementTypeName.toLowerCase()}`
+    addUIElementClass(elementTypeName: string, elementClass: typeof UIElement) {
+        this._elementClasses[elementTypeName.toLowerCase()] = elementClass
+    }
+    getUIElementClass(elementTypeName: string): typeof UIElement {
+        const elementClass = this._elementClasses[elementTypeName.toLowerCase()]
+        if (!elementClass)
+            throw `UIConfigurableElementFactory.getUIElementClass: no element class for ${elementTypeName.toLowerCase()}`
 
-    return elementClass
-  }
+        return elementClass
+    }
 }

@@ -1,0 +1,68 @@
+@startuml
+'https://plantuml.com/class-diagram
+
+class UIComponent {
+    -layouts: Dictionary<UILayout>
+    -renderRootLayout()
+    #getLayout( layoutElementId,layoutSettings,inheritReadOnly,cardinality = "1")
+}
+
+class UILayout {
+    renderLayout()
+}
+
+class RenderContext {
+  uicomponent: UIComponent
+  layouter: UILayout
+  _lastUID: string
+  +constructor(component: UIComponent, layouter: UILayout)
+  +resolve(expression?: string, id?: string): unknown
+  +getTimeZoneInfo(tzIndex: number | undefined): ApiTimeZoneInfo | undefined {
+  +resetCursor() {
+  +getCurrentUID() {
+  +next(): boolean {
+
+ }
+
+class UIElementRenderContext {
+  constructor(component: UIComponent,entry: UISchemaUIElement,layouter: UILayout)
+  entry: UISchemaUIElement
+}
+
+class UILayoutRenderContext {
+  entry: UISchemaLayout
+  constructor(component: UIComponent, entry: UISchemaLayout, layouter: UILayout) {
+  resetCursor()
+}
+
+class UIVirtualScrollLayout{}
+
+UILayout <|-- UIVirtualScrollLayout
+RenderContext <|-- UILayoutRenderContext
+RenderContext <|-- UIElementRenderContext
+UIComponent ..> UILayout: <<new rootLayout>>
+UIComponent --> UILayoutRenderContext: <<new>>
+UILayoutRenderContext <--> UILayout
+'abstract AbstractCollection
+'interface List
+'interface Collection
+'
+'List <|-- AbstractList
+'Collection <|-- AbstractCollection
+'
+'Collection <|- List
+'AbstractCollection <|- AbstractList
+'AbstractList <|-- ArrayList
+'
+'class ArrayList {
+'Object[] elementData
+'size()
+'}
+'
+'enum TimeUnit {
+'DAYS
+'HOURS
+'MINUTES
+'}
+'
+@enduml

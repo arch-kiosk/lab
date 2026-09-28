@@ -1,58 +1,61 @@
 {
-  "name": "@arch-kiosk/uicomponent",
-  "version": "1.0.0-local",
-  "private": true,
-  "files": [
-    "./dist"
-  ],
-  "type": "module",
-  "main": "./dist/uicomponent.js",
-  "module": "./dist/uicomponent.js",
-  "types": "./dist/uicomponent.d.ts",
-  "exports": {
-    ".": {
-      "types": "./dist/uicomponent.d.ts",
-      "import": "./dist/uicomponent.js"
+    "name": "@arch-kiosk/uicomponent",
+    "version": "2.0.0",
+    "private": true,
+    "files": [
+        "./dist"
+    ],
+    "type": "module",
+    "main": "./dist/uicomponent.js",
+    "module": "./dist/uicomponent.js",
+    "types": "./dist/uicomponent.d.ts",
+    "imports": {
+        "#src/*": "./src/*"
+    },
+    "exports": {
+        ".": {
+            "types": "./dist/uicomponent.d.ts",
+            "import": "./dist/uicomponent.js"
+        }
+    },
+    "scripts": {
+        "check types": "tsc",
+        "fmt": "vp fmt -- -c ..\\..\\.oxfmtrc.json",
+        "dev": "vp dev -- --force --host 127.0.0.1",
+        "build-only": "tsc && vp build",
+        "bump-ver": "bumpp --no-push --commit \"bumped version to v%s\"",
+        "rollout": "tsc && pnpm bump-ver && vp build && npm pack --pack-destination .\\dist",
+        "pull:uiwebcomponent": "cd ../.. && git subtree pull --prefix=packages/uiwebcomponent upstream-uiwebcomponent main --squash",
+        "docs:generate": "typedoc",
+        "docs:dev": "pnpm docs:generate && vitepress dev docs",
+        "docs:build": "vitepress build docs",
+        "docs:preview": "vitepress preview docs"
+    },
+    "dependencies": {
+        "@arch-kiosk/appfoundation": "workspace:*",
+        "@arch-kiosk/virtualizerlab": "workspace:*",
+        "@vaadin/combo-box": "^25.2.4",
+        "@vaadin/date-picker": "^25.2.4",
+        "@vaadin/date-time-picker": "^25.2.4",
+        "delay": "catalog:",
+        "lit": "^3.3.3",
+        "luxon": "^3.7.2"
+    },
+    "devDependencies": {
+        "@babel/core": "^7.29.7",
+        "@babel/preset-env": "^7.29.7",
+        "@types/jest": "^30.0.0",
+        "@types/luxon": "^3.7.2",
+        "babel-jest": "^30.4.1",
+        "jest": "^29.7.0",
+        "sass": "^1.58.0",
+        "ts-jest": "^29.4.11",
+        "ts-node": "^10.9.2",
+        "typedoc": "catalog:",
+        "typedoc-plugin-markdown": "catalog:",
+        "typedoc-vitepress-theme": "catalog:",
+        "vite": "catalog:",
+        "vite-plus": "catalog:",
+        "vitepress-sidebar": "catalog:"
     }
-  },
-  "imports": {
-    "#src/*": "./src/*"
-  },
-  "scripts": {
-    "check types": "tsc",
-    "dev": "vp dev -- --force --host 127.0.0.1",
-    "build-only": "tsc && vp build",
-    "bump-ver": "bumpp --no-push --commit \"bumped version to v%s\"",
-    "rollout": "tsc && pnpm bump-ver && vp build && npm pack --pack-destination .\\dist",
-    "pull:uiwebcomponent": "cd ../.. && git subtree pull --prefix=packages/uiwebcomponent upstream-uiwebcomponent main --squash",
-    "docs:generate": "typedoc",
-    "docs:dev": "pnpm docs:generate && vitepress dev docs",
-    "docs:build": "vitepress build docs",
-    "docs:preview": "vitepress preview docs"
-  },
-  "dependencies": {
-    "@arch-kiosk/appfoundation": "workspace:*",
-    "@vaadin/combo-box": "^25.2.4",
-    "@vaadin/date-picker": "^25.2.4",
-    "@vaadin/date-time-picker": "^25.2.4",
-    "lit": "^3.3.3",
-    "luxon": "^3.7.2"
-  },
-  "devDependencies": {
-    "@babel/core": "^7.29.7",
-    "@babel/preset-env": "^7.29.7",
-    "@types/jest": "^30.0.0",
-    "@types/luxon": "^3.7.2",
-    "babel-jest": "^30.4.1",
-    "jest": "^29.7.0",
-    "sass": "^1.58.0",
-    "ts-jest": "^29.4.11",
-    "ts-node": "^10.9.2",
-    "typedoc": "catalog:",
-    "typedoc-plugin-markdown": "catalog:",
-    "typedoc-vitepress-theme": "catalog:",
-    "vite": "catalog:",
-    "vite-plus": "catalog:",
-    "vitepress-sidebar": "catalog:"
-  }
 }

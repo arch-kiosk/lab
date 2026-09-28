@@ -2,14 +2,17 @@
 layout: home
 
 hero:
-  name: "ui-component"
-  text: "Render User Interfaces from JSON"
-  tagline: ""
-  actions:
-    - theme: brand
-      text: "Get Started"
-      link: /start/
-    - theme: alt
-      text: "API Reference"
-      link: /api/
+    name: 'ui-component'
+    text: 'Render User Interfaces from JSON'
+    tagline: ''
+    actions:
+        - theme: brand
+          text: 'Get Started'
+          link: /start
+        - theme: alt
+          text: 'UI Schema reference'
+          link: /schema
+        - theme: alt
+          text: 'API Reference'
+          link: /api/
 ---
