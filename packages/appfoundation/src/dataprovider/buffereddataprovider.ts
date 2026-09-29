@@ -1,5 +1,5 @@
 import { DraftStore } from "./draftstore"
-import {
+import type {
     DataRecord, DomainKeyHelper, RecordState,
     ValidationResultsReturnType, DataProviderValidationResults, DataProviderValidationStates,
     DataProviderValidationResult,

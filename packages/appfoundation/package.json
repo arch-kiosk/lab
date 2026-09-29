@@ -15,9 +15,17 @@
   ],
   "type": "module",
   "exports": {
-    ".": "./dist/index.mjs",
-    "./package.json": "./package.json"
-  },
+    ".": {
+      "types": "./dist/index.d.mts",
+      "import": "./dist/index.mjs",
+      "default": "./dist/index.mjs"
+    },
+    "./dataprovider": {
+      "types": "./dist/dataprovider/index.d.mts",
+      "import": "./dist/dataprovider/index.mjs",
+      "default": "./dist/dataprovider/index.mjs"
+    },
+    "./package.json": "./package.json"  },
   "types": "./dist/index.d.mts",
   "publishConfig": {
     "access": "public"

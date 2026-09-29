@@ -1,5 +1,5 @@
 // oxlint-disable typescript/no-redundant-type-constituents
-import { DataRecord, DomainKeyHelper } from "./sharedtypes"
+import { type DataRecord, type DomainKeyHelper } from './sharedtypes'
 
 export interface DraftEntry {
     record: DataRecord
@@ -53,6 +53,7 @@ export class DraftStore {
         })
         return drafts
     }
+
     public getSortedDrafts(domainKeyHelper: DomainKeyHelper<unknown>) {
         return this.sortDrafts([...this.#drafts.values()], domainKeyHelper)
     }
@@ -234,9 +235,9 @@ export class DraftStore {
             draft.record = updatedRecord
         } else {
             if (!rawDbRecord) {
-                throw "DraftStore.addModification: Can't modify a record without knowing the original db record"
+                throw 'DraftStore.addModification: Can\'t modify a record without knowing the original db record'
             }
-            console.log("Raw Db Record is", rawDbRecord)
+            console.log('Raw Db Record is', rawDbRecord)
             const originalDbKey = domainKeyHelper ? domainKeyHelper.extractKey(rawDbRecord) : undefined
             const newDraft = {
                 record: updatedRecord,
@@ -257,10 +258,10 @@ export class DraftStore {
      * @returns number of drafts marked with isNew
      */
     public get newCount(): number {
-        return this.#drafts
-            .values()
-            .filter((draft) => draft.isNew)
-            .toArray().length
+        return [...this.#drafts
+            .values()]
+            .filter((draft: any) => draft.isNew)
+            .length
     }
 
     /** returns the number of drafts that are tied to a record in the database
@@ -268,10 +269,9 @@ export class DraftStore {
      * @returns number of drafts tied to a record in database
      */
     public get modifiedCount(): number {
-        return this.#drafts
-            .values()
+        return [...this.#drafts.values()]
             .filter((d) => !d.isNew)
-            .toArray().length
+            .length
     }
 
     /**

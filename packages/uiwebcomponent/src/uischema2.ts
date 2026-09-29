@@ -2,7 +2,8 @@
 /**
  * UI Schema Definition V2
  * general rules:
- *   - All keywords or texts with semantic value use snake_case notation instead of PascalCase notation. The cases are strictly enforced.
+ *   - All keywords or texts with semantic value use snake_case notation instead of PascalCase notation. That allows everything to be lowercase.
+ *   - The cases are strictly enforced.
  */
 
 /** The version of this schema definition */

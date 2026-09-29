@@ -37,7 +37,7 @@ peerDependencyRules:
     vite: "*"
     vitest: "*"
 allowBuilds:
-  "@parcel/watcher": set this to true or false
+  "@parcel/watcher": false
   "@vaadin/vaadin-usage-statistics": false
 patchedDependencies:
   '@vaadin/vaadin-usage-statistics': patches/@vaadin__vaadin-usage-statistics.patch

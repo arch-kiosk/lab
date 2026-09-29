@@ -3,8 +3,10 @@
 export type DataRecord = { uid: string } & Record<string, any>
 export type RecordState = 'draft' | 'new' | undefined
 
+//todo: Code smell. This is too tightly coupled (at least by name) to the VirtualScrollContainer in a different package.
 export type VirtualScrollContainerDataRecord = { uid: string } & Record<string, any>
 
+//todo: Code smell. This is too tightly coupled (at least by name) to the VirtualScrollContainer in a different package.
 export interface VirtualScrollContainerDataProvider {
     //used by virtual scroll layout:
     recordCount(): number | undefined

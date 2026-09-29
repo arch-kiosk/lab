@@ -13,11 +13,10 @@ export default defineConfig(({ command, mode }) => {
   return {
     resolve: {
 
-      alias: {
-        // Directs the dev server to intercept the bare string and serve the raw TS source
-        '@arch-kiosk/appfoundation': resolve(__dirname, '../appfoundation/src/index.ts'),
-        '#src': resolve(__dirname, './src'),
-      }
+      // alias: {
+      //   // Directs the dev server to intercept the bare string and serve the raw TS source
+      //   '#src': resolve(__dirname, './src'),
+      // }
     },
     optimizeDeps: {
       // noDiscovery: true,

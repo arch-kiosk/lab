@@ -3,7 +3,7 @@ import { ConcreteDataProvider } from './teststaticdataprovider'
 import {
     DataProviderValidationResult,
     ValidationResultsReturnType,
-} from '@arch-kiosk/virtualizerlab'
+} from '@arch-kiosk/appfoundation/dataprovider'
 
 export function configureTestSchemaVirtualScrollLayout(uiComponent: UIComponent) {
     uiComponent.uiSchema = getUiSchema()

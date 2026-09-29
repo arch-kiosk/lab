@@ -1,13 +1,13 @@
 // noinspection TypeScriptAbstractClassConstructorCanBeMadeProtected
 
 import {
-  DataRecord,
-  DataNotifier,
-  RecordState,
-  DataProvider,
-  ValidationResultsReturnType,
+  type DataRecord,
+  type DataNotifier,
+  type RecordState,
+  type DataProvider,
+  type ValidationResultsReturnType,
 } from './sharedtypes'
-import { LruPageCache, PageCache } from "./cache"
+import { LruPageCache, type PageCache } from "./cache"
 
 /** todo: this does not belong in this package. AppFoundation? */
 export abstract class DataProviderBasis implements DataProvider {

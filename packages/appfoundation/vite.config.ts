@@ -1,4 +1,5 @@
 import { defineConfig } from "vite-plus"
+import { resolve } from 'node:path'
 
 export default defineConfig({
   resolve: {
@@ -10,10 +11,14 @@ export default defineConfig({
     }
   },
   pack: {
+    entry: {
+      index: resolve(__dirname, 'src/index.ts'),
+      'dataprovider/index': resolve(__dirname, 'src/dataprovider/index.ts'),
+    },
     dts: {
       // tsgo: true,
     },
-    exports: true,
+    exports: false,
   },
   lint: {
     options: {

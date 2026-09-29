@@ -1,10 +1,11 @@
-import { BufferedDataProvider } from "#src/buffereddataprovider"
+import { BufferedDataProvider } from "@arch-kiosk/appfoundation/dataprovider"
 import delay from "delay"
-import { DataRecord } from "#src/sharedtypes"
+import { DataRecord } from "@arch-kiosk/appfoundation/dataprovider"
 const MAX_RECORDS = 50
 
 interface MyDataRecord extends DataRecord {
   textInput: string
+  // oxlint-disable-next-line typescript/no-explicit-any
   data: any
 }
 

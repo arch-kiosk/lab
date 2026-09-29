@@ -14,7 +14,7 @@ export default defineConfig(({ command, mode }) => {
         resolve: {
             alias: {
                 // Directs the dev server to intercept the bare string and serve the raw TS source
-                '@arch-kiosk/appfoundation': resolve(__dirname, '../appfoundation/src/index.ts'),
+                // '@arch-kiosk/appfoundation': resolve(__dirname, '../appfoundation/src/index.ts'),
                 '@arch-kiosk/virtualizerlab': resolve(
                     __dirname,
                     '../../apps/virtualizerlab/src/virtualizerlab.ts',

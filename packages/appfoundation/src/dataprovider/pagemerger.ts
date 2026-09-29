@@ -1,5 +1,5 @@
-import { DomainKeyHelper, DataRecord as D } from "../src/sharedtypes"
-import { DraftStore } from "../src/draftstore"
+import { type DomainKeyHelper, type DataRecord as D } from "./sharedtypes"
+import { DraftStore } from "./draftstore"
 
 export type DataRecord = D | { uid: string; data: string }
 export type MergeWindowItem = {

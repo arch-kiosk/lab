@@ -1,18 +1,16 @@
+// oxlint-disable typescript/no-redundant-type-constituents
 import { ApiTimeZoneInfo, UISchemaUIElement } from '#src/uischema'
 import { html, TemplateResult } from 'lit'
 import { UIElementRenderContext } from '#src/uielementrendercontext'
 
 export class UIElement {
     // eslint-disable-next-line typescript/no-explicit-any
-    static resolve(context: UIElementRenderContext, expression?: string, id?: string): unknown {
-        // return id ?? value
+    static resolve(context: UIElementRenderContext, expression?: string, id?: string): unknown | undefined {
         return expression ? context.resolve(expression, id) : undefined
-
     }
 
-    static batchResolve(context: UIElementRenderContext, expressions?: Array<string|undefined>, id?: string): Array<unknown> {
-        // return id ?? value
-        return expressions ? context.resolve(expressions, id) : undefined
+    static batchResolve(context: UIElementRenderContext, expressions?: Array<string|undefined>, id?: string): Array<unknown> | undefined {
+        return expressions ? context.resolve(expressions, id) as Array<unknown | undefined> : undefined
     }
 
     static getTimeZoneInfo(

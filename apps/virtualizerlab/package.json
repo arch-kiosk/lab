@@ -36,6 +36,7 @@
     "build": "vp build && tsc -p tsconfig.build.json"
   },
   "dependencies": {
+    "@arch-kiosk/appfoundation": "workspace:*",
     "@lit-labs/virtualizer": "catalog:",
     "@tanstack/lit-virtual": "catalog:",
     "@tanstack/virtual-core": "catalog:",

@@ -8,7 +8,7 @@ import { VirtualizerController } from '@tanstack/lit-virtual'
 import type { VirtualItem } from '@tanstack/virtual-core'
 
 import local_css from './styles/virtualscrollcontainer.sass?inline'
-import { VirtualScrollContainerDataProvider } from '#src/sharedtypes'
+import { VirtualScrollContainerDataProvider } from '@arch-kiosk/appfoundation/dataprovider'
 
 
 export type VirtualScrollContainerDataNotification = {

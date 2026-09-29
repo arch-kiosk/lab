@@ -1,7 +1,7 @@
-import { BufferedDataProvider } from '@arch-kiosk/virtualizerlab'
+import { BufferedDataProvider } from '@arch-kiosk/appfoundation/dataprovider'
+import { VirtualScrollContainerDataRecord } from '@arch-kiosk/appfoundation/dataprovider'
 import {type UIComponentDataProvider} from '#src/uicomponent'
 import delay from 'delay'
-import { VirtualScrollContainerDataRecord } from '@arch-kiosk/virtualizerlab'
 const MAX_RECORDS = 50
 
 interface MyDataRecord extends VirtualScrollContainerDataRecord {
