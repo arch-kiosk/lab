@@ -1,0 +1,206 @@
+@startuml
+skinparam classAttributeIconSize 0
+skinparam monochrome false
+skinparam linetype ortho
+top to bottom direction
+
+' ==========================================
+' 1. TOP LEVEL ENTRY POINT
+' ==========================================
+interface UISchema {
+    + dsd: Dictionary<string[]> {optional}
+}
+
+interface UISchemaHeaderDictV2 {
+    + version: "2"
+}
+
+interface UISchemaMetaSettings {
+    + scenario: string {optional}
+}
+
+interface UISchemaDataBindingSettings {
+    + cardinality: '1' | 'N'
+}
+
+UISchema *-- "1" UISchemaHeaderDictV2 : header
+UISchema *-- "1" UISchemaDataBindingSettings : data_binding
+UISchema *-- "0..1" UISchemaMetaSettings : meta
+UISchema -> "1" UISchemaUIRootLayoutElement : root
+
+' Force Top Level above all base tiers
+UISchema -[hidden]down-> UISchemaBaseUIElement
+UISchema -[hidden]down-> UISchemaLayoutSettings
+
+' ==========================================
+' 2. ROOT & LAYOUT CONTAINERS
+' ==========================================
+interface UISchemaUIRootLayoutElement {
+}
+
+interface UISchemaLayoutElement {
+    + element_type: 'layout'
+    + ui_elements: Dictionary<UISchemaUIElements>
+}
+
+interface UISchemaLayoutSettings {
+    + orchestration_strategy: string
+    + readonly: boolean {optional}
+    + order: string[] {optional}
+    + default_element_visibility: InterpretedExpression | boolean {optional}
+}
+
+UISchemaUIRootLayoutElement --up-|> UISchemaLayoutElement
+UISchemaLayoutElement --up-|> UISchemaLayoutSettings
+UISchemaLayoutElement *-- "1..*" UISchemaBaseUIElement : ui_elements
+
+' Force Layout Tier above Base Hierarchy
+UISchemaLayoutElement -[hidden]down-> UISchemaBaseUIElement
+
+' ==========================================
+' 3. BASE ELEMENT HIERARCHY
+' ==========================================
+interface UISchemaBaseUIElement {
+    + enabled: InterpretedExpression | boolean {optional}
+    + visible: InterpretedExpression | boolean {optional}
+}
+
+interface UISchemaDynamicUIElement {
+    + text: InterpretedExpression {optional}
+    + value: InterpretedExpression {optional}
+}
+
+interface UISchemaBoundUIElement {
+    + readonly: boolean {optional}
+}
+
+UISchemaLayoutElement --up-|> UISchemaBaseUIElement
+UISchemaDynamicUIElement --up-|> UISchemaBaseUIElement
+UISchemaBoundUIElement --up-|> UISchemaDynamicUIElement
+
+' Force Base Hierarchy above Helpers & Concrete Tier
+UISchemaBaseUIElement -[hidden]down-> UISchemaUIElementElementLayout
+UISchemaBoundUIElement -[hidden]down-> UISchemaTextField
+
+' ==========================================
+' 4. HELPER & PROPERTY OBJECTS
+' ==========================================
+interface UISchemaUIElementElementLayout {
+    + min_width: UISchemaUIElementLayoutDimension {optional}
+    + min_height: UISchemaUIElementLayoutDimension {optional}
+    + max_height: UISchemaUIElementLayoutDimension {optional}
+    + max_width: UISchemaUIElementLayoutDimension {optional}
+}
+
+interface UISchemaLayoutPadding {
+    + top: NumberOrString {optional}
+    + end: NumberOrString {optional}
+    + bottom: NumberOrString {optional}
+    + start: NumberOrString {optional}
+}
+
+interface UISchemaUIElementStyleBasics {
+    + css_classes: InterpretedExpression[] {optional}
+    + css_styles: InterpretedExpression[] {optional}
+}
+
+interface UISchemaUIElementBinding {
+    + field_name: string
+}
+
+interface UISchemaIdentifierDisplay {
+    + is_identifier: boolean {optional}
+    + mask_identifier: boolean {optional}
+}
+
+interface UISchemaDisplayEllipsis {
+    + max_characters: number
+}
+
+interface UISchemaLookupSettings {
+    + topic: string
+    + selection: string[]
+    + key: string
+}
+
+UISchemaBaseUIElement *-- "0..1" UISchemaUIElementElementLayout : layout
+UISchemaBaseUIElement *-- "0..1" UISchemaUIElementStyleBasics : style
+UISchemaBoundUIElement *-- "0..1" UISchemaUIElementBinding : binding
+UISchemaUIElementElementLayout *-- "0..1" UISchemaLayoutPadding : padding
+
+' ==========================================
+' 5. CONCRETE SUBCLASSES (BOTTOM TIER)
+' ==========================================
+interface UISchemaLine {
+    + element_type: 'line'
+    + transparent: boolean {optional}
+}
+
+interface UISchemaButton {
+    + element_type: 'button'
+    + button_type: 'okButton' | 'cancelButton' | 'iconButton' {optional}
+    + icon: InterpretedExpression {optional}
+    + default: 'ENTER' | 'CANCEL' {optional}
+}
+
+interface UISchemaTemplateLabel {
+    + element_type: 'template_label'
+}
+
+interface UISchemaFile {
+    + element_type: 'file'
+    + resolution: string
+    + alternate_description: string {optional}
+    + file_description: 'right' | 'bottom' | 'none' {optional}
+    + align_image: 'center' | 'left' {optional}
+    + fit_content: 'contain' | 'fit' | 'scale' {optional}
+}
+
+interface UISchemaTextField {
+    + element_type: 'text_field'
+    + multiline: boolean {optional}
+}
+
+interface UISchemaDateTimeField {
+    + element_type: 'date_time_field'
+    + date_format: string {optional}
+    + include_time: boolean {optional}
+}
+
+interface UISchemaComboBox {
+    + element_type: 'selection'
+    + items: string[] | UISchemaLookupSettings
+}
+
+interface UISchemaBoolField {
+    + element_type: 'bool'
+}
+
+UISchemaLine --up-|> UISchemaBaseUIElement
+UISchemaButton --up-|> UISchemaDynamicUIElement
+UISchemaTemplateLabel --up-|> UISchemaDynamicUIElement
+UISchemaFile --up-|> UISchemaDynamicUIElement
+
+UISchemaTextField --up-|> UISchemaBoundUIElement
+UISchemaDateTimeField --up-|> UISchemaBoundUIElement
+UISchemaComboBox --up-|> UISchemaBoundUIElement
+UISchemaBoolField --up-|> UISchemaBoundUIElement
+
+UISchemaTemplateLabel .up.|> UISchemaIdentifierDisplay
+UISchemaTextField .up.|> UISchemaIdentifierDisplay
+UISchemaTextField *- "0..1" UISchemaDisplayEllipsis : ellipsis
+UISchemaComboBox o-- "0..1" UISchemaLookupSettings : items
+
+' ==========================================
+' UTILITIES
+' ==========================================
+class Error {
+}
+
+class UISchemaError {
+    + name: string = 'UISchemaError'
+    + constructor(message: string)
+}
+UISchemaError --up-|> Error
+
+@enduml

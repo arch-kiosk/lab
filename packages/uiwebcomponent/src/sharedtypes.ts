@@ -1,22 +1,32 @@
 // import {DataNotifier, DataRecord, RecordState} from "@arch-kiosk/virtualscrollcontainer/src/sharedtypes";
-import { ApiTimeZoneInfo, Dictionary, UISchemaLookupSettings, UISchemaUIElements } from './uischema'
-import { VirtualScrollContainerDataProvider } from '@arch-kiosk/virtualizerlab'
+import {
+    Dictionary,
+    UISchemaBaseUIElement, UISchemaLookupSettings, UISchemaUIElements,
+} from './uischema'
+import { VirtualScrollContainerDataProvider } from '@arch-kiosk/appfoundation/dataprovider'
 import { ComboBoxDataProviderParams } from '@vaadin/combo-box'
 import { ComboBoxDataProviderCallback } from '@vaadin/combo-box/src/vaadin-combo-box-data-provider-mixin'
 import { UILayout } from '#src/layouts/uilayout'
 import { TemplateResult } from 'lit'
 import { RenderContextDataContext } from '#src/uielementrendercontext'
-import { DataProviderValidationResult } from '@arch-kiosk/virtualizerlab'
+import { DataProviderValidationResult } from '@arch-kiosk/appfoundation/dataprovider'
+
+export declare interface ApiTimeZoneInfo {
+    tz_index: number
+    tz_long: string
+    tz_IANA: string
+    deprecated: boolean
+}
 
 export interface UIComponentDataProvider extends VirtualScrollContainerDataProvider {
     resolve(expression?: string | Array<string|undefined>, id?: string, recordIndex?: number): unknown
     getFieldValidationInformation(recordIndex: number, fieldId:string): Array<DataProviderValidationResult>
     getRecordValidationInformation(recordIndex: number): Array<DataProviderValidationResult>
-    // setNotifier(notifier: DataNotifier): void
-    // getTelemetry?(): { cached: number; capacity: number }
-    // logTelemetry?(): void
-    // addRecord(record: DataRecord): void
-    // deleteRecords(uids: string[]) : Promise<void>
+}
+
+export declare interface UIElementWithId {
+    id: string
+    element: UISchemaBaseUIElement
 }
 
 // eslint-disable-next-line typescript/no-explicit-any

@@ -50,7 +50,7 @@ function getUiSchema(): UISchema {
             cardinality: 'N',
         },
         root: {
-            element_type: 'layout',
+            element_type: 'xlayout',
             orchestration_strategy: 'scroll',
             layout: {
                 max_height: '50vh',

@@ -1,7 +1,7 @@
 import {
     Dictionary,
     UISchemaError,
-    UISchemaUIElement,
+    UISchemaBaseUIElement,
     UISchemaUIElementElementLayout,
     UISchemaLayoutElement, UISchemaUIElements,
 } from '../uischema'
@@ -43,7 +43,7 @@ export class UIVirtualScrollLayout extends UILayout {
     }
 
     private validateSchemaDefinition(id: string) {
-        let uiElements: Dictionary<UISchemaUIElement>
+        let uiElements: Dictionary<UISchemaBaseUIElement>
         // if (id === 'root') {
         //   uiElements = (reactiveControllerHost.getSchemaElement() as UISchema).root.element_type.ui_elements
         // } else {

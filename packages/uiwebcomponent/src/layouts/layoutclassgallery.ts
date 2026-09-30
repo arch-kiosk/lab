@@ -1,6 +1,6 @@
 import {
     UISchemaListLayoutSettings,
-    UISchemaUIElement,
+    UISchemaBaseUIElement,
     UISchemaUIElementElementLayout,
 } from '../uischema'
 import { html, nothing, TemplateResult } from 'lit'
@@ -144,7 +144,7 @@ export class UIGalleryLayoutClass extends UIListLayout {
         renderContext: UILayoutRenderContext,
         layouter: UILayout,
         style: string,
-        renderElement: (id: string, entry: UISchemaUIElement, layouter: UILayout) => TemplateResult,
+        renderElement: (id: string, entry: UISchemaBaseUIElement, layouter: UILayout) => TemplateResult,
     ): TemplateResult {
         const elements = this.getOrderedElements(renderContext.layoutDefinition)
 

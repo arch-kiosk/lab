@@ -138,8 +138,12 @@ export type UISchemaUIElementLayoutDimension = number | 'max' | string
     start?: NumberOrString
 }
 
+//@discriminator element_type makes sure that ts-json-schema-generator
+//generates an allOf and not an anyOf. The "element_type" is what determines the
+//UISchemaElement that is actually being used.
 /**
- * @oneOf
+ * union type for all UIElement types
+ * @discriminator element_type
  */
 export type UISchemaUIElements =
     | UISchemaLayoutElement

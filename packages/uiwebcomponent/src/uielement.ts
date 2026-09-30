@@ -1,5 +1,5 @@
 // oxlint-disable typescript/no-redundant-type-constituents
-import { ApiTimeZoneInfo, UISchemaUIElement } from '#src/uischema'
+import { ApiTimeZoneInfo, UISchemaBaseUIElement } from '#src/uischema'
 import { html, TemplateResult } from 'lit'
 import { UIElementRenderContext } from '#src/uielementrendercontext'
 
@@ -70,7 +70,7 @@ export class UIElement {
     }
 
     static getStyleSetting(
-        element: UISchemaUIElement,
+        element: UISchemaBaseUIElement,
         attribute: string,
         _default: string,
     ): string {

@@ -1,4 +1,5 @@
 'use strict'
+import Ajv from 'ajv';
 import { unsafeCSS, LitElement, TemplateResult, PropertyValues } from 'lit'
 import { html } from 'lit/static-html.js'
 import { customElement, property, state } from 'lit/decorators.js'
@@ -7,13 +8,14 @@ import './layouts/uirenderboundary'
 // @ts-ignore
 import local_css from './styles/ui-component.sass?inline'
 import { UIConfigurableElementFactory } from './uielementfactory'
+import schemaArtifact from './jsonschema/uischemav2.json'
+// import betterAjvErrors from 'better-ajv-errors';
 
 import {
     Dictionary,
     UISchemaError,
     UISchema,
     UISchemaLayoutElement,
-    UISchemaUIElementWithId,
     UISchemaLayoutPadding,
     UISchemaUIElements,
 } from './uischema'
@@ -22,6 +24,7 @@ import {
     UIComponentDataProvider,
     UIComponentTimeZoneInfoProvider,
     UIInputData,
+    UIElementWithId
 } from './sharedtypes'
 
 export type { UIComponentDataProvider, UIComponentTimeZoneInfoProvider } from './sharedtypes'
@@ -45,9 +48,14 @@ export class UIComponent extends LitElement {
     /** @ignore */
     static styles = unsafeCSS(local_css)
     _messages: { [key: string]: object } = {}
-    bindingToElementList: Dictionary<UISchemaUIElementWithId> = {}
+    bindingToElementList: Dictionary<UIElementWithId> = {}
     flatElementList: Dictionary<UISchemaUIElements> = {}
     layouts: Dictionary<UILayout> = {}
+    ajv = new Ajv({
+        allErrors: true,
+        discriminator: true, // Enables strict tagged-union evaluation on @discriminator fields
+    })
+    validateFn = this.ajv.compile(schemaArtifact);
     // _element_list: { [key: string]: UISchemaUIElement } = {}
     // _selection_data: { [key: string]: { [key: string]: string } } = {}
 
@@ -289,17 +297,66 @@ export class UIComponent extends LitElement {
         }
 
         /* main function body */
-        console.log(`Processing Schema Definition`, this.uiSchema)
-        this.bindingToElementList = {}
-        this.flatElementList = {}
-        const warnings: Array<string> = []
-        const errors = this.checkSchemaDefinitionBasics()
+        let errors: Array<unknown> =[]
+        let warnings: Array<string> = []
+        try {
+            console.log(`Validating Schema Definition`)
+            this.validateSchema()
+            console.log(`Processing Schema Definition`, this.uiSchema)
+            this.bindingToElementList = {}
+            this.flatElementList = {}
+            errors = this.checkSchemaDefinitionBasics()
+        } catch(e) {
+            errors.push(`Cannot validate or process schema definition: ${e as string}`)
+            console.error(`Cannot validate or process schema definition`,e)
+        }
         if (errors.length === 0) {
             processSchemaDefinitionElement('root', this.uiSchema!.root)
         }
         this._showError = errors.length ? errors.join('\n') + warnings.join('\n') : ''
     }
 
+    public validateSchema() {
+        const valid = this.validateFn(this.uiSchema);
+        if (!valid) {
+            const rawErrors = this.validateFn.errors || [];
+
+            // 1. Filter out internal structural noise from conditional (if/then/allOf) schemas
+            const targetErrors = rawErrors.filter(
+                (e) => !['if', 'then', 'else', 'allOf', 'anyOf', 'oneOf'].includes(e.keyword)
+            );
+
+            // 2. Map AJV errors into detailed, contextual strings
+            const formattedMessages = targetErrors.map((e) => {
+                const path = e.instancePath || '/root';
+
+                switch (e.keyword) {
+                    case 'const': {
+                        const expected = JSON.stringify(e.params.allowedValue);
+                        return `${path}: must be equal to constant ${expected}`;
+                    }
+                    case 'enum': {
+                        const allowed = (e.params.allowedValues as unknown[])
+                            .map((v) => JSON.stringify(v))
+                            .join(', ');
+                        return `${path}: must be one of [${allowed}]`;
+                    }
+                    case 'additionalProperties': {
+                        return `${path}: unknown property "${e.params.additionalProperty}" is not allowed`;
+                    }
+                    case 'required': {
+                        return `${path}: missing required property "${e.params.missingProperty}"`;
+                    }
+                    default:
+                        return `${path}: ${e.message}`;
+                }
+            });
+
+            // 3. Deduplicate and throw formatted error list
+            const uniqueErrors = Array.from(new Set(formattedMessages));
+            throw new Error(`\n- ${uniqueErrors.join('\n- ')}`);
+        }
+    }
     public getSchemaElement(id: string) {
         // if (!id || id === "root") return this.uiSchema
         return this.flatElementList[id]
@@ -405,7 +462,7 @@ export class UIComponent extends LitElement {
         layoutSchema: UISchemaLayoutElement,
         inheritReadOnly = false,
         cardinality = '1',
-        parentCardinality?: '1' | 'N' | undefined
+        parentCardinality?: '1' | 'N'
     ): UILayout {
         if (this.layouts.hasOwnProperty(layoutElementId)) {
             return this.layouts[layoutElementId]

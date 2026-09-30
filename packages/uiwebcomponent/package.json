@@ -23,13 +23,7 @@
         "fmt": "vp fmt -- -c ..\\..\\.oxfmtrc.json",
         "dev": "vp dev -- --force --host 127.0.0.1",
         "build-only": "tsc && vp build",
-        "bump-ver": "bumpp --no-push --commit \"bumped version to v%s\"",
-        "rollout": "tsc && pnpm bump-ver && vp build && npm pack --pack-destination .\\dist",
-        "pull:uiwebcomponent": "cd ../.. && git subtree pull --prefix=packages/uiwebcomponent upstream-uiwebcomponent main --squash",
-        "docs:generate": "typedoc",
-        "docs:dev": "pnpm docs:generate && vitepress dev docs",
-        "docs:build": "vitepress build docs",
-        "docs:preview": "vitepress preview docs"
+        "generate:schema": "ts-json-schema-generator --path .\\src\\uischema2.ts -t UISchema -o ./src/jsonschema/uischemav2.json --no-type-check"
     },
     "dependencies": {
         "@arch-kiosk/appfoundation": "workspace:*",
@@ -37,6 +31,8 @@
         "@vaadin/combo-box": "^25.2.4",
         "@vaadin/date-picker": "^25.2.4",
         "@vaadin/date-time-picker": "^25.2.4",
+        "ajv": "catalog:",
+        "better-ajv-errors": "catalog:",
         "delay": "catalog:",
         "lit": "^3.3.3",
         "luxon": "^3.7.2"
@@ -50,6 +46,7 @@
         "jest": "^29.7.0",
         "sass": "^1.58.0",
         "ts-jest": "^29.4.11",
+        "ts-json-schema-generator": "catalog:",
         "ts-node": "^10.9.2",
         "typedoc": "catalog:",
         "typedoc-plugin-markdown": "catalog:",

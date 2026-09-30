@@ -1,0 +1,9 @@
+{
+    "path": "./src/ui-schema2.ts",
+    "type": "UISchema",
+    "out": "./src/jsonschema/uischemav2.json",
+    "union": "oneOf",
+    "discriminatorField": "element_type",
+    "additionalProperties": false
+
+}
