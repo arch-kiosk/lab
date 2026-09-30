@@ -7,10 +7,23 @@
  */
 
 /** The version of this schema definition */
-export declare interface UISchemaHeaderDictV2 {
+ export interface UISchemaHeaderDictV2 {
     version: '2'
 }
 
+/* =========================================
+        helper classes
+   ========================================= */
+export interface Dictionary<T> {
+    [Key: string]: T
+}
+
+export type NumberOrString = number | string
+
+/** And expression that needs to be interpreted first */
+export type InterpretedExpression = string
+
+/** JS throws an error of this class if the error is related to the schema definition */
 export class UISchemaError extends Error {
     constructor(message: string) {
         super(message)
@@ -23,14 +36,14 @@ export class UISchemaError extends Error {
  * for the use cases in which a schema appears.
  *
  */
-export declare interface UISchema {
+ export interface UISchema {
     /** defines information about version and type of the definition language being used.
    These definitions control how to even parse the structure and what components and parts to expect.
    */
     header: UISchemaHeaderDictV2
 
     /** additional information used by diverse parties processing the schema.
-     * Not rendered within the ui but defining the context within which the schema is being interpreted or even rendered. */
+     * Not rendered within the ui but informing the context within which the schema is being interpreted or even rendered. */
     meta?: UISchemaMetaSettings
 
     /** data set definition for database-bound elements within the definition.
@@ -40,88 +53,94 @@ export declare interface UISchema {
     /** describes the data source and how the ui is interacting with it */
     data_binding: UISchemaDataBindingSettings
 
+    /** the root element has to be a layout element */
     root: UISchemaUIRootLayoutElement
 }
 
-/** describes the data source and how the ui is interacting with it */
-export declare interface UISchemaDataBindingSettings {
-    /** "1" means the data source provides only one row, N that there are multiple rows */
-    cardinality: '1' | 'N'
-}
-
-export interface Dictionary<T> {
-    [Key: string]: T
-}
-
-export declare interface ApiTimeZoneInfo {
-    tz_index: number
-    tz_long: string
-    tz_IANA: string
-    deprecated: boolean
-}
-
-export declare interface UISchemaMetaSettings {
+ export interface UISchemaMetaSettings {
     scenario?: string
 }
 
-export declare interface UISchemaDSDDict {
+ export interface UISchemaDSDDict {
     [key: string]: string[]
 }
 
-// export declare interface UISchemaLayoutSettings {
+/** describes the data source and how the ui is interacting with it */
+export type UISchemaDataBindingCardinalities = '1' | 'N'
+
+/** describes the data source and how the ui is interacting with it */
+ export interface UISchemaDataBindingSettings {
+    /** "1" means the data source provides only one row, N that there are multiple rows */
+    cardinality: UISchemaDataBindingCardinalities
+}
+
+
+//  export interface UISchemaLayoutSettings {
 // }
 
-// export declare interface UISchemaListLayoutSettings extends UISchemaLayoutSettings {
+//  export interface UISchemaListLayoutSettings extends UISchemaLayoutSettings {
 //   type: "list"
 //   order_records_by: undefined | Array<string>
 //   allow_ordering_by: undefined | Array<string>
 // }
 
-export declare interface UISchemaUIElement {
+ export interface UISchemaBaseUIElement {
+    /** positioning, spatial dimensions and positioning - how the element interacts on the layout */
     layout?: UISchemaUIElementElementLayout
-    enabled?: boolean
-    visible?: string | false | true
-    style?: { [key: string]: string }
-    extra_style?: string
-    is_identifier?: boolean
-    mask_identifier?: string
-    text?: string
-    max_characters?: number
-    value?: string
-    default?: 'ENTER' | 'CANCEL'
+    /** how the element itself appears */
+    style?: UISchemaUIElementStyleBasics
+    enabled?: InterpretedExpression | boolean
+    visible?: InterpretedExpression | boolean
 }
 
-export declare interface UISchemaBoundUIElement extends UISchemaUIElement {
+ export interface UISchemaDynamicUIElement extends UISchemaBaseUIElement {
+    text?: InterpretedExpression
+    value?: InterpretedExpression
+}
+
+ export interface UISchemaBoundUIElement extends UISchemaDynamicUIElement {
     readonly?: boolean
     binding?: UISchemaUIElementBinding
 }
 
-export declare interface UISchemaUIRootLayoutElement extends UISchemaLayoutElement {}
-
-export declare interface UISchemaUIElementWithId {
-    id: string
-    element: UISchemaUIElement
+ export interface UISchemaUIElementStyleBasics {
+    css_classes?: InterpretedExpression[]
+    css_styles?: InterpretedExpression[]
 }
 
-export declare interface UISchemaUIElementBinding {
+ export interface UISchemaIdentifierDisplay {
+    is_identifier?: boolean
+    mask_identifier?: boolean
+}
+
+ export interface UISchemaUIRootLayoutElement extends UISchemaLayoutElement {
+
+}
+
+ export interface UISchemaUIElementBinding {
     field_name: string
 }
 
-export declare interface UISchemaUIElementElementLayout {
-    min_width?: number | 'max' | string
-    min_height?: number | 'max' | string
-    max_height?: number | 'max' | string
-    max_width?: number | 'max' | string
-    padding?: number | string | UISchemaLayoutPadding
+export type UISchemaUIElementLayoutDimension = number | 'max' | string
+
+ export interface UISchemaUIElementElementLayout {
+    min_width?: UISchemaUIElementLayoutDimension
+    min_height?: UISchemaUIElementLayoutDimension
+    max_height?: UISchemaUIElementLayoutDimension
+    max_width?: UISchemaUIElementLayoutDimension
+    padding?: NumberOrString | UISchemaLayoutPadding
 }
 
-export declare interface UISchemaLayoutPadding {
-    top: number
-    right: number
-    bottom: number
-    left: number
+ export interface UISchemaLayoutPadding {
+    top?: NumberOrString
+    end?: NumberOrString
+    bottom?: NumberOrString
+    start?: NumberOrString
 }
 
+/**
+ * @oneOf
+ */
 export type UISchemaUIElements =
     | UISchemaLayoutElement
     | UISchemaButton
@@ -132,64 +151,70 @@ export type UISchemaUIElements =
     | UISchemaTemplateLabel
     | UISchemaBoolField
     | UISchemaFile
-export declare interface UISchemaLayoutSettings {
+
+ export interface UISchemaLayoutSettings {
     /** settings for how the layout renders its elements */
-    // layout_settings: UISchemaLayoutSettings
     orchestration_strategy: string
     readonly?: boolean
     order?: string[]
-    default_element_visibility?: string | boolean
+    default_element_visibility?: InterpretedExpression | boolean
 }
-export declare interface UISchemaLayoutElement
-    extends Omit<UISchemaUIElement, 'binding'>, UISchemaLayoutSettings {
-    element_type: 'layout'
 
+ export interface UISchemaLayoutElement extends UISchemaBaseUIElement,  UISchemaLayoutSettings {
+    element_type: 'layout'
     /** elements grouped in this layout */
     ui_elements: Dictionary<UISchemaUIElements>
 }
 
-export declare interface UISchemaButton extends UISchemaUIElement {
+ export interface UISchemaButton extends UISchemaDynamicUIElement {
     element_type: 'button'
     button_type?: 'okButton' | 'cancelButton' | 'iconButton'
-    icon?: string
+    icon?: InterpretedExpression
+    default?: 'ENTER' | 'CANCEL'
 }
 
-export declare interface UISchemaTextField extends UISchemaBoundUIElement {
+ export interface UISchemaTextField extends UISchemaBoundUIElement, UISchemaIdentifierDisplay {
     element_type: 'text_field'
+    /** settings to limit the text length */
+    ellipsis?: UISchemaDisplayEllipsis
     multiline?: boolean
 }
+/** settings to limit the text length and format the way the ellipsis is displayed */
+ export interface UISchemaDisplayEllipsis {
+    max_characters: number
+}
 
-export declare interface UISchemaDateTimeField extends UISchemaBoundUIElement {
+ export interface UISchemaDateTimeField extends UISchemaBoundUIElement {
     element_type: 'date_time_field'
     date_format?: string
     include_time?: boolean
 }
 
-export declare interface UISchemaLine extends UISchemaUIElement {
+ export interface UISchemaLine extends UISchemaBaseUIElement {
     element_type: 'line'
     transparent?: boolean
 }
 
-export declare interface UISchemaComboBox extends UISchemaBoundUIElement {
+ export interface UISchemaComboBox extends UISchemaBoundUIElement {
     element_type: 'selection'
     items: Array<string> | UISchemaLookupSettings
 }
 
-export declare interface UISchemaTemplateLabel extends UISchemaUIElement {
+ export interface UISchemaTemplateLabel extends UISchemaDynamicUIElement, UISchemaIdentifierDisplay  {
     element_type: 'template_label'
 }
 
-export declare interface UISchemaBoolField extends UISchemaBoundUIElement {
+ export interface UISchemaBoolField extends UISchemaBoundUIElement {
     element_type: 'bool'
 }
 
-export declare interface UISchemaLookupSettings {
+ export interface UISchemaLookupSettings {
     topic: string
-    selection: [string]
+    selection: string[]
     key: string
 }
 
-export declare interface UISchemaFile extends UISchemaUIElement {
+ export interface UISchemaFile extends UISchemaDynamicUIElement {
     element_type: 'file'
     resolution: string
     alternate_description?: string
