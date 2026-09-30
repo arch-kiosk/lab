@@ -1,0 +1,999 @@
+{
+  "$ref": "#/definitions/UISchema",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "definitions": {
+    "Dictionary<UISchemaUIElements>": {
+      "additionalProperties": {
+        "$ref": "#/definitions/UISchemaUIElements"
+      },
+      "type": "object"
+    },
+    "InterpretedExpression": {
+      "description": "And expression that needs to be interpreted first",
+      "type": "string"
+    },
+    "NumberOrString": {
+      "type": [
+        "number",
+        "string"
+      ]
+    },
+    "UISchema": {
+      "additionalProperties": false,
+      "description": "UISchema defines the top level structure of the schema definition. This is the starting point. The structure itself contains mostly contextual information for the use cases in which a schema appears.",
+      "properties": {
+        "data_binding": {
+          "$ref": "#/definitions/UISchemaDataBindingSettings",
+          "description": "describes the data source and how the ui is interacting with it"
+        },
+        "dsd": {
+          "$ref": "#/definitions/UISchemaDSDDict",
+          "description": "data set definition for database-bound elements within the definition. This is not being directly used by the ui component but it serves as contextual data that might be used by the host of the layout"
+        },
+        "header": {
+          "$ref": "#/definitions/UISchemaHeaderDictV2",
+          "description": "defines information about version and type of the definition language being used. These definitions control how to even parse the structure and what components and parts to expect."
+        },
+        "meta": {
+          "$ref": "#/definitions/UISchemaMetaSettings",
+          "description": "additional information used by diverse parties processing the schema. Not rendered within the ui but informing the context within which the schema is being interpreted or even rendered."
+        },
+        "root": {
+          "$ref": "#/definitions/UISchemaUIRootLayoutElement",
+          "description": "the root element has to be a layout element"
+        }
+      },
+      "required": [
+        "header",
+        "data_binding",
+        "root"
+      ],
+      "type": "object"
+    },
+    "UISchemaBoolField": {
+      "additionalProperties": false,
+      "properties": {
+        "binding": {
+          "$ref": "#/definitions/UISchemaUIElementBinding"
+        },
+        "element_type": {
+          "const": "bool",
+          "type": "string"
+        },
+        "enabled": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/InterpretedExpression"
+            },
+            {
+              "type": "boolean"
+            }
+          ]
+        },
+        "layout": {
+          "$ref": "#/definitions/UISchemaUIElementElementLayout",
+          "description": "positioning, spatial dimensions and positioning - how the element interacts on the layout"
+        },
+        "readonly": {
+          "type": "boolean"
+        },
+        "style": {
+          "$ref": "#/definitions/UISchemaUIElementStyleBasics",
+          "description": "how the element itself appears"
+        },
+        "text": {
+          "$ref": "#/definitions/InterpretedExpression"
+        },
+        "value": {
+          "$ref": "#/definitions/InterpretedExpression"
+        },
+        "visible": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/InterpretedExpression"
+            },
+            {
+              "type": "boolean"
+            }
+          ]
+        }
+      },
+      "required": [
+        "element_type"
+      ],
+      "type": "object"
+    },
+    "UISchemaButton": {
+      "additionalProperties": false,
+      "properties": {
+        "button_type": {
+          "enum": [
+            "okButton",
+            "cancelButton",
+            "iconButton"
+          ],
+          "type": "string"
+        },
+        "default": {
+          "enum": [
+            "ENTER",
+            "CANCEL"
+          ],
+          "type": "string"
+        },
+        "element_type": {
+          "const": "button",
+          "type": "string"
+        },
+        "enabled": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/InterpretedExpression"
+            },
+            {
+              "type": "boolean"
+            }
+          ]
+        },
+        "icon": {
+          "$ref": "#/definitions/InterpretedExpression"
+        },
+        "layout": {
+          "$ref": "#/definitions/UISchemaUIElementElementLayout",
+          "description": "positioning, spatial dimensions and positioning - how the element interacts on the layout"
+        },
+        "style": {
+          "$ref": "#/definitions/UISchemaUIElementStyleBasics",
+          "description": "how the element itself appears"
+        },
+        "text": {
+          "$ref": "#/definitions/InterpretedExpression"
+        },
+        "value": {
+          "$ref": "#/definitions/InterpretedExpression"
+        },
+        "visible": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/InterpretedExpression"
+            },
+            {
+              "type": "boolean"
+            }
+          ]
+        }
+      },
+      "required": [
+        "element_type"
+      ],
+      "type": "object"
+    },
+    "UISchemaComboBox": {
+      "additionalProperties": false,
+      "properties": {
+        "binding": {
+          "$ref": "#/definitions/UISchemaUIElementBinding"
+        },
+        "element_type": {
+          "const": "selection",
+          "type": "string"
+        },
+        "enabled": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/InterpretedExpression"
+            },
+            {
+              "type": "boolean"
+            }
+          ]
+        },
+        "items": {
+          "anyOf": [
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            {
+              "$ref": "#/definitions/UISchemaLookupSettings"
+            }
+          ]
+        },
+        "layout": {
+          "$ref": "#/definitions/UISchemaUIElementElementLayout",
+          "description": "positioning, spatial dimensions and positioning - how the element interacts on the layout"
+        },
+        "readonly": {
+          "type": "boolean"
+        },
+        "style": {
+          "$ref": "#/definitions/UISchemaUIElementStyleBasics",
+          "description": "how the element itself appears"
+        },
+        "text": {
+          "$ref": "#/definitions/InterpretedExpression"
+        },
+        "value": {
+          "$ref": "#/definitions/InterpretedExpression"
+        },
+        "visible": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/InterpretedExpression"
+            },
+            {
+              "type": "boolean"
+            }
+          ]
+        }
+      },
+      "required": [
+        "element_type",
+        "items"
+      ],
+      "type": "object"
+    },
+    "UISchemaDSDDict": {
+      "additionalProperties": {
+        "items": {
+          "type": "string"
+        },
+        "type": "array"
+      },
+      "type": "object"
+    },
+    "UISchemaDataBindingCardinalities": {
+      "description": "describes the data source and how the ui is interacting with it",
+      "enum": [
+        "1",
+        "N"
+      ],
+      "type": "string"
+    },
+    "UISchemaDataBindingSettings": {
+      "additionalProperties": false,
+      "description": "describes the data source and how the ui is interacting with it",
+      "properties": {
+        "cardinality": {
+          "$ref": "#/definitions/UISchemaDataBindingCardinalities",
+          "description": "\"1\" means the data source provides only one row, N that there are multiple rows"
+        }
+      },
+      "required": [
+        "cardinality"
+      ],
+      "type": "object"
+    },
+    "UISchemaDateTimeField": {
+      "additionalProperties": false,
+      "properties": {
+        "binding": {
+          "$ref": "#/definitions/UISchemaUIElementBinding"
+        },
+        "date_format": {
+          "type": "string"
+        },
+        "element_type": {
+          "const": "date_time_field",
+          "type": "string"
+        },
+        "enabled": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/InterpretedExpression"
+            },
+            {
+              "type": "boolean"
+            }
+          ]
+        },
+        "include_time": {
+          "type": "boolean"
+        },
+        "layout": {
+          "$ref": "#/definitions/UISchemaUIElementElementLayout",
+          "description": "positioning, spatial dimensions and positioning - how the element interacts on the layout"
+        },
+        "readonly": {
+          "type": "boolean"
+        },
+        "style": {
+          "$ref": "#/definitions/UISchemaUIElementStyleBasics",
+          "description": "how the element itself appears"
+        },
+        "text": {
+          "$ref": "#/definitions/InterpretedExpression"
+        },
+        "value": {
+          "$ref": "#/definitions/InterpretedExpression"
+        },
+        "visible": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/InterpretedExpression"
+            },
+            {
+              "type": "boolean"
+            }
+          ]
+        }
+      },
+      "required": [
+        "element_type"
+      ],
+      "type": "object"
+    },
+    "UISchemaDisplayEllipsis": {
+      "additionalProperties": false,
+      "description": "settings to limit the text length and format the way the ellipsis is displayed",
+      "properties": {
+        "max_characters": {
+          "type": "number"
+        }
+      },
+      "required": [
+        "max_characters"
+      ],
+      "type": "object"
+    },
+    "UISchemaFile": {
+      "additionalProperties": false,
+      "properties": {
+        "align_image": {
+          "enum": [
+            "center",
+            "left"
+          ],
+          "type": "string"
+        },
+        "alternate_description": {
+          "type": "string"
+        },
+        "element_type": {
+          "const": "file",
+          "type": "string"
+        },
+        "enabled": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/InterpretedExpression"
+            },
+            {
+              "type": "boolean"
+            }
+          ]
+        },
+        "file_description": {
+          "enum": [
+            "right",
+            "bottom",
+            "none"
+          ],
+          "type": "string"
+        },
+        "fit_content": {
+          "enum": [
+            "contain",
+            "fit",
+            "scale"
+          ],
+          "type": "string"
+        },
+        "layout": {
+          "$ref": "#/definitions/UISchemaUIElementElementLayout",
+          "description": "positioning, spatial dimensions and positioning - how the element interacts on the layout"
+        },
+        "resolution": {
+          "type": "string"
+        },
+        "style": {
+          "$ref": "#/definitions/UISchemaUIElementStyleBasics",
+          "description": "how the element itself appears"
+        },
+        "text": {
+          "$ref": "#/definitions/InterpretedExpression"
+        },
+        "value": {
+          "$ref": "#/definitions/InterpretedExpression"
+        },
+        "visible": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/InterpretedExpression"
+            },
+            {
+              "type": "boolean"
+            }
+          ]
+        }
+      },
+      "required": [
+        "element_type",
+        "resolution"
+      ],
+      "type": "object"
+    },
+    "UISchemaHeaderDictV2": {
+      "additionalProperties": false,
+      "description": "The version of this schema definition",
+      "properties": {
+        "version": {
+          "const": "2",
+          "type": "string"
+        }
+      },
+      "required": [
+        "version"
+      ],
+      "type": "object"
+    },
+    "UISchemaLayoutElement": {
+      "additionalProperties": false,
+      "properties": {
+        "default_element_visibility": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/InterpretedExpression"
+            },
+            {
+              "type": "boolean"
+            }
+          ]
+        },
+        "element_type": {
+          "const": "layout",
+          "type": "string"
+        },
+        "enabled": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/InterpretedExpression"
+            },
+            {
+              "type": "boolean"
+            }
+          ]
+        },
+        "layout": {
+          "$ref": "#/definitions/UISchemaUIElementElementLayout",
+          "description": "positioning, spatial dimensions and positioning - how the element interacts on the layout"
+        },
+        "orchestration_strategy": {
+          "description": "settings for how the layout renders its elements",
+          "type": "string"
+        },
+        "order": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "readonly": {
+          "type": "boolean"
+        },
+        "style": {
+          "$ref": "#/definitions/UISchemaUIElementStyleBasics",
+          "description": "how the element itself appears"
+        },
+        "ui_elements": {
+          "$ref": "#/definitions/Dictionary%3CUISchemaUIElements%3E",
+          "description": "elements grouped in this layout"
+        },
+        "visible": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/InterpretedExpression"
+            },
+            {
+              "type": "boolean"
+            }
+          ]
+        }
+      },
+      "required": [
+        "element_type",
+        "orchestration_strategy",
+        "ui_elements"
+      ],
+      "type": "object"
+    },
+    "UISchemaLayoutPadding": {
+      "additionalProperties": false,
+      "properties": {
+        "bottom": {
+          "$ref": "#/definitions/NumberOrString"
+        },
+        "end": {
+          "$ref": "#/definitions/NumberOrString"
+        },
+        "start": {
+          "$ref": "#/definitions/NumberOrString"
+        },
+        "top": {
+          "$ref": "#/definitions/NumberOrString"
+        }
+      },
+      "type": "object"
+    },
+    "UISchemaLine": {
+      "additionalProperties": false,
+      "properties": {
+        "element_type": {
+          "const": "line",
+          "type": "string"
+        },
+        "enabled": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/InterpretedExpression"
+            },
+            {
+              "type": "boolean"
+            }
+          ]
+        },
+        "layout": {
+          "$ref": "#/definitions/UISchemaUIElementElementLayout",
+          "description": "positioning, spatial dimensions and positioning - how the element interacts on the layout"
+        },
+        "style": {
+          "$ref": "#/definitions/UISchemaUIElementStyleBasics",
+          "description": "how the element itself appears"
+        },
+        "transparent": {
+          "type": "boolean"
+        },
+        "visible": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/InterpretedExpression"
+            },
+            {
+              "type": "boolean"
+            }
+          ]
+        }
+      },
+      "required": [
+        "element_type"
+      ],
+      "type": "object"
+    },
+    "UISchemaLookupSettings": {
+      "additionalProperties": false,
+      "properties": {
+        "key": {
+          "type": "string"
+        },
+        "selection": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "topic": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "topic",
+        "selection",
+        "key"
+      ],
+      "type": "object"
+    },
+    "UISchemaMetaSettings": {
+      "additionalProperties": false,
+      "properties": {
+        "scenario": {
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "UISchemaTemplateLabel": {
+      "additionalProperties": false,
+      "properties": {
+        "element_type": {
+          "const": "template_label",
+          "type": "string"
+        },
+        "enabled": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/InterpretedExpression"
+            },
+            {
+              "type": "boolean"
+            }
+          ]
+        },
+        "is_identifier": {
+          "type": "boolean"
+        },
+        "layout": {
+          "$ref": "#/definitions/UISchemaUIElementElementLayout",
+          "description": "positioning, spatial dimensions and positioning - how the element interacts on the layout"
+        },
+        "mask_identifier": {
+          "type": "boolean"
+        },
+        "style": {
+          "$ref": "#/definitions/UISchemaUIElementStyleBasics",
+          "description": "how the element itself appears"
+        },
+        "text": {
+          "$ref": "#/definitions/InterpretedExpression"
+        },
+        "value": {
+          "$ref": "#/definitions/InterpretedExpression"
+        },
+        "visible": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/InterpretedExpression"
+            },
+            {
+              "type": "boolean"
+            }
+          ]
+        }
+      },
+      "required": [
+        "element_type"
+      ],
+      "type": "object"
+    },
+    "UISchemaTextField": {
+      "additionalProperties": false,
+      "properties": {
+        "binding": {
+          "$ref": "#/definitions/UISchemaUIElementBinding"
+        },
+        "element_type": {
+          "const": "text_field",
+          "type": "string"
+        },
+        "ellipsis": {
+          "$ref": "#/definitions/UISchemaDisplayEllipsis",
+          "description": "settings to limit the text length"
+        },
+        "enabled": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/InterpretedExpression"
+            },
+            {
+              "type": "boolean"
+            }
+          ]
+        },
+        "is_identifier": {
+          "type": "boolean"
+        },
+        "layout": {
+          "$ref": "#/definitions/UISchemaUIElementElementLayout",
+          "description": "positioning, spatial dimensions and positioning - how the element interacts on the layout"
+        },
+        "mask_identifier": {
+          "type": "boolean"
+        },
+        "multiline": {
+          "type": "boolean"
+        },
+        "readonly": {
+          "type": "boolean"
+        },
+        "style": {
+          "$ref": "#/definitions/UISchemaUIElementStyleBasics",
+          "description": "how the element itself appears"
+        },
+        "text": {
+          "$ref": "#/definitions/InterpretedExpression"
+        },
+        "value": {
+          "$ref": "#/definitions/InterpretedExpression"
+        },
+        "visible": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/InterpretedExpression"
+            },
+            {
+              "type": "boolean"
+            }
+          ]
+        }
+      },
+      "required": [
+        "element_type"
+      ],
+      "type": "object"
+    },
+    "UISchemaUIElementBinding": {
+      "additionalProperties": false,
+      "properties": {
+        "field_name": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "field_name"
+      ],
+      "type": "object"
+    },
+    "UISchemaUIElementElementLayout": {
+      "additionalProperties": false,
+      "properties": {
+        "max_height": {
+          "$ref": "#/definitions/UISchemaUIElementLayoutDimension"
+        },
+        "max_width": {
+          "$ref": "#/definitions/UISchemaUIElementLayoutDimension"
+        },
+        "min_height": {
+          "$ref": "#/definitions/UISchemaUIElementLayoutDimension"
+        },
+        "min_width": {
+          "$ref": "#/definitions/UISchemaUIElementLayoutDimension"
+        },
+        "padding": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/NumberOrString"
+            },
+            {
+              "$ref": "#/definitions/UISchemaLayoutPadding"
+            }
+          ]
+        }
+      },
+      "type": "object"
+    },
+    "UISchemaUIElementLayoutDimension": {
+      "anyOf": [
+        {
+          "type": "number"
+        },
+        {
+          "const": "max",
+          "type": "string"
+        },
+        {
+          "type": "string"
+        }
+      ]
+    },
+    "UISchemaUIElementStyleBasics": {
+      "additionalProperties": false,
+      "properties": {
+        "css_classes": {
+          "items": {
+            "$ref": "#/definitions/InterpretedExpression"
+          },
+          "type": "array"
+        },
+        "css_styles": {
+          "items": {
+            "$ref": "#/definitions/InterpretedExpression"
+          },
+          "type": "array"
+        }
+      },
+      "type": "object"
+    },
+    "UISchemaUIElements": {
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "element_type": {
+                "const": "layout",
+                "type": "string"
+              }
+            }
+          },
+          "then": {
+            "$ref": "#/definitions/UISchemaLayoutElement"
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "element_type": {
+                "const": "button",
+                "type": "string"
+              }
+            }
+          },
+          "then": {
+            "$ref": "#/definitions/UISchemaButton"
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "element_type": {
+                "const": "text_field",
+                "type": "string"
+              }
+            }
+          },
+          "then": {
+            "$ref": "#/definitions/UISchemaTextField"
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "element_type": {
+                "const": "date_time_field",
+                "type": "string"
+              }
+            }
+          },
+          "then": {
+            "$ref": "#/definitions/UISchemaDateTimeField"
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "element_type": {
+                "const": "line",
+                "type": "string"
+              }
+            }
+          },
+          "then": {
+            "$ref": "#/definitions/UISchemaLine"
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "element_type": {
+                "const": "selection",
+                "type": "string"
+              }
+            }
+          },
+          "then": {
+            "$ref": "#/definitions/UISchemaComboBox"
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "element_type": {
+                "const": "template_label",
+                "type": "string"
+              }
+            }
+          },
+          "then": {
+            "$ref": "#/definitions/UISchemaTemplateLabel"
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "element_type": {
+                "const": "bool",
+                "type": "string"
+              }
+            }
+          },
+          "then": {
+            "$ref": "#/definitions/UISchemaBoolField"
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "element_type": {
+                "const": "file",
+                "type": "string"
+              }
+            }
+          },
+          "then": {
+            "$ref": "#/definitions/UISchemaFile"
+          }
+        }
+      ],
+      "description": "union type for all UIElement types",
+      "properties": {
+        "element_type": {
+          "enum": [
+            "layout",
+            "button",
+            "text_field",
+            "date_time_field",
+            "line",
+            "selection",
+            "template_label",
+            "bool",
+            "file"
+          ]
+        }
+      },
+      "required": [
+        "element_type"
+      ],
+      "type": "object"
+    },
+    "UISchemaUIRootLayoutElement": {
+      "additionalProperties": false,
+      "properties": {
+        "default_element_visibility": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/InterpretedExpression"
+            },
+            {
+              "type": "boolean"
+            }
+          ]
+        },
+        "element_type": {
+          "const": "layout",
+          "type": "string"
+        },
+        "enabled": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/InterpretedExpression"
+            },
+            {
+              "type": "boolean"
+            }
+          ]
+        },
+        "layout": {
+          "$ref": "#/definitions/UISchemaUIElementElementLayout",
+          "description": "positioning, spatial dimensions and positioning - how the element interacts on the layout"
+        },
+        "orchestration_strategy": {
+          "description": "settings for how the layout renders its elements",
+          "type": "string"
+        },
+        "order": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "readonly": {
+          "type": "boolean"
+        },
+        "style": {
+          "$ref": "#/definitions/UISchemaUIElementStyleBasics",
+          "description": "how the element itself appears"
+        },
+        "ui_elements": {
+          "$ref": "#/definitions/Dictionary%3CUISchemaUIElements%3E",
+          "description": "elements grouped in this layout"
+        },
+        "visible": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/InterpretedExpression"
+            },
+            {
+              "type": "boolean"
+            }
+          ]
+        }
+      },
+      "required": [
+        "element_type",
+        "orchestration_strategy",
+        "ui_elements"
+      ],
+      "type": "object"
+    }
+  }
+}
