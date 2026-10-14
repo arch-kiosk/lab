@@ -1,11 +1,13 @@
 import {
-    UISchemaLayoutElement,
-    UISchemaUIElementElementLayout,
+    UISchemaDynamicUIElement,
+    UISchemaElementOnLayout,
+    UISchemaLayoutElement, UISchemaOrchestrationStrategyKeys,
 } from '../uischema'
-import { UILayoutRenderContext } from '../uielementrendercontext'
+import { UIElementRenderContext, UILayoutRenderContext } from '../uielementrendercontext'
 import { html, nothing, ReactiveController, TemplateResult } from 'lit'
 import { UIComponent } from '#src/uicomponent'
-import { UIElementRenderer } from '#src/sharedtypes'
+import { TemplateResultOrNothing, UIElementRenderer } from '#src/sharedtypes'
+import { UIElement } from '#src/uielement'
 
 // @ts-ignore
 export abstract class UILayout implements ReactiveController {
@@ -30,7 +32,12 @@ export abstract class UILayout implements ReactiveController {
         console.log(`instantiating layout ${id}`)
     }
 
-    abstract renderLayoutStyles(layout?: UISchemaUIElementElementLayout): string
+
+    abstract renderLayoutStyles(elementDefinition: UISchemaElementOnLayout<UISchemaOrchestrationStrategyKeys>, elementRenderContext?: unknown): string
+
+    public adjustElementStyles<A>(elementRenderContext: A): A {
+        return elementRenderContext
+    }
 
     protected requestRerender(targetElement?: HTMLElement) {
         if (targetElement) {
@@ -93,45 +100,121 @@ export abstract class UILayout implements ReactiveController {
     }
 
 
+
     public renderLayout(
         layoutId: string,
         renderContext: UILayoutRenderContext,
         renderElement: UIElementRenderer,
-    ): TemplateResult {
-        const elements = this.getOrderedElements(renderContext.layoutDefinition)
+    ): TemplateResultOrNothing{
+        const layoutDefinition = renderContext.elementDefinition
+        const v = UIElement.isVisible(renderContext, layoutId)
+        console.log(`${layoutId} visible is ${v}`)
+        if (!(v)) {
+            return nothing
+        }
+
+        const cssClasses = UIElement.getCSSClasses(renderContext, layoutDefinition.style?.css_classes)
+        const cssStyles = UIElement.getCSSStyles(renderContext, layoutDefinition.style?.css_styles)
+
+        if (renderContext.parentLayout)
+            renderContext.parentLayout.adjustElementStyles({
+                cssClasses: cssClasses,
+                cssStyles: cssStyles
+            },
+        )
+
+        const elements = this.getOrderedElements(renderContext.elementDefinition)
         let style: string = ''
-        if (renderContext.parentLayout) style = renderContext.parentLayout.renderLayoutStyles()
-        style += (style ? ';' : '')
-        style += this.reactiveControllerHost.getPaddingStyle(renderContext.layoutDefinition.layout?.padding)
+
+        // This applies the parent layout styles to the layout element
+        if (renderContext.parentLayout) style = renderContext.parentLayout.renderLayoutStyles(layoutDefinition)
+
+        // style += (style ? ';' : '')
+        // style += this.reactiveControllerHost.getPaddingStyle(renderContext.layoutDefinition.layout?.padding)
         const recordNr = renderContext.dataContext?renderContext.dataContext.recordIndex:undefined
         // if (recordNr) renderContext.uicomponent.dataProvider?.getRecord(recordNr, true)
+        console.log(`rendering layout ${this._id} for record`,renderContext.dataContext.record)
 
         const renderedElements = elements.map((id) =>
-            renderElement(id, renderContext.layoutDefinition.ui_elements[id], this, renderContext.dataContext),
+            renderElement(id, renderContext.elementDefinition.ui_elements[id], this, renderContext.dataContext),
         )
         const recordUid = renderContext.dataContext?renderContext.dataContext.recordUID as string:undefined
-        console.log(`rendering layout ${this._id} for`,renderContext.dataContext.record)
+        if (renderContext.parentLayout) {
+            style = (style ? style + ";" : "") + renderContext.parentLayout.renderLayoutStyles(renderContext.elementDefinition, {
+                cssClasses: cssClasses,
+                cssStyles: cssStyles
+            })
+            console.log(`rendering layout ${this._id} with styles`, (renderContext.elementDefinition as UISchemaElementOnLayout<UISchemaOrchestrationStrategyKeys>).layout)
+
+        }
+        return this.renderHtmlTemplate(
+                recordNr,
+                layoutId,
+                renderContext,
+                cssClasses,
+                (style ? style + ";" : "") + Object.entries(cssStyles).map(([key, val]) => `${key}:${val}`).join(";"),
+                recordUid,
+                renderedElements)
+    }
+
+    protected renderHtmlTemplate(recordNr: number | undefined,
+                                 layoutId: string,
+                                 renderContext: UILayoutRenderContext,
+                                 cssClasses: string[],
+                                 style: string, recordUid: string | undefined,
+                                 renderedElements: TemplateResultOrNothing[]) {
         return html`
-            ${this.validation && recordNr !== undefined?this.renderRecordValidation(layoutId, renderContext):nothing}
-            <div id="${renderContext.getScopedId(layoutId)}" class="${this.cssClass}" 
+            ${this.validation && recordNr !== undefined ? this.renderRecordValidation(layoutId, renderContext) : nothing}
+            <div id="${renderContext.getScopedId(layoutId)}" class="${[this.cssClass, ...cssClasses].join(" ")}" 
                  style="${style}" 
                  data-record-nr="${recordNr ?? nothing}" 
                  data-record-uid="${recordUid ?? nothing}"
-                 @input="${(event:InputEvent) => this.dataChanged(event, recordNr)}"
+                 @input="${(event: InputEvent) => this.dataChanged(event, recordNr)}"
             >
             ${renderedElements}
             </div>
         `
     }
 
-    renderElement(
-        layout: UISchemaUIElementElementLayout | undefined,
-        element: TemplateResult,
+    renderElement<A>(
+        elementDefinition: UISchemaElementOnLayout<UISchemaOrchestrationStrategyKeys>,
+        elementRenderContext: A,
+        elementRenderer:(context: A) => TemplateResult
     ): TemplateResult {
         return html`
-            <div class="text-field-div" style="${this.renderLayoutStyles(layout)}">${element}</div>
+            <div class="element-container" part="${elementDefinition.element_type}" style="${this.renderLayoutStyles(elementDefinition, elementRenderContext)}">${elementRenderer(elementRenderContext)}</div>
         `
     }
+
+    protected devInfo(context: UIElementRenderContext, ...texts: Array<string | undefined>) {
+        if (context.uicomponent.showDevelopmentInfo) {
+            const ht: Array<TemplateResult> = []
+            for (const t of texts) {
+                ht.push(
+                    html`<span class="developer-info"">[${t == undefined ? 'undefined' : t}]</span>`,
+                )
+            }
+            return ht
+        } else return html``
+    }
+
+    public renderLabel(context: UIElementRenderContext, id: string, text: string, errorState = false) {
+        let elementDefinition = context.elementDefinition as UISchemaDynamicUIElement
+        return this.renderElementLabels
+            ? html`
+                    <label for="${context.getScopedId(id)}"
+                           style="${errorState ? 'color: red' : nothing}"
+                    >${text ? text : nothing}
+                        ${this.devInfo(
+                            context,
+                            elementDefinition.text,
+                            elementDefinition.value,
+                        )}
+                    </label>
+            `
+            : this.devInfo(context, elementDefinition.text, elementDefinition.value)
+    }
+
 
     public getOrderedElements(layoutSchema: UISchemaLayoutElement): Array<string> {
         try {
@@ -174,7 +257,7 @@ export abstract class UIListLayout extends UILayout {
 
     protected _initSorting(renderContext: UILayoutRenderContext) {
         if (renderContext.uicomponent && renderContext.uicomponent.setSortOrder) {
-            let settings: UISchemaListLayoutSettings = renderContext.layoutDefinition
+            let settings: UISchemaListLayoutSettings = renderContext.elementDefinition
                 .layout_settings as UISchemaListLayoutSettings
             if (settings) {
                 if (this._sortOrder.length == 0) {

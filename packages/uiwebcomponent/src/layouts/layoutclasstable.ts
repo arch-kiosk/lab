@@ -57,7 +57,7 @@ export class UITableLayoutClass extends UIListLayout {
         return nothing
     }
     public renderHeaders(renderContext: UILayoutRenderContext, elements: string[]) {
-        const settings = renderContext.layoutDefinition
+        const settings = renderContext.elementDefinition
             .layout_settings as UISchemaListLayoutSettings
         const orderAllowed = settings.allow_ordering_by || []
         const allAllowed = settings.allow_ordering_by == undefined
@@ -70,7 +70,7 @@ export class UITableLayoutClass extends UIListLayout {
                             <th
                                 class="table-header"
                                 style="${this.getTableHeaderStyle(
-                                    renderContext.layoutDefinition.ui_elements[id].layout,
+                                    renderContext.elementDefinition.ui_elements[id].layout,
                                 )}"
                                 data-id="${id}"
                                 @click="${allAllowed || orderAllowed.includes(id)
@@ -80,7 +80,7 @@ export class UITableLayoutClass extends UIListLayout {
                                 ${this.renderSortButton(id)}
                                 <span class="table-header-text"
                                     >${renderContext.resolve(
-                                        renderContext.layoutDefinition.ui_elements[id].element_type
+                                        renderContext.elementDefinition.ui_elements[id].element_type
                                             .text,
                                     )}</span
                                 >
@@ -107,7 +107,7 @@ export class UITableLayoutClass extends UIListLayout {
         style: string,
         renderElement: (id: string, entry: UISchemaBaseUIElement, layouter: UILayout) => TemplateResult,
     ): TemplateResult {
-        const elements = this.getOrderedElements(renderContext.layoutDefinition)
+        const elements = this.getOrderedElements(renderContext.elementDefinition)
 
         const rows: TemplateResult[] = []
         renderContext.resetCursor()
@@ -118,7 +118,7 @@ export class UITableLayoutClass extends UIListLayout {
                     id="R${renderContext.getCurrentUID() ? renderContext.getCurrentUID() : nothing}"
                 >
                     ${elements.map((id) =>
-                        renderElement(id, renderContext.layoutDefinition.ui_elements[id], layouter),
+                        renderElement(id, renderContext.elementDefinition.ui_elements[id], layouter),
                     )}
                 </tr>
             `)

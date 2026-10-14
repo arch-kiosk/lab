@@ -23,7 +23,12 @@
         "fmt": "vp fmt -- -c ..\\..\\.oxfmtrc.json",
         "dev": "vp dev -- --force --host 127.0.0.1",
         "build-only": "tsc && vp build",
-        "generate:schema": "ts-json-schema-generator --path .\\src\\uischema2.ts -t UISchema -o ./src/jsonschema/uischemav2.json --no-type-check"
+        "generate:schema": "ts-json-schema-generator --path .\\src\\uischema2.ts -t UISchema -o ./src/jsonschema/uischemav2.json --no-type-check",
+        "docs:generate": "typedoc",
+        "docs:dev": "pnpm docs:generate && vitepress dev docs",
+        "docs:build": "vitepress build docs",
+        "prepublishOnly": "vp run build",
+        "bump-ver": "bumpp --no-push --commit \"bumped version to v%s\""
     },
     "dependencies": {
         "@arch-kiosk/appfoundation": "workspace:*",
@@ -31,6 +36,7 @@
         "@vaadin/combo-box": "^25.2.4",
         "@vaadin/date-picker": "^25.2.4",
         "@vaadin/date-time-picker": "^25.2.4",
+        "@voidzero-dev/vite-plus-core": "catalog:",
         "ajv": "catalog:",
         "better-ajv-errors": "catalog:",
         "delay": "catalog:",
@@ -49,6 +55,7 @@
         "ts-json-schema-generator": "catalog:",
         "ts-node": "^10.9.2",
         "typedoc": "catalog:",
+        "typedoc-plugin-frontmatter": "catalog:",
         "typedoc-plugin-markdown": "catalog:",
         "typedoc-vitepress-theme": "catalog:",
         "vite": "catalog:",

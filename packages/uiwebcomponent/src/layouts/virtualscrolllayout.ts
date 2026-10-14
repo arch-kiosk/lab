@@ -2,20 +2,18 @@ import {
     Dictionary,
     UISchemaError,
     UISchemaBaseUIElement,
-    UISchemaUIElementElementLayout,
-    UISchemaLayoutElement, UISchemaUIElements,
+    UISchemaLayoutElement,
 } from '../uischema'
-import { html, LitElement, TemplateResult } from 'lit'
+import { html, TemplateResult } from 'lit'
 import { createRef, Ref, ref } from 'lit/directives/ref.js'
 import { UILayoutRenderContext } from '../uielementrendercontext'
 import { UILayout } from './uilayout'
 import '@arch-kiosk/virtualizerlab'
+import {    VirtualScrollContainer } from "@arch-kiosk/virtualizerlab"
 import {
     BufferedDataProvider,
-    RowRenderer,
-    VirtualScrollContainer,
     VirtualScrollContainerDataProvider,
-} from '@arch-kiosk/virtualizerlab'
+} from '@arch-kiosk/appfoundation/dataprovider'
 import { UIComponent } from '#src/uicomponent'
 import { UIElementRenderer } from '#src/sharedtypes'
 
@@ -62,7 +60,7 @@ export class UIVirtualScrollLayout extends UILayout {
         const subLayout = Object.values(uiElements)[0] as UISchemaLayoutElement
         if (subLayout.element_type !== 'layout') {
             throw new UISchemaError(
-                `layoutElement ${id} must have exactly one layout element. The type ${subLayout.element_type.name} is not allowed.`,
+                `layoutElement ${id} must have exactly one layout element. The type ${subLayout.element_type} is not allowed.`,
             )
         }
         return Object.keys(uiElements)[0]
@@ -88,18 +86,18 @@ export class UIVirtualScrollLayout extends UILayout {
         let style: string = ''
         this.renderContext = renderContext
         if (this.renderContext.parentLayout) {
-            style = this.renderContext.parentLayout.renderLayoutStyles()
+            style = this.renderContext.parentLayout.renderLayoutStyles(renderContext.elementDefinition)
         }
-        style += style
-            ? ';'
-            : '' + this.reactiveControllerHost.getPaddingStyle(renderContext.layoutDefinition?.layout?.padding)
+        // style += style
+        //     ? ';'
+        //     : '' + this.reactiveControllerHost.getPaddingStyle(renderContext.layoutDefinition?.layout?.padding)
         // This is only an emergency break to make sure the scroll layout always has a height.
         // It will be overridden by the height set in the schema definition
         let max_height = 'max-height: 100vh;'
-        if (renderContext.layoutDefinition.layout?.max_height) {
-            if (typeof (renderContext.layoutDefinition.layout?.max_height) === 'string' ||
-                typeof (renderContext.layoutDefinition.layout?.max_height) === 'number') {
-                max_height += `max-height: ${renderContext.layoutDefinition.layout?.max_height}` + ';'
+        if (renderContext.elementDefinition.layout?.max_height) {
+            if (typeof (renderContext.elementDefinition.layout?.max_height) === 'string' ||
+                typeof (renderContext.elementDefinition.layout?.max_height) === 'number') {
+                max_height += `max-height: ${renderContext.elementDefinition.layout?.max_height}` + ';'
             }
         }
         style = max_height + style

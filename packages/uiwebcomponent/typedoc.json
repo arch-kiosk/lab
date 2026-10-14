@@ -1,16 +1,34 @@
 {
     "$schema": "https://typedoc.org/schema.json",
-    "entryPoints": ["./src/ui-component.ts"],
+    "entryPoints": [
+        "./src/uicomponent.ts"
+    ],
     "out": "./docs/api",
-    "plugin": ["typedoc-plugin-markdown", "typedoc-vitepress-theme"],
+    "plugin": [
+        "typedoc-plugin-markdown",
+        "typedoc-plugin-frontmatter",
+        "typedoc-vitepress-theme"
+    ],
+    "frontmatterGlobals": {
+        "outline": [2,3]
+    },
     "theme": "default",
+    "categorizeByGroup": false,
+    "navigation": {
+        "includeCategories": true,
+        "includeGroups": false
+    },
+    "skipErrorChecking": true,
+    "sort": ["source-order"],
     "entryPointStrategy": "resolve",
-
     "readme": "none",
     "entryFileName": "index.md",
     "modulesFileName": "index.md",
-
-    "exclude": ["**/node_modules/**", "**/*.spec.ts", "**/*.test.ts"],
+    "exclude": [
+        "**/node_modules/**",
+        "**/*.spec.ts",
+        "**/*.test.ts"
+    ],
     "excludeExternals": true,
     "excludeInternal": true,
     "excludePrivate": true,

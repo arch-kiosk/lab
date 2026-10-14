@@ -22,7 +22,7 @@ export interface VirtualScrollContainerDataProvider {
     getRecordState(uid: string): 'draft' | 'new' | undefined
 
     setActiveRecord(index: number): void
-
+    getActiveRecordIndex(): number | undefined
     dataChanged(recordIndex: number, fieldId: string, value: unknown): void
 }
 

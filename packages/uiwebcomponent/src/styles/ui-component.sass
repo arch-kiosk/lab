@@ -97,6 +97,11 @@ input,textarea
 .light-background
   background-color: $col-bg-1-lighter
 
+.element-container
+  margin-left: .5em
+  margin-right: .5em
+
+//todo: I want to get rid of this:
 .text-field-div
   margin-left: .5em
   margin-right: .5em
@@ -281,3 +286,15 @@ vaadin-date-picker > input:disabled, vaadin-time-picker > input:disabled, vaadin
 .gallery-headers
   display: flex
   flex-direction: row-reverse
+
+@keyframes skeleton-loading
+  0%
+    background-position: 100% 0
+  100%
+    background-position: 0 0
+
+.skeleton
+  background: linear-gradient(90deg, #e0e0e0 25%, #f0f0f0 37%, #e0e0e0 63%)
+  background-size: 400% 100%
+  animation: skeleton-loading 1.4s ease infinite
+  border-radius: 4px

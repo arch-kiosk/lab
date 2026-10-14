@@ -1,5 +1,4 @@
 'use strict'
-import Ajv from 'ajv';
 import { unsafeCSS, LitElement, TemplateResult, PropertyValues } from 'lit'
 import { html } from 'lit/static-html.js'
 import { customElement, property, state } from 'lit/decorators.js'
@@ -8,23 +7,20 @@ import './layouts/uirenderboundary'
 // @ts-ignore
 import local_css from './styles/ui-component.sass?inline'
 import { UIConfigurableElementFactory } from './uielementfactory'
-import schemaArtifact from './jsonschema/uischemav2.json'
-// import betterAjvErrors from 'better-ajv-errors';
 
 import {
     Dictionary,
     UISchemaError,
     UISchema,
     UISchemaLayoutElement,
-    UISchemaLayoutPadding,
-    UISchemaUIElements,
+    UISchemaUIElements, UISchemaProcessor,
 } from './uischema'
 
 import {
     UIComponentDataProvider,
     UIComponentTimeZoneInfoProvider,
     UIInputData,
-    UIElementWithId
+    UIElementWithId,
 } from './sharedtypes'
 
 export type { UIComponentDataProvider, UIComponentTimeZoneInfoProvider } from './sharedtypes'
@@ -51,11 +47,8 @@ export class UIComponent extends LitElement {
     bindingToElementList: Dictionary<UIElementWithId> = {}
     flatElementList: Dictionary<UISchemaUIElements> = {}
     layouts: Dictionary<UILayout> = {}
-    ajv = new Ajv({
-        allErrors: true,
-        discriminator: true, // Enables strict tagged-union evaluation on @discriminator fields
-    })
-    validateFn = this.ajv.compile(schemaArtifact);
+    schemaProcessor?: UISchemaProcessor
+    public interpretedExpressionPrefix = ''
     // _element_list: { [key: string]: UISchemaUIElement } = {}
     // _selection_data: { [key: string]: { [key: string]: string } } = {}
 
@@ -71,6 +64,14 @@ export class UIComponent extends LitElement {
 
     @property()
     dataProvider: UIComponentDataProvider | null = null
+
+    @property({ type: String, attribute: 'override-css' })
+    overrideCss: string = ''
+
+    /* Note: Lit has nothing to do with instanceSheet! When instanceSheet is updated via replaceSync,
+    the Browser applies the changes immediately/*
+     */
+    private instanceSheet = new CSSStyleSheet()
 
     @property()
     linkIdentifiers: boolean = true
@@ -113,17 +114,24 @@ export class UIComponent extends LitElement {
     protected willUpdate(_changedProperties: PropertyValues) {
         // super.willUpdate(_changedProperties);
         if (_changedProperties.has('uiSchema') && this.uiSchema) {
-            this.processSchemaDefinition()
+            this.flatElementList = {}
+            this.bindingToElementList = {}
+            this.schemaProcessor = new UISchemaProcessor(this.uiSchema)
+            this._showError = this.schemaProcessor.processSchemaDefinition()
+            if (!this._showError) {
+                this.flatElementList = this.schemaProcessor.flatElementList
+                this.bindingToElementList = this.schemaProcessor.bindingToElementList
+            }
         }
     }
 
     public scopeId(id: string, recordIndex?: number) {
-        return id + (recordIndex !== undefined && recordIndex >-1 ? `_R${recordIndex}` : "")
+        return id + (recordIndex !== undefined && recordIndex > -1 ? `_R${recordIndex}` : '')
     }
 
-    public unScopeId(scopedId:string) {
-        const last_R_index = scopedId.lastIndexOf("_R");
-        return last_R_index === -1 ? scopedId : scopedId.substring(0, last_R_index);
+    public unScopeId(scopedId: string) {
+        const last_R_index = scopedId.lastIndexOf('_R')
+        return last_R_index === -1 ? scopedId : scopedId.substring(0, last_R_index)
     }
 
     protected keyupOnElement = (e: KeyboardEvent) => {
@@ -135,6 +143,15 @@ export class UIComponent extends LitElement {
         //     this.fieldChangedById(this._default?.["CANCEL"])
         //   }
         // }
+    }
+
+    protected firstUpdated(_changedProperties: PropertyValues) {
+        if (this.shadowRoot) {
+            this.shadowRoot.adoptedStyleSheets = [
+                ...this.shadowRoot.adoptedStyleSheets,
+                this.instanceSheet,
+            ]
+        }
     }
 
     // protected firstUpdated(_changedProperties: PropertyValueMap<unknown>) {
@@ -182,9 +199,12 @@ export class UIComponent extends LitElement {
     //   }
     // }
 
-    // updated(_changedProperties: PropertyValueMap<unknown>) {
-    //   super.updated(_changedProperties)
-    // }
+    updated(_changedProperties: PropertyValues) {
+        super.updated(_changedProperties)
+        if (_changedProperties.has('overrideCss')) {
+            this.instanceSheet.replaceSync(this.overrideCss || '')
+        }
+    }
 
     // protected getSchemaElement(id: string) {
     //   return this._element_list[id]
@@ -218,145 +238,6 @@ export class UIComponent extends LitElement {
         // return false
     }
 
-    protected checkSchemaDefinitionBasics(): Array<string> {
-        const errors: Array<string> = []
-        if (!this.uiSchema!.data_binding?.cardinality) {
-            errors.push(`The schema definition is not defining data_binding.cardinality. `)
-        }
-        if (!this.uiSchema?.root) {
-            console.log(`No root element`)
-            errors.push(`There is an error in the schema definition: There is no root element`)
-        } else {
-            if (this.uiSchema.root.element_type !== 'layout') {
-                console.log(`the root element must be of type layout.`)
-                errors.push(
-                    `There is an error in the schema definition: the root element must have element_type "layout"`,
-                )
-            } else {
-                if (!this.uiSchema.root.orchestration_strategy) {
-                    console.error(
-                        'The schema definition is not defining an orchestration_strategy',
-                        this.uiSchema.root,
-                    )
-                    errors.push(`The schema definition is not defining an orchestration_strategy`)
-                }
-                if (!this.uiSchema.root.ui_elements) {
-                    errors.push(
-                        `The schema definition is not defining any ui_elements in the root layout`,
-                    )
-                }
-            }
-        }
-        return errors
-    }
-
-    protected processSchemaDefinition() {
-        const processSchemaDefinitionElement = (id: string, uiElement: UISchemaUIElements) => {
-            const regex = new RegExp('^[a-z][a-z0-9\\-_]*$', 'gmi')
-            if (!id.match(regex)) {
-                errors.push(
-                    `There is an error in the schema definition: the element id "${id}" is illegal. It must start with a letter followed by only letters and numbers. Element skipped.`,
-                )
-                return
-            }
-            if (id in this.flatElementList) {
-                errors.push(
-                    `There is an error in the schema definition: the element id "${id}" is used more than once in the UI schema. Skipped.`,
-                )
-                return
-            }
-            if (Object.keys(uiElement).length == 0 || !Object.hasOwn(uiElement, 'element_type')) {
-                errors.push(`ui-component: Element id ${id} lacks "element_type": skipped.`)
-                return
-            }
-
-            if ('binding' in uiElement) {
-                const fieldName = uiElement.binding?.field_name.toLowerCase()
-                if (fieldName) {
-                    if (fieldName in this.bindingToElementList) {
-                        console.log(
-                            `duplicate binding to ${fieldName} bound again in element ${id} in UI schema`,
-                        )
-                        errors.push(
-                            `There is an error in the schema definition: dsd field "${fieldName}" bound again in element "${id}" in UI schema`,
-                        )
-                        return
-                    }
-                    this.bindingToElementList[fieldName] = { id: id, element: uiElement }
-                }
-            }
-            uiElement.enabled = uiElement.enabled ?? true
-            this.flatElementList[id] = uiElement
-            if (uiElement.element_type === 'layout') {
-                for (const [id, childElement] of Object.entries(
-                    (uiElement as UISchemaLayoutElement).ui_elements,
-                )) {
-                    processSchemaDefinitionElement(id, childElement)
-                }
-            }
-        }
-
-        /* main function body */
-        let errors: Array<unknown> =[]
-        let warnings: Array<string> = []
-        try {
-            console.log(`Validating Schema Definition`)
-            this.validateSchema()
-            console.log(`Processing Schema Definition`, this.uiSchema)
-            this.bindingToElementList = {}
-            this.flatElementList = {}
-            errors = this.checkSchemaDefinitionBasics()
-        } catch(e) {
-            errors.push(`Cannot validate or process schema definition: ${e as string}`)
-            console.error(`Cannot validate or process schema definition`,e)
-        }
-        if (errors.length === 0) {
-            processSchemaDefinitionElement('root', this.uiSchema!.root)
-        }
-        this._showError = errors.length ? errors.join('\n') + warnings.join('\n') : ''
-    }
-
-    public validateSchema() {
-        const valid = this.validateFn(this.uiSchema);
-        if (!valid) {
-            const rawErrors = this.validateFn.errors || [];
-
-            // 1. Filter out internal structural noise from conditional (if/then/allOf) schemas
-            const targetErrors = rawErrors.filter(
-                (e) => !['if', 'then', 'else', 'allOf', 'anyOf', 'oneOf'].includes(e.keyword)
-            );
-
-            // 2. Map AJV errors into detailed, contextual strings
-            const formattedMessages = targetErrors.map((e) => {
-                const path = e.instancePath || '/root';
-
-                switch (e.keyword) {
-                    case 'const': {
-                        const expected = JSON.stringify(e.params.allowedValue);
-                        return `${path}: must be equal to constant ${expected}`;
-                    }
-                    case 'enum': {
-                        const allowed = (e.params.allowedValues as unknown[])
-                            .map((v) => JSON.stringify(v))
-                            .join(', ');
-                        return `${path}: must be one of [${allowed}]`;
-                    }
-                    case 'additionalProperties': {
-                        return `${path}: unknown property "${e.params.additionalProperty}" is not allowed`;
-                    }
-                    case 'required': {
-                        return `${path}: missing required property "${e.params.missingProperty}"`;
-                    }
-                    default:
-                        return `${path}: ${e.message}`;
-                }
-            });
-
-            // 3. Deduplicate and throw formatted error list
-            const uniqueErrors = Array.from(new Set(formattedMessages));
-            throw new Error(`\n- ${uniqueErrors.join('\n- ')}`);
-        }
-    }
     public getSchemaElement(id: string) {
         // if (!id || id === "root") return this.uiSchema
         return this.flatElementList[id]
@@ -462,7 +343,7 @@ export class UIComponent extends LitElement {
         layoutSchema: UISchemaLayoutElement,
         inheritReadOnly = false,
         cardinality = '1',
-        parentCardinality?: '1' | 'N'
+        parentCardinality?: '1' | 'N',
     ): UILayout {
         if (this.layouts.hasOwnProperty(layoutElementId)) {
             return this.layouts[layoutElementId]
@@ -540,7 +421,7 @@ export class UIComponent extends LitElement {
         id: string,
         elementDefinition: UISchemaUIElements,
         parentLayout: UILayout,
-        dataContext: RenderContextDataContext
+        dataContext: RenderContextDataContext,
     ) {
         try {
             if (!this.uiElementFactory) {
@@ -559,7 +440,10 @@ export class UIComponent extends LitElement {
             return uiElementClass.render(renderContext, id)
         } catch (e) {
             console.error(`Exception in UIComponent.renderUIElement: ${e as string}`)
-            return html` ${elementDefinition.element_type} "${id}": ${e} `
+            return html`
+                <div style="border: 2px dashed red">${elementDefinition.element_type} "${id}":
+                    ${e}
+                </div>`
         }
     }
 
@@ -567,7 +451,7 @@ export class UIComponent extends LitElement {
         id: string,
         elementDefinition: UISchemaUIElements,
         parentLayout: UILayout,
-        dataContext: RenderContextDataContext
+        dataContext: RenderContextDataContext,
     ) {
         switch (elementDefinition.element_type) {
             case 'layout':
@@ -577,21 +461,10 @@ export class UIComponent extends LitElement {
         }
     }
 
-    public getPaddingStyle(padding?: string | number | UISchemaLayoutPadding) {
-        let style = ''
-        if (typeof padding === 'number') {
-            style = `padding: ${padding}px`
-        } else if (typeof padding === 'string') {
-            style = `padding: ${padding}`
-        } else if (padding) {
-            style = `padding: ${(<UISchemaLayoutPadding>padding).top} ${(<UISchemaLayoutPadding>padding).right} ${(<UISchemaLayoutPadding>padding).bottom} ${(<UISchemaLayoutPadding>padding).left}`
-        }
-        return style
-    }
 
     private onRerenderRequest = (event: Event) => {
         const uiRenderBoundary: UIRenderBoundary = event.currentTarget as UIRenderBoundary
-        if (uiRenderBoundary && uiRenderBoundary.tagName === "UI-RENDER-BOUNDARY") {
+        if (uiRenderBoundary && uiRenderBoundary.tagName === 'UI-RENDER-BOUNDARY') {
             uiRenderBoundary.requestUpdate()
         } else {
             this.requestUpdate()
@@ -603,15 +476,15 @@ export class UIComponent extends LitElement {
         id: string,
         layoutDefinition: UISchemaLayoutElement,
         parentLayout: UILayout,
-        dataContext: RenderContextDataContext
+        dataContext: RenderContextDataContext,
     ): TemplateResult {
         let elementLayout
         try {
             elementLayout = this.getLayout(
                 id,
                 layoutDefinition,
-                parentLayout.layoutDefinition.readonly,undefined,
-                parentLayout.cardinality
+                parentLayout.layoutDefinition.readonly, undefined,
+                parentLayout.cardinality,
             )
 
         } catch (e) {
@@ -623,13 +496,13 @@ export class UIComponent extends LitElement {
         const layoutRenderContext = new UILayoutRenderContext(this, layoutDefinition, dataContext, parentLayout)
 // Wrap the render output inside a boundary component
         return html`
-        <ui-render-boundary @rerender-request="${this.onRerenderRequest}"
-            .renderContent=${() => elementLayout.renderLayout(
-                    id,
-                    layoutRenderContext,
-                    this.renderElement.bind(this))
-            }>
-        </ui-render-boundary>
+            <ui-render-boundary @rerender-request="${this.onRerenderRequest}"
+                                .renderContent=${() => elementLayout.renderLayout(
+                                        id,
+                                        layoutRenderContext,
+                                        this.renderElement.bind(this))
+                                }>
+            </ui-render-boundary>
         `
     }
 
@@ -656,7 +529,8 @@ export class UIComponent extends LitElement {
     protected renderRootLayout(layout: UILayout) {
         //todo: There must be a proper datacontext here for the root layout:
         // The root layout could simply be a "1" type and connect to the current record of the dataprovider
-        const layoutRenderContext = new UILayoutRenderContext(this, layout.layoutDefinition,{recordIndex: -1}, undefined)
+        const layoutRenderContext = new UILayoutRenderContext(this, layout.layoutDefinition, { recordIndex: this.dataProvider?.getActiveRecordIndex() ?? -1 }, undefined)
+
         return layout.renderLayout('root', layoutRenderContext, this.renderElement.bind(this))
     }
 
@@ -666,7 +540,7 @@ export class UIComponent extends LitElement {
     }
 
     protected render() {
-        console.log("ui component rerender")
+        console.log('ui component rerender')
         // noinspection JSMismatchedCollectionQueryUpdate
         const itemTemplates: TemplateResult[] = []
         let rootLayout

@@ -50,6 +50,7 @@
     "@types/node": "catalog:",
     "bumpp": "catalog:",
     "typedoc-plugin-markdown": "catalog:",
+    "typedoc-plugin-frontmatter": "catalog:",
     "typedoc-vitepress-theme": "catalog:",
     "typescript": "catalog:",
     "vite-plus": "catalog:",

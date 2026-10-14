@@ -28,28 +28,28 @@ export class ConcreteDataProvider extends BufferedDataProvider implements UIComp
         return match ? match[1] ?? "" : null;
     }
 
-    public resolve(valueExpression: string | Array<string|undefined>, _?: string, recordIndex?: number): unknown {
-        let valueExpressions = (typeof(valueExpression) === "string")?[valueExpression]:valueExpression
+    public resolve(valueExpression: unknown | Array<unknown|undefined>, _?: string, recordIndex?: number): unknown {
+        let valueExpressions = Array.isArray(valueExpression)?valueExpression:[valueExpression]
         let result: unknown[] = []
         let record: undefined | MyDataRecord = recordIndex === undefined ? undefined : this.getRecord(recordIndex, true) as MyDataRecord | undefined
 
         for (const toResolve of valueExpressions) {
-            const expression = this.getSingleExpressionContent(toResolve??"")
-            if (!expression) {
-                result.push(toResolve)
-                continue
-            }
-            if (record) {
-                if (expression in record) {
-                    result.push( `${record[expression]}`)
+                const expression = typeof(toResolve) === "string" ? this.getSingleExpressionContent(toResolve??"") : undefined
+                if (!expression) {
+                    result.push(toResolve)
                     continue
-                } else {
-                    console.log(`unknown expression ${expression} in record`, record)
                 }
-            }
-            result.push( undefined)
+                if (record) {
+                    if (expression in record) {
+                        result.push( `${record[expression]}`)
+                        continue
+                    } else {
+                        console.log(`unknown expression ${expression} in record`, record)
+                    }
+                }
+                result.push( undefined)
         }
-        return (typeof(valueExpression) === "string")?result[0]:result
+        return Array.isArray(valueExpression)?result:result[0]
     }
 
     constructor(pageSize = 50, cacheCapacity = 10) {

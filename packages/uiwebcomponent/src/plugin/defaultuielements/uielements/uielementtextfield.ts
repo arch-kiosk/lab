@@ -1,163 +1,196 @@
 import { UIElement } from '#src/uielement'
 import { nothing, html } from 'lit'
-import { UISchemaTextField, UISchemaBoundUIElement } from '#src/uischema'
+import { styleMap } from 'lit/directives/style-map.js'
+
+import {
+    UISchemaTextField,
+
+} from '#src/uischema'
 import { UIElementRenderContext } from '#src/uielementrendercontext'
+import { TemplateResultOrNothing } from '#src/sharedtypes'
 
 export class UIElementTextField extends UIElement {
-    static renderLabel(context: UIElementRenderContext, id: string, text: string, errorState=false) {
-        return context.parentLayout?.renderElementLabels
-            ? html`
-                  <label for="${context.getScopedId(id)}" style="${errorState?'color: red':nothing}"
-                      >${text ? text : nothing}
-                      ${this.devInfo(
-                          context,
-                          context.elementDefinition.text,
-                          context.elementDefinition.value,
-                      )}
-                  </label>
-              `
-            : this.devInfo(context, context.elementDefinition.text, context.elementDefinition.value)
+
+    static renderSkeleton(context: UIElementRenderContext, id: string) {
+        return this.renderElement(context, id, true)
     }
 
-    static render(context: UIElementRenderContext, id: string) {
+    static checkElementDefinition(context: UIElementRenderContext): UISchemaTextField {
         if (!context.parentLayout)
             throw 'UIElementTextField.render: render context is missing parentLayout'
-        try {
-            let resolvedValues = this.batchResolve(
-                context, [
-                    context.elementDefinition.value,
-                    context.elementDefinition.text],
-                id) as Array<string|undefined>
-            let value = resolvedValues[0]
-            let maskedValue = null
+        if (context.elementDefinition.element_type !== 'text_field')
+            throw `'UIElementTextField.render: render called with wrong element type ${context.elementDefinition.element_type}`
+        return context.elementDefinition
+    }
 
-            if (!this.isVisible(context, value, id)) {
-                if (id.startsWith("uid")) console.error(`  textfield ${context.getScopedId(id)} not visible anymore`)
-                return html`${nothing}`
-            }
-            const validationInfo = context.getFieldValidationInfo(id)
-            let errState = Boolean(validationInfo && validationInfo.find((v) => v.result === "error"))
-
-            if (id.startsWith("uid")) console.error(`  textfield ${context.getScopedId(id)} still visible`)
-            let text = resolvedValues[1]!
-            let htmlClass = this.getStyleSetting(
-                context.elementDefinition,
-                'classes',
-                '',
-            )
-            let cssStyle = this.addStyle(
-                '',
-                this.getStyleTextAlign(context.elementDefinition.element_type),
-            )
-            let isIdentifier = this.isIdentifier(context)
-            if (context.elementDefinition.layout?.max_height) {
-                cssStyle = this.addStyle(
-                    cssStyle,
-                    `max-height: ${context.elementDefinition.layout.max_height === 'max' ? 'none' : context.elementDefinition.layout.max_height + 'em'}`,
-                )
-            }
-            if (this.isIdentifier(context)) {
-                htmlClass = (htmlClass ? ' ' : '') + 'identifier-link'
-            }
-            if (this.maskIdentifier(context)) {
-                maskedValue = this.resolve(context, this.maskIdentifier(context), id)
-            }
-            if (errState) {
-                cssStyle = this.addStyle(
-                    cssStyle,
-                    `border: 1px dotted red`,
-                )
-            }
-            if (context.elementDefinition.max_characters) {
-                if (
-                    typeof value === 'string' &&
-                    value.length > context.elementDefinition.max_characters
-                ) {
-                    value =
-                        value
-                            .slice(0, context.elementDefinition.max_characters)
-                            .trim()
-                            .split(' ')
-                            .slice(0, -1)
-                            .join(' ') + '..'
-                    console.log('value', value)
-                }
-            }
-            if ((context.elementDefinition as UISchemaTextField).multiline) {
-                if (typeof value === 'string') {
-                    value = value.replaceAll('\r\n', '\n')
-                    value = value.replaceAll('\r', '\n')
-                }
-                if (!context.elementDefinition.enabled || (context.elementDefinition as UISchemaBoundUIElement).readonly) {
-                    return context.parentLayout.renderElement(
-                        context.elementDefinition.layout,
-                        html`
-                            ${this.renderLabel(context, id, text, errState)}
-                            <div
-                                    style="${cssStyle ? cssStyle : nothing}"
-                                    id="${context.getScopedId(id)}"
-                                    class="multiline-textarea read-only-textarea ${htmlClass}">
-                                ${value || nothing}
-                            </div>
-                        `,
-                    )
-                } else {
-                    return context.parentLayout.renderElement(
-                        context.elementDefinition.layout,
-                        html`
-                            ${this.renderLabel(context, id, text, errState)}
-                            <textarea
-                                    id=${context.getScopedId(id)}
-                                    class="${htmlClass}"
-                                    style="${cssStyle ? cssStyle : nothing}">
-                                ${value || nothing}
-                            </textarea>
-                        `,
-                    )
-                }
-            } else {
-                if (!context.elementDefinition.enabled || (context.elementDefinition as UISchemaBoundUIElement).readonly) {
-                    return context.parentLayout.renderElement(
-                        context.elementDefinition.layout,
-                        html`
-                            ${this.renderLabel(context, id, text, errState)}
-                            <div
-                                style="${cssStyle ? cssStyle : nothing}"
-                                id=${context.getScopedId(id)}
-                                class="read-only-textarea ${htmlClass}"
-                                data-identifier="${isIdentifier ? value : nothing}"
-                                @click="${isIdentifier
-                                    ? context.uicomponent.gotoIdentifier
-                                    : nothing}">
-                                <span>${isIdentifier
-                                        ? html`<i class="footsteps"></i>`
-                                        : nothing}${isIdentifier && maskedValue
-                                        ? maskedValue || nothing
-                                        : html`${value || nothing}`}
-                                </span>
-                            </div>
-                        `,
-                    )
-                } else {
-                    return context.parentLayout.renderElement(
-                        context.elementDefinition.layout,
-                        html`
-                            ${this.renderLabel(context, id, text, errState)}
-                            <input
-                                id=${context.getScopedId(id)}
-                                type="text"
-                                class="${htmlClass}"
-                                style="${cssStyle ? cssStyle : nothing}"
-                                value="${value || nothing}"
-                                ?disabled=${!context.elementDefinition.enabled ||
-                                (context.elementDefinition as UISchemaBoundUIElement).readonly}/>
-                        `,
-                    )
-                }
-            }
-        } catch (e) {
-            console.error(`textfield.render: ${e as string} with context`, context)
-            throw e
+    static getValidationInfo(context: UIElementRenderContext, id: string) {
+        const validationInfo = {
+            hasError: false,
+            results: context.getFieldValidationInfo(id),
         }
+        validationInfo.hasError = Boolean(
+            validationInfo.results
+            && validationInfo.results.find((v) => v.result === 'error'),
+        )
+        return validationInfo
+    }
+
+    static renderElement(context: UIElementRenderContext, id: string, skeleton = false): TemplateResultOrNothing {
+
+        /* ============================================
+           First of all: prepare what is needed for the rendering part
+           ============================================ */
+
+        const elementDefinition = this.checkElementDefinition(context)
+        const parentLayout = context.parentLayout!
+
+        let [value, text] = this.batchResolve(
+            context,
+            [elementDefinition.value, elementDefinition.text],
+            id
+        ) as [string | undefined, string]
+
+        if (!this.isVisible(context, id, value)) {
+            return nothing
+        }
+
+        const validationInfo = skeleton ? undefined : this.getValidationInfo(context, id)
+
+        const cssClasses = this.getCSSClasses(context, elementDefinition.style?.css_classes)
+
+        const cssStyles = this.getCSSStyles(context, elementDefinition.style?.css_styles)
+
+        const isIdentifier = this.isIdentifier(context)
+
+        if (isIdentifier) {
+            cssClasses.push('identifier-link')
+        }
+
+        if (skeleton) {
+            cssClasses.push('skeleton')
+        }
+
+        const maskIdentifier = this.maskIdentifier(context, elementDefinition.display_identifier)
+        const maskedValue = maskIdentifier? this.resolve(context, maskIdentifier, id) : null
+
+        if (validationInfo?.hasError) {
+            cssStyles["border"] = "1px dotted red"
+        }
+
+        if (
+            elementDefinition.ellipsis?.max_characters &&
+            typeof value === 'string' &&
+            value.length > elementDefinition.ellipsis.max_characters
+        ) {
+            value = value.slice(0, Math.max(0, elementDefinition.ellipsis.max_characters - 2)) + '..'
+        }
+
+        parentLayout.adjustElementStyles({
+                cssClasses: cssClasses,
+                cssStyles: cssStyles
+            },
+        )
+
+        const isReadOnly =
+            !(elementDefinition.enabled ?? true) ||
+            (elementDefinition.readonly ?? false) ||
+            skeleton
+
+        /* ============================================
+            Enough preparation, let's render.
+        ============================================ */
+
+        if (elementDefinition.multiline && isReadOnly) {
+            //todo: I don't like this in the ui-component. The dataprovider must do this if necessary
+            //if (typeof value === 'string') {
+            //     value = value.replaceAll('\r\n', '\n')
+            //     value = value.replaceAll('\r', '\n')
+            // }
+                cssClasses.push("multiline-textarea", "read-only-textarea")
+                return parentLayout.renderElement(
+                    elementDefinition,
+                    {
+                        cssClasses: cssClasses,
+                        cssStyles: cssStyles
+                    },
+                    (erc) => html`
+                        ${parentLayout.renderLabel(context, id, text, validationInfo?.hasError)}
+                        <div
+                                style=${styleMap(erc.cssStyles)}
+                                id=${context.getScopedId(id)}
+                                class=${erc.cssClasses.join(' ')}
+                        >
+                            ${value || nothing}
+                        </div>
+                    `,
+                )
+            }
+
+        if (elementDefinition.multiline && !isReadOnly) {
+            return parentLayout.renderElement(
+                elementDefinition,
+                {
+                    cssClasses: cssClasses,
+                    cssStyles: cssStyles
+                },
+                (erc) => html`
+                    ${parentLayout.renderLabel(context, id, text, validationInfo?.hasError)}
+                    <textarea
+                        id=${context.getScopedId(id)}
+                        class=${erc.cssClasses.join(' ')}
+                        style=${styleMap(erc.cssStyles)}
+                    >${value ?? ''}</textarea>
+                `,
+            )
+        }
+
+        // read-only input field (not a multiline)
+        if (!elementDefinition.multiline && isReadOnly) {
+            return parentLayout.renderElement(
+                elementDefinition,
+                {
+                    cssClasses: cssClasses,
+                    cssStyles: cssStyles
+                },
+                (erc) => html`
+                    ${parentLayout.renderLabel(context, id, text, validationInfo?.hasError)}
+                    <div
+                            style=${erc.cssStyles.length?styleMap(erc.cssStyles):nothing}
+                            id=${context.getScopedId(id)}
+                            class="read-only-textarea ${erc.cssClasses.join(" ")}"
+                            data-identifier=${isIdentifier ? value : nothing}
+                            @click=${isIdentifier
+                                    ? context.uicomponent.gotoIdentifier
+                                    : nothing}
+                    >
+                            <span>${isIdentifier
+                                    ? html`<i class="footsteps"></i>`
+                                    : nothing}${isIdentifier && maskedValue
+                                    ? maskedValue || nothing
+                                    : html`${value || nothing}`}
+                            </span>
+                    </div>`
+            )
+        }
+
+        // normal, active input field
+        return parentLayout.renderElement(
+            elementDefinition,
+            {
+                cssClasses: cssClasses,
+                cssStyles: cssStyles
+            },
+            (erc) => html`
+                ${parentLayout.renderLabel(context, id, text, validationInfo?.hasError)}
+                <input
+                        id=${context.getScopedId(id)}
+                        type="text"
+                        class=${erc.cssClasses.join(' ')}
+                        style=${styleMap(erc.cssStyles)}
+                        value=${value ?? ''}
+                        ?disabled=${!(elementDefinition.enabled ?? true) ||
+                        elementDefinition.readonly}/>
+            `,
+        )
     }
 }

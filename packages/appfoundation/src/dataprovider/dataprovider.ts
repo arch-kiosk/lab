@@ -53,6 +53,10 @@ export abstract class DataProviderBasis implements DataProvider {
   abstract deleteRecords(uids: string[]): Promise<void>
   abstract dataChanged(recordIndex: number, fieldId: string, value: unknown): void
 
+  public getActiveRecordIndex() {
+    return this.activeRecordIndex
+  }
+
   public constructor(pageSize = 50, cacheCapacity = 10) {
     this.pageSize = pageSize
     this.pageCache = new LruPageCache(cacheCapacity)

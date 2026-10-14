@@ -7,9 +7,13 @@ import { VirtualScrollContainerDataProvider } from '@arch-kiosk/appfoundation/da
 import { ComboBoxDataProviderParams } from '@vaadin/combo-box'
 import { ComboBoxDataProviderCallback } from '@vaadin/combo-box/src/vaadin-combo-box-data-provider-mixin'
 import { UILayout } from '#src/layouts/uilayout'
-import { TemplateResult } from 'lit'
+import { nothing, TemplateResult } from 'lit'
 import { RenderContextDataContext } from '#src/uielementrendercontext'
 import { DataProviderValidationResult } from '@arch-kiosk/appfoundation/dataprovider'
+
+export function assertExists<T>(val: T | null | undefined, msg = "Value missing"): asserts val is T {
+    if (val == null) throw new Error(msg);
+}
 
 export declare interface ApiTimeZoneInfo {
     tz_index: number
@@ -17,6 +21,8 @@ export declare interface ApiTimeZoneInfo {
     tz_IANA: string
     deprecated: boolean
 }
+
+export type TemplateResultOrNothing = TemplateResult | typeof nothing
 
 export interface UIComponentDataProvider extends VirtualScrollContainerDataProvider {
     resolve(expression?: string | Array<string|undefined>, id?: string, recordIndex?: number): unknown
@@ -64,7 +70,7 @@ export type UIElementRenderer = (
     elementDefinition: UISchemaUIElements,
     parentLayout: UILayout,
     dataContext: RenderContextDataContext
-) => TemplateResult
+) => TemplateResultOrNothing
 // export declare interface UISchemaUIElements {
 //     [key: string]: UISchemaUIElement
 // }

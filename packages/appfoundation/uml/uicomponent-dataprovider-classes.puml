@@ -7,6 +7,7 @@ namespace VirtualScrollContainer {
         +getRecord(index,bufferedOnly,notify)
         +getRecordState(uid)
         +setActiveRecord(index)
+        +getActiveRecordIndex()
         +dataChanged(recordIndex, fieldId, value)
     }
 

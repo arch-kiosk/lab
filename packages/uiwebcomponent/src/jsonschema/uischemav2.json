@@ -2,14 +2,20 @@
   "$ref": "#/definitions/UISchema",
   "$schema": "http://json-schema.org/draft-07/schema#",
   "definitions": {
-    "Dictionary<UISchemaUIElements>": {
+    "Dictionary<UISchemaElementOnLayout<\"columns\">>": {
       "additionalProperties": {
-        "$ref": "#/definitions/UISchemaUIElements"
+        "$ref": "#/definitions/UISchemaElementOnLayout%3C%22columns%22%3E"
+      },
+      "type": "object"
+    },
+    "Dictionary<UISchemaElementOnLayout<\"scroll\">>": {
+      "additionalProperties": {
+        "$ref": "#/definitions/UISchemaElementOnLayout%3C%22scroll%22%3E"
       },
       "type": "object"
     },
     "InterpretedExpression": {
-      "description": "And expression that needs to be interpreted first",
+      "description": "And expression that needs to be interpreted first. How it gets interpreted and what syntax it would have to follow is entirely up to the components host. This will simply be piped through to the data provider's resolve() method as is",
       "type": "string"
     },
     "NumberOrString": {
@@ -24,11 +30,11 @@
       "properties": {
         "data_binding": {
           "$ref": "#/definitions/UISchemaDataBindingSettings",
-          "description": "describes the data source and how the ui is interacting with it"
+          "description": "mandatory. describes the data source and how the ui is interacting with it"
         },
         "dsd": {
           "$ref": "#/definitions/UISchemaDSDDict",
-          "description": "data set definition for database-bound elements within the definition. This is not being directly used by the ui component but it serves as contextual data that might be used by the host of the layout"
+          "description": "Optional data set definition for database-bound elements within the definition. This is not being directly used by the ui component but it serves as contextual data that might be used by the host of the layout"
         },
         "header": {
           "$ref": "#/definitions/UISchemaHeaderDictV2",
@@ -36,7 +42,7 @@
         },
         "meta": {
           "$ref": "#/definitions/UISchemaMetaSettings",
-          "description": "additional information used by diverse parties processing the schema. Not rendered within the ui but informing the context within which the schema is being interpreted or even rendered."
+          "description": "Optional information used by a variety of processes using the schema. Not rendered within the ui but informing the context within which the schema is being interpreted or even rendered."
         },
         "root": {
           "$ref": "#/definitions/UISchemaUIRootLayoutElement",
@@ -50,191 +56,6 @@
       ],
       "type": "object"
     },
-    "UISchemaBoolField": {
-      "additionalProperties": false,
-      "properties": {
-        "binding": {
-          "$ref": "#/definitions/UISchemaUIElementBinding"
-        },
-        "element_type": {
-          "const": "bool",
-          "type": "string"
-        },
-        "enabled": {
-          "anyOf": [
-            {
-              "$ref": "#/definitions/InterpretedExpression"
-            },
-            {
-              "type": "boolean"
-            }
-          ]
-        },
-        "layout": {
-          "$ref": "#/definitions/UISchemaUIElementElementLayout",
-          "description": "positioning, spatial dimensions and positioning - how the element interacts on the layout"
-        },
-        "readonly": {
-          "type": "boolean"
-        },
-        "style": {
-          "$ref": "#/definitions/UISchemaUIElementStyleBasics",
-          "description": "how the element itself appears"
-        },
-        "text": {
-          "$ref": "#/definitions/InterpretedExpression"
-        },
-        "value": {
-          "$ref": "#/definitions/InterpretedExpression"
-        },
-        "visible": {
-          "anyOf": [
-            {
-              "$ref": "#/definitions/InterpretedExpression"
-            },
-            {
-              "type": "boolean"
-            }
-          ]
-        }
-      },
-      "required": [
-        "element_type"
-      ],
-      "type": "object"
-    },
-    "UISchemaButton": {
-      "additionalProperties": false,
-      "properties": {
-        "button_type": {
-          "enum": [
-            "okButton",
-            "cancelButton",
-            "iconButton"
-          ],
-          "type": "string"
-        },
-        "default": {
-          "enum": [
-            "ENTER",
-            "CANCEL"
-          ],
-          "type": "string"
-        },
-        "element_type": {
-          "const": "button",
-          "type": "string"
-        },
-        "enabled": {
-          "anyOf": [
-            {
-              "$ref": "#/definitions/InterpretedExpression"
-            },
-            {
-              "type": "boolean"
-            }
-          ]
-        },
-        "icon": {
-          "$ref": "#/definitions/InterpretedExpression"
-        },
-        "layout": {
-          "$ref": "#/definitions/UISchemaUIElementElementLayout",
-          "description": "positioning, spatial dimensions and positioning - how the element interacts on the layout"
-        },
-        "style": {
-          "$ref": "#/definitions/UISchemaUIElementStyleBasics",
-          "description": "how the element itself appears"
-        },
-        "text": {
-          "$ref": "#/definitions/InterpretedExpression"
-        },
-        "value": {
-          "$ref": "#/definitions/InterpretedExpression"
-        },
-        "visible": {
-          "anyOf": [
-            {
-              "$ref": "#/definitions/InterpretedExpression"
-            },
-            {
-              "type": "boolean"
-            }
-          ]
-        }
-      },
-      "required": [
-        "element_type"
-      ],
-      "type": "object"
-    },
-    "UISchemaComboBox": {
-      "additionalProperties": false,
-      "properties": {
-        "binding": {
-          "$ref": "#/definitions/UISchemaUIElementBinding"
-        },
-        "element_type": {
-          "const": "selection",
-          "type": "string"
-        },
-        "enabled": {
-          "anyOf": [
-            {
-              "$ref": "#/definitions/InterpretedExpression"
-            },
-            {
-              "type": "boolean"
-            }
-          ]
-        },
-        "items": {
-          "anyOf": [
-            {
-              "items": {
-                "type": "string"
-              },
-              "type": "array"
-            },
-            {
-              "$ref": "#/definitions/UISchemaLookupSettings"
-            }
-          ]
-        },
-        "layout": {
-          "$ref": "#/definitions/UISchemaUIElementElementLayout",
-          "description": "positioning, spatial dimensions and positioning - how the element interacts on the layout"
-        },
-        "readonly": {
-          "type": "boolean"
-        },
-        "style": {
-          "$ref": "#/definitions/UISchemaUIElementStyleBasics",
-          "description": "how the element itself appears"
-        },
-        "text": {
-          "$ref": "#/definitions/InterpretedExpression"
-        },
-        "value": {
-          "$ref": "#/definitions/InterpretedExpression"
-        },
-        "visible": {
-          "anyOf": [
-            {
-              "$ref": "#/definitions/InterpretedExpression"
-            },
-            {
-              "type": "boolean"
-            }
-          ]
-        }
-      },
-      "required": [
-        "element_type",
-        "items"
-      ],
-      "type": "object"
-    },
     "UISchemaDSDDict": {
       "additionalProperties": {
         "items": {
@@ -242,10 +63,11 @@
         },
         "type": "array"
       },
+      "description": "Data set definition for database-bound elements within the definition. This is not being directly used by the ui component but it serves as contextual data that might be used by the host of the layout",
       "type": "object"
     },
     "UISchemaDataBindingCardinalities": {
-      "description": "describes the data source and how the ui is interacting with it",
+      "description": "\"1\" means the data source provides only one row, N that there are multiple rows",
       "enum": [
         "1",
         "N"
@@ -257,71 +79,11 @@
       "description": "describes the data source and how the ui is interacting with it",
       "properties": {
         "cardinality": {
-          "$ref": "#/definitions/UISchemaDataBindingCardinalities",
-          "description": "\"1\" means the data source provides only one row, N that there are multiple rows"
+          "$ref": "#/definitions/UISchemaDataBindingCardinalities"
         }
       },
       "required": [
         "cardinality"
-      ],
-      "type": "object"
-    },
-    "UISchemaDateTimeField": {
-      "additionalProperties": false,
-      "properties": {
-        "binding": {
-          "$ref": "#/definitions/UISchemaUIElementBinding"
-        },
-        "date_format": {
-          "type": "string"
-        },
-        "element_type": {
-          "const": "date_time_field",
-          "type": "string"
-        },
-        "enabled": {
-          "anyOf": [
-            {
-              "$ref": "#/definitions/InterpretedExpression"
-            },
-            {
-              "type": "boolean"
-            }
-          ]
-        },
-        "include_time": {
-          "type": "boolean"
-        },
-        "layout": {
-          "$ref": "#/definitions/UISchemaUIElementElementLayout",
-          "description": "positioning, spatial dimensions and positioning - how the element interacts on the layout"
-        },
-        "readonly": {
-          "type": "boolean"
-        },
-        "style": {
-          "$ref": "#/definitions/UISchemaUIElementStyleBasics",
-          "description": "how the element itself appears"
-        },
-        "text": {
-          "$ref": "#/definitions/InterpretedExpression"
-        },
-        "value": {
-          "$ref": "#/definitions/InterpretedExpression"
-        },
-        "visible": {
-          "anyOf": [
-            {
-              "$ref": "#/definitions/InterpretedExpression"
-            },
-            {
-              "type": "boolean"
-            }
-          ]
-        }
-      },
-      "required": [
-        "element_type"
       ],
       "type": "object"
     },
@@ -338,82 +100,1067 @@
       ],
       "type": "object"
     },
-    "UISchemaFile": {
-      "additionalProperties": false,
-      "properties": {
-        "align_image": {
-          "enum": [
-            "center",
-            "left"
-          ],
-          "type": "string"
-        },
-        "alternate_description": {
-          "type": "string"
-        },
-        "element_type": {
-          "const": "file",
-          "type": "string"
-        },
-        "enabled": {
-          "anyOf": [
-            {
-              "$ref": "#/definitions/InterpretedExpression"
-            },
-            {
-              "type": "boolean"
+    "UISchemaElementOnLayout<\"columns\">": {
+      "anyOf": [
+        {
+          "properties": {
+            "layout": {
+              "$ref": "#/definitions/UISchemaUIElementElementInColumnsLayout"
             }
-          ]
+          },
+          "type": "object"
         },
-        "file_description": {
-          "enum": [
-            "right",
-            "bottom",
-            "none"
-          ],
-          "type": "string"
-        },
-        "fit_content": {
-          "enum": [
-            "contain",
-            "fit",
-            "scale"
-          ],
-          "type": "string"
-        },
-        "layout": {
-          "$ref": "#/definitions/UISchemaUIElementElementLayout",
-          "description": "positioning, spatial dimensions and positioning - how the element interacts on the layout"
-        },
-        "resolution": {
-          "type": "string"
-        },
-        "style": {
-          "$ref": "#/definitions/UISchemaUIElementStyleBasics",
-          "description": "how the element itself appears"
-        },
-        "text": {
-          "$ref": "#/definitions/InterpretedExpression"
-        },
-        "value": {
-          "$ref": "#/definitions/InterpretedExpression"
-        },
-        "visible": {
-          "anyOf": [
-            {
-              "$ref": "#/definitions/InterpretedExpression"
+        {
+          "additionalProperties": false,
+          "properties": {
+            "button_type": {
+              "description": "the type of button determines the appearance",
+              "enum": [
+                "okButton",
+                "cancelButton",
+                "iconButton"
+              ],
+              "type": "string"
             },
-            {
-              "type": "boolean"
+            "default": {
+              "description": "optional setting that controls if a button is triggered when a user confirms or cancels by any other means than pressing the button. E.g. and most common if the user presses ENTER or the ESC (CANCEL) on the keyboard while within the button's layout bounds.",
+              "enum": [
+                "ENTER",
+                "CANCEL"
+              ],
+              "type": "string"
+            },
+            "element_type": {
+              "const": "button",
+              "type": "string"
+            },
+            "icon": {
+              "$ref": "#/definitions/InterpretedExpression",
+              "description": "for type iconButton: The icon, which must resolve to a FontAwesome icon code."
+            },
+            "layout": {
+              "$ref": "#/definitions/UISchemaUIElementElementInColumnsLayout"
+            },
+            "style": {
+              "$ref": "#/definitions/UISchemaUIElementStyleBasics",
+              "description": "optional visual design - how the element itself appears"
+            },
+            "text": {
+              "$ref": "#/definitions/InterpretedExpression",
+              "description": "optional. the text for the label or name of the field on the ui"
+            },
+            "value": {
+              "$ref": "#/definitions/InterpretedExpression",
+              "description": "optional. the expression that defines what value is being displayed in the input part of the element"
+            },
+            "visible": {
+              "anyOf": [
+                {
+                  "$ref": "#/definitions/InterpretedExpression"
+                },
+                {
+                  "type": "boolean"
+                }
+              ],
+              "description": "optional. Determines if the element is visible. Defaults to a layout setting or true."
             }
-          ]
+          },
+          "required": [
+            "element_type"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "binding": {
+              "$ref": "#/definitions/UISchemaUIElementBinding",
+              "description": "binding to the data"
+            },
+            "display_identifier": {
+              "$ref": "#/definitions/UISchemaIdentifierDisplay",
+              "description": "Defines that the value represents an identifier.\n\nEither simply boolean `true` or a  {@link  UISchemaIdentifierDisplay }  section that allows masking. If absent, the value is not rendered or treated as an identifier."
+            },
+            "element_type": {
+              "const": "text_field",
+              "type": "string"
+            },
+            "ellipsis": {
+              "$ref": "#/definitions/UISchemaDisplayEllipsis",
+              "description": "settings to limit the text length"
+            },
+            "enabled": {
+              "anyOf": [
+                {
+                  "$ref": "#/definitions/InterpretedExpression"
+                },
+                {
+                  "type": "boolean"
+                }
+              ],
+              "description": "optional. Determines if a field can be navigated to (receive the focus). Default is true."
+            },
+            "layout": {
+              "$ref": "#/definitions/UISchemaUIElementElementInColumnsLayout"
+            },
+            "multiline": {
+              "description": "is this a multiline field, so should line feeds or carriage returns be accepted?",
+              "type": "boolean"
+            },
+            "readonly": {
+              "description": "optional. Determines if a field takes inputs right now. The element might still receive the caret or focus (unlike enabled=false elements), you just cannot change the value. but you might e.g. be able to copy the input value onto the clipboard. Default is false.",
+              "type": "boolean"
+            },
+            "style": {
+              "$ref": "#/definitions/UISchemaUIElementStyleBasics",
+              "description": "optional visual design - how the element itself appears"
+            },
+            "text": {
+              "$ref": "#/definitions/InterpretedExpression",
+              "description": "optional. the text for the label or name of the field on the ui"
+            },
+            "value": {
+              "$ref": "#/definitions/InterpretedExpression",
+              "description": "optional. the expression that defines what value is being displayed in the input part of the element"
+            },
+            "visible": {
+              "anyOf": [
+                {
+                  "const": ".",
+                  "type": "string"
+                },
+                {
+                  "type": "boolean"
+                },
+                {
+                  "$ref": "#/definitions/InterpretedExpression"
+                }
+              ],
+              "description": "Determines if the element will show at all on the layout. The default depends on the layout's default setting  {@link  UISchemaLayoutElement } .\n\n- Use `\".\"` to make this dependent on whether there is a value to display (no value -> element vanishes).\n- Use an  {@link  InterpretedExpression }  that the host can resolve to a boolean result."
+            }
+          },
+          "required": [
+            "binding",
+            "element_type"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "binding": {
+              "$ref": "#/definitions/UISchemaUIElementBinding",
+              "description": "binding to the data"
+            },
+            "date_format": {
+              "type": "string"
+            },
+            "element_type": {
+              "const": "date_time_field",
+              "type": "string"
+            },
+            "enabled": {
+              "anyOf": [
+                {
+                  "$ref": "#/definitions/InterpretedExpression"
+                },
+                {
+                  "type": "boolean"
+                }
+              ],
+              "description": "optional. Determines if a field can be navigated to (receive the focus). Default is true."
+            },
+            "include_time": {
+              "type": "boolean"
+            },
+            "layout": {
+              "$ref": "#/definitions/UISchemaUIElementElementInColumnsLayout"
+            },
+            "readonly": {
+              "description": "optional. Determines if a field takes inputs right now. The element might still receive the caret or focus (unlike enabled=false elements), you just cannot change the value. but you might e.g. be able to copy the input value onto the clipboard. Default is false.",
+              "type": "boolean"
+            },
+            "style": {
+              "$ref": "#/definitions/UISchemaUIElementStyleBasics",
+              "description": "optional visual design - how the element itself appears"
+            },
+            "text": {
+              "$ref": "#/definitions/InterpretedExpression",
+              "description": "optional. the text for the label or name of the field on the ui"
+            },
+            "value": {
+              "$ref": "#/definitions/InterpretedExpression",
+              "description": "optional. the expression that defines what value is being displayed in the input part of the element"
+            },
+            "visible": {
+              "anyOf": [
+                {
+                  "$ref": "#/definitions/InterpretedExpression"
+                },
+                {
+                  "type": "boolean"
+                }
+              ],
+              "description": "optional. Determines if the element is visible. Defaults to a layout setting or true."
+            }
+          },
+          "required": [
+            "binding",
+            "element_type"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "element_type": {
+              "const": "line",
+              "type": "string"
+            },
+            "layout": {
+              "$ref": "#/definitions/UISchemaUIElementElementInColumnsLayout"
+            },
+            "style": {
+              "$ref": "#/definitions/UISchemaUIElementStyleBasics",
+              "description": "optional visual design - how the element itself appears"
+            },
+            "transparent": {
+              "description": "if set the element does not show the line but acts as a horizontal spacer",
+              "type": "boolean"
+            },
+            "visible": {
+              "anyOf": [
+                {
+                  "$ref": "#/definitions/InterpretedExpression"
+                },
+                {
+                  "type": "boolean"
+                }
+              ],
+              "description": "optional. Determines if the element is visible. Defaults to a layout setting or true."
+            }
+          },
+          "required": [
+            "element_type"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "binding": {
+              "$ref": "#/definitions/UISchemaUIElementBinding",
+              "description": "binding to the data"
+            },
+            "element_type": {
+              "const": "selection",
+              "type": "string"
+            },
+            "enabled": {
+              "anyOf": [
+                {
+                  "$ref": "#/definitions/InterpretedExpression"
+                },
+                {
+                  "type": "boolean"
+                }
+              ],
+              "description": "optional. Determines if a field can be navigated to (receive the focus). Default is true."
+            },
+            "items": {
+              "anyOf": [
+                {
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                },
+                {
+                  "$ref": "#/definitions/UISchemaLookupSettings"
+                }
+              ],
+              "description": "Either a list of static selection values or more refined settings via UISchemaLookupSettings"
+            },
+            "layout": {
+              "$ref": "#/definitions/UISchemaUIElementElementInColumnsLayout"
+            },
+            "readonly": {
+              "description": "optional. Determines if a field takes inputs right now. The element might still receive the caret or focus (unlike enabled=false elements), you just cannot change the value. but you might e.g. be able to copy the input value onto the clipboard. Default is false.",
+              "type": "boolean"
+            },
+            "style": {
+              "$ref": "#/definitions/UISchemaUIElementStyleBasics",
+              "description": "optional visual design - how the element itself appears"
+            },
+            "text": {
+              "$ref": "#/definitions/InterpretedExpression",
+              "description": "optional. the text for the label or name of the field on the ui"
+            },
+            "value": {
+              "$ref": "#/definitions/InterpretedExpression",
+              "description": "optional. the expression that defines what value is being displayed in the input part of the element"
+            },
+            "visible": {
+              "anyOf": [
+                {
+                  "$ref": "#/definitions/InterpretedExpression"
+                },
+                {
+                  "type": "boolean"
+                }
+              ],
+              "description": "optional. Determines if the element is visible. Defaults to a layout setting or true."
+            }
+          },
+          "required": [
+            "binding",
+            "element_type",
+            "items"
+          ],
+          "type": "object"
+        },
+        {
+          "properties": {
+            "element_type": {
+              "const": "template_label",
+              "type": "string"
+            },
+            "layout": {
+              "$ref": "#/definitions/UISchemaUIElementElementInColumnsLayout"
+            },
+            "style": {
+              "$ref": "#/definitions/UISchemaUIElementStyleBasics",
+              "description": "optional visual design - how the element itself appears"
+            },
+            "text": {
+              "$ref": "#/definitions/InterpretedExpression",
+              "description": "optional. the text for the label or name of the field on the ui"
+            },
+            "value": {
+              "$ref": "#/definitions/InterpretedExpression",
+              "description": "optional. the expression that defines what value is being displayed in the input part of the element"
+            },
+            "visible": {
+              "anyOf": [
+                {
+                  "$ref": "#/definitions/InterpretedExpression"
+                },
+                {
+                  "type": "boolean"
+                }
+              ],
+              "description": "optional. Determines if the element is visible. Defaults to a layout setting or true."
+            }
+          },
+          "required": [
+            "element_type"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "element_type": {
+              "const": "template_label",
+              "type": "string"
+            },
+            "layout": {
+              "$ref": "#/definitions/UISchemaUIElementElementInColumnsLayout"
+            },
+            "mask_identifier": {
+              "$ref": "#/definitions/InterpretedExpression",
+              "description": "Optional. Instead of showing the actual identifier, resolves expression and shows the result"
+            },
+            "style": {
+              "$ref": "#/definitions/UISchemaUIElementStyleBasics",
+              "description": "optional visual design - how the element itself appears"
+            },
+            "text": {
+              "$ref": "#/definitions/InterpretedExpression",
+              "description": "optional. the text for the label or name of the field on the ui"
+            },
+            "value": {
+              "$ref": "#/definitions/InterpretedExpression",
+              "description": "optional. the expression that defines what value is being displayed in the input part of the element"
+            },
+            "visible": {
+              "anyOf": [
+                {
+                  "$ref": "#/definitions/InterpretedExpression"
+                },
+                {
+                  "type": "boolean"
+                }
+              ],
+              "description": "optional. Determines if the element is visible. Defaults to a layout setting or true."
+            }
+          },
+          "required": [
+            "element_type"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "binding": {
+              "$ref": "#/definitions/UISchemaUIElementBinding",
+              "description": "binding to the data"
+            },
+            "element_type": {
+              "const": "bool",
+              "type": "string"
+            },
+            "enabled": {
+              "anyOf": [
+                {
+                  "$ref": "#/definitions/InterpretedExpression"
+                },
+                {
+                  "type": "boolean"
+                }
+              ],
+              "description": "optional. Determines if a field can be navigated to (receive the focus). Default is true."
+            },
+            "layout": {
+              "$ref": "#/definitions/UISchemaUIElementElementInColumnsLayout"
+            },
+            "readonly": {
+              "description": "optional. Determines if a field takes inputs right now. The element might still receive the caret or focus (unlike enabled=false elements), you just cannot change the value. but you might e.g. be able to copy the input value onto the clipboard. Default is false.",
+              "type": "boolean"
+            },
+            "style": {
+              "$ref": "#/definitions/UISchemaUIElementStyleBasics",
+              "description": "optional visual design - how the element itself appears"
+            },
+            "text": {
+              "$ref": "#/definitions/InterpretedExpression",
+              "description": "optional. the text for the label or name of the field on the ui"
+            },
+            "value": {
+              "$ref": "#/definitions/InterpretedExpression",
+              "description": "optional. the expression that defines what value is being displayed in the input part of the element"
+            },
+            "visible": {
+              "anyOf": [
+                {
+                  "$ref": "#/definitions/InterpretedExpression"
+                },
+                {
+                  "type": "boolean"
+                }
+              ],
+              "description": "optional. Determines if the element is visible. Defaults to a layout setting or true."
+            }
+          },
+          "required": [
+            "binding",
+            "element_type"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "align_image": {
+              "enum": [
+                "center",
+                "left"
+              ],
+              "type": "string"
+            },
+            "alternate_description": {
+              "type": "string"
+            },
+            "element_type": {
+              "const": "file",
+              "type": "string"
+            },
+            "file_description": {
+              "enum": [
+                "right",
+                "bottom",
+                "none"
+              ],
+              "type": "string"
+            },
+            "fit_content": {
+              "enum": [
+                "contain",
+                "fit",
+                "scale"
+              ],
+              "type": "string"
+            },
+            "layout": {
+              "$ref": "#/definitions/UISchemaUIElementElementInColumnsLayout"
+            },
+            "resolution": {
+              "type": "string"
+            },
+            "style": {
+              "$ref": "#/definitions/UISchemaUIElementStyleBasics",
+              "description": "optional visual design - how the element itself appears"
+            },
+            "text": {
+              "$ref": "#/definitions/InterpretedExpression",
+              "description": "optional. the text for the label or name of the field on the ui"
+            },
+            "value": {
+              "$ref": "#/definitions/InterpretedExpression",
+              "description": "optional. the expression that defines what value is being displayed in the input part of the element"
+            },
+            "visible": {
+              "anyOf": [
+                {
+                  "$ref": "#/definitions/InterpretedExpression"
+                },
+                {
+                  "type": "boolean"
+                }
+              ],
+              "description": "optional. Determines if the element is visible. Defaults to a layout setting or true."
+            }
+          },
+          "required": [
+            "element_type",
+            "resolution"
+          ],
+          "type": "object"
         }
-      },
-      "required": [
-        "element_type",
-        "resolution"
       ],
-      "type": "object"
+      "description": "Wraps any UI element (leaf or sub-layout) when placed inside a layout of strategy S, attaching the strategy-specific layout positioning property."
+    },
+    "UISchemaElementOnLayout<\"scroll\">": {
+      "anyOf": [
+        {
+          "properties": {
+            "layout": {
+              "$ref": "#/definitions/UISchemaUIElementElementLayoutBase"
+            }
+          },
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "button_type": {
+              "description": "the type of button determines the appearance",
+              "enum": [
+                "okButton",
+                "cancelButton",
+                "iconButton"
+              ],
+              "type": "string"
+            },
+            "default": {
+              "description": "optional setting that controls if a button is triggered when a user confirms or cancels by any other means than pressing the button. E.g. and most common if the user presses ENTER or the ESC (CANCEL) on the keyboard while within the button's layout bounds.",
+              "enum": [
+                "ENTER",
+                "CANCEL"
+              ],
+              "type": "string"
+            },
+            "element_type": {
+              "const": "button",
+              "type": "string"
+            },
+            "icon": {
+              "$ref": "#/definitions/InterpretedExpression",
+              "description": "for type iconButton: The icon, which must resolve to a FontAwesome icon code."
+            },
+            "layout": {
+              "$ref": "#/definitions/UISchemaUIElementElementLayoutBase"
+            },
+            "style": {
+              "$ref": "#/definitions/UISchemaUIElementStyleBasics",
+              "description": "optional visual design - how the element itself appears"
+            },
+            "text": {
+              "$ref": "#/definitions/InterpretedExpression",
+              "description": "optional. the text for the label or name of the field on the ui"
+            },
+            "value": {
+              "$ref": "#/definitions/InterpretedExpression",
+              "description": "optional. the expression that defines what value is being displayed in the input part of the element"
+            },
+            "visible": {
+              "anyOf": [
+                {
+                  "$ref": "#/definitions/InterpretedExpression"
+                },
+                {
+                  "type": "boolean"
+                }
+              ],
+              "description": "optional. Determines if the element is visible. Defaults to a layout setting or true."
+            }
+          },
+          "required": [
+            "element_type"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "binding": {
+              "$ref": "#/definitions/UISchemaUIElementBinding",
+              "description": "binding to the data"
+            },
+            "display_identifier": {
+              "$ref": "#/definitions/UISchemaIdentifierDisplay",
+              "description": "Defines that the value represents an identifier.\n\nEither simply boolean `true` or a  {@link  UISchemaIdentifierDisplay }  section that allows masking. If absent, the value is not rendered or treated as an identifier."
+            },
+            "element_type": {
+              "const": "text_field",
+              "type": "string"
+            },
+            "ellipsis": {
+              "$ref": "#/definitions/UISchemaDisplayEllipsis",
+              "description": "settings to limit the text length"
+            },
+            "enabled": {
+              "anyOf": [
+                {
+                  "$ref": "#/definitions/InterpretedExpression"
+                },
+                {
+                  "type": "boolean"
+                }
+              ],
+              "description": "optional. Determines if a field can be navigated to (receive the focus). Default is true."
+            },
+            "layout": {
+              "$ref": "#/definitions/UISchemaUIElementElementLayoutBase"
+            },
+            "multiline": {
+              "description": "is this a multiline field, so should line feeds or carriage returns be accepted?",
+              "type": "boolean"
+            },
+            "readonly": {
+              "description": "optional. Determines if a field takes inputs right now. The element might still receive the caret or focus (unlike enabled=false elements), you just cannot change the value. but you might e.g. be able to copy the input value onto the clipboard. Default is false.",
+              "type": "boolean"
+            },
+            "style": {
+              "$ref": "#/definitions/UISchemaUIElementStyleBasics",
+              "description": "optional visual design - how the element itself appears"
+            },
+            "text": {
+              "$ref": "#/definitions/InterpretedExpression",
+              "description": "optional. the text for the label or name of the field on the ui"
+            },
+            "value": {
+              "$ref": "#/definitions/InterpretedExpression",
+              "description": "optional. the expression that defines what value is being displayed in the input part of the element"
+            },
+            "visible": {
+              "anyOf": [
+                {
+                  "const": ".",
+                  "type": "string"
+                },
+                {
+                  "type": "boolean"
+                },
+                {
+                  "$ref": "#/definitions/InterpretedExpression"
+                }
+              ],
+              "description": "Determines if the element will show at all on the layout. The default depends on the layout's default setting  {@link  UISchemaLayoutElement } .\n\n- Use `\".\"` to make this dependent on whether there is a value to display (no value -> element vanishes).\n- Use an  {@link  InterpretedExpression }  that the host can resolve to a boolean result."
+            }
+          },
+          "required": [
+            "binding",
+            "element_type"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "binding": {
+              "$ref": "#/definitions/UISchemaUIElementBinding",
+              "description": "binding to the data"
+            },
+            "date_format": {
+              "type": "string"
+            },
+            "element_type": {
+              "const": "date_time_field",
+              "type": "string"
+            },
+            "enabled": {
+              "anyOf": [
+                {
+                  "$ref": "#/definitions/InterpretedExpression"
+                },
+                {
+                  "type": "boolean"
+                }
+              ],
+              "description": "optional. Determines if a field can be navigated to (receive the focus). Default is true."
+            },
+            "include_time": {
+              "type": "boolean"
+            },
+            "layout": {
+              "$ref": "#/definitions/UISchemaUIElementElementLayoutBase"
+            },
+            "readonly": {
+              "description": "optional. Determines if a field takes inputs right now. The element might still receive the caret or focus (unlike enabled=false elements), you just cannot change the value. but you might e.g. be able to copy the input value onto the clipboard. Default is false.",
+              "type": "boolean"
+            },
+            "style": {
+              "$ref": "#/definitions/UISchemaUIElementStyleBasics",
+              "description": "optional visual design - how the element itself appears"
+            },
+            "text": {
+              "$ref": "#/definitions/InterpretedExpression",
+              "description": "optional. the text for the label or name of the field on the ui"
+            },
+            "value": {
+              "$ref": "#/definitions/InterpretedExpression",
+              "description": "optional. the expression that defines what value is being displayed in the input part of the element"
+            },
+            "visible": {
+              "anyOf": [
+                {
+                  "$ref": "#/definitions/InterpretedExpression"
+                },
+                {
+                  "type": "boolean"
+                }
+              ],
+              "description": "optional. Determines if the element is visible. Defaults to a layout setting or true."
+            }
+          },
+          "required": [
+            "binding",
+            "element_type"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "element_type": {
+              "const": "line",
+              "type": "string"
+            },
+            "layout": {
+              "$ref": "#/definitions/UISchemaUIElementElementLayoutBase"
+            },
+            "style": {
+              "$ref": "#/definitions/UISchemaUIElementStyleBasics",
+              "description": "optional visual design - how the element itself appears"
+            },
+            "transparent": {
+              "description": "if set the element does not show the line but acts as a horizontal spacer",
+              "type": "boolean"
+            },
+            "visible": {
+              "anyOf": [
+                {
+                  "$ref": "#/definitions/InterpretedExpression"
+                },
+                {
+                  "type": "boolean"
+                }
+              ],
+              "description": "optional. Determines if the element is visible. Defaults to a layout setting or true."
+            }
+          },
+          "required": [
+            "element_type"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "binding": {
+              "$ref": "#/definitions/UISchemaUIElementBinding",
+              "description": "binding to the data"
+            },
+            "element_type": {
+              "const": "selection",
+              "type": "string"
+            },
+            "enabled": {
+              "anyOf": [
+                {
+                  "$ref": "#/definitions/InterpretedExpression"
+                },
+                {
+                  "type": "boolean"
+                }
+              ],
+              "description": "optional. Determines if a field can be navigated to (receive the focus). Default is true."
+            },
+            "items": {
+              "anyOf": [
+                {
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                },
+                {
+                  "$ref": "#/definitions/UISchemaLookupSettings"
+                }
+              ],
+              "description": "Either a list of static selection values or more refined settings via UISchemaLookupSettings"
+            },
+            "layout": {
+              "$ref": "#/definitions/UISchemaUIElementElementLayoutBase"
+            },
+            "readonly": {
+              "description": "optional. Determines if a field takes inputs right now. The element might still receive the caret or focus (unlike enabled=false elements), you just cannot change the value. but you might e.g. be able to copy the input value onto the clipboard. Default is false.",
+              "type": "boolean"
+            },
+            "style": {
+              "$ref": "#/definitions/UISchemaUIElementStyleBasics",
+              "description": "optional visual design - how the element itself appears"
+            },
+            "text": {
+              "$ref": "#/definitions/InterpretedExpression",
+              "description": "optional. the text for the label or name of the field on the ui"
+            },
+            "value": {
+              "$ref": "#/definitions/InterpretedExpression",
+              "description": "optional. the expression that defines what value is being displayed in the input part of the element"
+            },
+            "visible": {
+              "anyOf": [
+                {
+                  "$ref": "#/definitions/InterpretedExpression"
+                },
+                {
+                  "type": "boolean"
+                }
+              ],
+              "description": "optional. Determines if the element is visible. Defaults to a layout setting or true."
+            }
+          },
+          "required": [
+            "binding",
+            "element_type",
+            "items"
+          ],
+          "type": "object"
+        },
+        {
+          "properties": {
+            "element_type": {
+              "const": "template_label",
+              "type": "string"
+            },
+            "layout": {
+              "$ref": "#/definitions/UISchemaUIElementElementLayoutBase"
+            },
+            "style": {
+              "$ref": "#/definitions/UISchemaUIElementStyleBasics",
+              "description": "optional visual design - how the element itself appears"
+            },
+            "text": {
+              "$ref": "#/definitions/InterpretedExpression",
+              "description": "optional. the text for the label or name of the field on the ui"
+            },
+            "value": {
+              "$ref": "#/definitions/InterpretedExpression",
+              "description": "optional. the expression that defines what value is being displayed in the input part of the element"
+            },
+            "visible": {
+              "anyOf": [
+                {
+                  "$ref": "#/definitions/InterpretedExpression"
+                },
+                {
+                  "type": "boolean"
+                }
+              ],
+              "description": "optional. Determines if the element is visible. Defaults to a layout setting or true."
+            }
+          },
+          "required": [
+            "element_type"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "element_type": {
+              "const": "template_label",
+              "type": "string"
+            },
+            "layout": {
+              "$ref": "#/definitions/UISchemaUIElementElementLayoutBase"
+            },
+            "mask_identifier": {
+              "$ref": "#/definitions/InterpretedExpression",
+              "description": "Optional. Instead of showing the actual identifier, resolves expression and shows the result"
+            },
+            "style": {
+              "$ref": "#/definitions/UISchemaUIElementStyleBasics",
+              "description": "optional visual design - how the element itself appears"
+            },
+            "text": {
+              "$ref": "#/definitions/InterpretedExpression",
+              "description": "optional. the text for the label or name of the field on the ui"
+            },
+            "value": {
+              "$ref": "#/definitions/InterpretedExpression",
+              "description": "optional. the expression that defines what value is being displayed in the input part of the element"
+            },
+            "visible": {
+              "anyOf": [
+                {
+                  "$ref": "#/definitions/InterpretedExpression"
+                },
+                {
+                  "type": "boolean"
+                }
+              ],
+              "description": "optional. Determines if the element is visible. Defaults to a layout setting or true."
+            }
+          },
+          "required": [
+            "element_type"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "binding": {
+              "$ref": "#/definitions/UISchemaUIElementBinding",
+              "description": "binding to the data"
+            },
+            "element_type": {
+              "const": "bool",
+              "type": "string"
+            },
+            "enabled": {
+              "anyOf": [
+                {
+                  "$ref": "#/definitions/InterpretedExpression"
+                },
+                {
+                  "type": "boolean"
+                }
+              ],
+              "description": "optional. Determines if a field can be navigated to (receive the focus). Default is true."
+            },
+            "layout": {
+              "$ref": "#/definitions/UISchemaUIElementElementLayoutBase"
+            },
+            "readonly": {
+              "description": "optional. Determines if a field takes inputs right now. The element might still receive the caret or focus (unlike enabled=false elements), you just cannot change the value. but you might e.g. be able to copy the input value onto the clipboard. Default is false.",
+              "type": "boolean"
+            },
+            "style": {
+              "$ref": "#/definitions/UISchemaUIElementStyleBasics",
+              "description": "optional visual design - how the element itself appears"
+            },
+            "text": {
+              "$ref": "#/definitions/InterpretedExpression",
+              "description": "optional. the text for the label or name of the field on the ui"
+            },
+            "value": {
+              "$ref": "#/definitions/InterpretedExpression",
+              "description": "optional. the expression that defines what value is being displayed in the input part of the element"
+            },
+            "visible": {
+              "anyOf": [
+                {
+                  "$ref": "#/definitions/InterpretedExpression"
+                },
+                {
+                  "type": "boolean"
+                }
+              ],
+              "description": "optional. Determines if the element is visible. Defaults to a layout setting or true."
+            }
+          },
+          "required": [
+            "binding",
+            "element_type"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "align_image": {
+              "enum": [
+                "center",
+                "left"
+              ],
+              "type": "string"
+            },
+            "alternate_description": {
+              "type": "string"
+            },
+            "element_type": {
+              "const": "file",
+              "type": "string"
+            },
+            "file_description": {
+              "enum": [
+                "right",
+                "bottom",
+                "none"
+              ],
+              "type": "string"
+            },
+            "fit_content": {
+              "enum": [
+                "contain",
+                "fit",
+                "scale"
+              ],
+              "type": "string"
+            },
+            "layout": {
+              "$ref": "#/definitions/UISchemaUIElementElementLayoutBase"
+            },
+            "resolution": {
+              "type": "string"
+            },
+            "style": {
+              "$ref": "#/definitions/UISchemaUIElementStyleBasics",
+              "description": "optional visual design - how the element itself appears"
+            },
+            "text": {
+              "$ref": "#/definitions/InterpretedExpression",
+              "description": "optional. the text for the label or name of the field on the ui"
+            },
+            "value": {
+              "$ref": "#/definitions/InterpretedExpression",
+              "description": "optional. the expression that defines what value is being displayed in the input part of the element"
+            },
+            "visible": {
+              "anyOf": [
+                {
+                  "$ref": "#/definitions/InterpretedExpression"
+                },
+                {
+                  "type": "boolean"
+                }
+              ],
+              "description": "optional. Determines if the element is visible. Defaults to a layout setting or true."
+            }
+          },
+          "required": [
+            "element_type",
+            "resolution"
+          ],
+          "type": "object"
+        }
+      ],
+      "description": "Wraps any UI element (leaf or sub-layout) when placed inside a layout of strategy S, attaching the strategy-specific layout positioning property."
     },
     "UISchemaHeaderDictV2": {
       "additionalProperties": false,
@@ -429,140 +1176,28 @@
       ],
       "type": "object"
     },
-    "UISchemaLayoutElement": {
-      "additionalProperties": false,
-      "properties": {
-        "default_element_visibility": {
-          "anyOf": [
-            {
-              "$ref": "#/definitions/InterpretedExpression"
-            },
-            {
-              "type": "boolean"
+    "UISchemaIdentifierDisplay": {
+      "anyOf": [
+        {
+          "const": true,
+          "type": "boolean"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "mask_identifier": {
+              "$ref": "#/definitions/InterpretedExpression",
+              "description": "Optional. Instead of showing the actual identifier, resolves expression and shows the result"
             }
-          ]
-        },
-        "element_type": {
-          "const": "layout",
-          "type": "string"
-        },
-        "enabled": {
-          "anyOf": [
-            {
-              "$ref": "#/definitions/InterpretedExpression"
-            },
-            {
-              "type": "boolean"
-            }
-          ]
-        },
-        "layout": {
-          "$ref": "#/definitions/UISchemaUIElementElementLayout",
-          "description": "positioning, spatial dimensions and positioning - how the element interacts on the layout"
-        },
-        "orchestration_strategy": {
-          "description": "settings for how the layout renders its elements",
-          "type": "string"
-        },
-        "order": {
-          "items": {
-            "type": "string"
           },
-          "type": "array"
-        },
-        "readonly": {
-          "type": "boolean"
-        },
-        "style": {
-          "$ref": "#/definitions/UISchemaUIElementStyleBasics",
-          "description": "how the element itself appears"
-        },
-        "ui_elements": {
-          "$ref": "#/definitions/Dictionary%3CUISchemaUIElements%3E",
-          "description": "elements grouped in this layout"
-        },
-        "visible": {
-          "anyOf": [
-            {
-              "$ref": "#/definitions/InterpretedExpression"
-            },
-            {
-              "type": "boolean"
-            }
-          ]
+          "type": "object"
         }
-      },
-      "required": [
-        "element_type",
-        "orchestration_strategy",
-        "ui_elements"
       ],
-      "type": "object"
-    },
-    "UISchemaLayoutPadding": {
-      "additionalProperties": false,
-      "properties": {
-        "bottom": {
-          "$ref": "#/definitions/NumberOrString"
-        },
-        "end": {
-          "$ref": "#/definitions/NumberOrString"
-        },
-        "start": {
-          "$ref": "#/definitions/NumberOrString"
-        },
-        "top": {
-          "$ref": "#/definitions/NumberOrString"
-        }
-      },
-      "type": "object"
-    },
-    "UISchemaLine": {
-      "additionalProperties": false,
-      "properties": {
-        "element_type": {
-          "const": "line",
-          "type": "string"
-        },
-        "enabled": {
-          "anyOf": [
-            {
-              "$ref": "#/definitions/InterpretedExpression"
-            },
-            {
-              "type": "boolean"
-            }
-          ]
-        },
-        "layout": {
-          "$ref": "#/definitions/UISchemaUIElementElementLayout",
-          "description": "positioning, spatial dimensions and positioning - how the element interacts on the layout"
-        },
-        "style": {
-          "$ref": "#/definitions/UISchemaUIElementStyleBasics",
-          "description": "how the element itself appears"
-        },
-        "transparent": {
-          "type": "boolean"
-        },
-        "visible": {
-          "anyOf": [
-            {
-              "$ref": "#/definitions/InterpretedExpression"
-            },
-            {
-              "type": "boolean"
-            }
-          ]
-        }
-      },
-      "required": [
-        "element_type"
-      ],
-      "type": "object"
+      "description": "settings needed to describe how an element shows an identifier. An identifier in the context of the ui-component is a link destination. It represents a value that is semantically significant for the host. The element renders a link of some sort that triggers the component's gotoIdentifier callback."
     },
     "UISchemaLookupSettings": {
       "additionalProperties": false,
+      "description": "settings that are used to fetch selection values from the data provide",
       "properties": {
         "key": {
           "type": "string"
@@ -586,6 +1221,7 @@
     },
     "UISchemaMetaSettings": {
       "additionalProperties": false,
+      "description": "Meta information used by a variety of processes reading the schema. Not rendered within the ui but informing the context within which the schema is being interpreted.",
       "properties": {
         "scenario": {
           "type": "string"
@@ -593,127 +1229,9 @@
       },
       "type": "object"
     },
-    "UISchemaTemplateLabel": {
-      "additionalProperties": false,
-      "properties": {
-        "element_type": {
-          "const": "template_label",
-          "type": "string"
-        },
-        "enabled": {
-          "anyOf": [
-            {
-              "$ref": "#/definitions/InterpretedExpression"
-            },
-            {
-              "type": "boolean"
-            }
-          ]
-        },
-        "is_identifier": {
-          "type": "boolean"
-        },
-        "layout": {
-          "$ref": "#/definitions/UISchemaUIElementElementLayout",
-          "description": "positioning, spatial dimensions and positioning - how the element interacts on the layout"
-        },
-        "mask_identifier": {
-          "type": "boolean"
-        },
-        "style": {
-          "$ref": "#/definitions/UISchemaUIElementStyleBasics",
-          "description": "how the element itself appears"
-        },
-        "text": {
-          "$ref": "#/definitions/InterpretedExpression"
-        },
-        "value": {
-          "$ref": "#/definitions/InterpretedExpression"
-        },
-        "visible": {
-          "anyOf": [
-            {
-              "$ref": "#/definitions/InterpretedExpression"
-            },
-            {
-              "type": "boolean"
-            }
-          ]
-        }
-      },
-      "required": [
-        "element_type"
-      ],
-      "type": "object"
-    },
-    "UISchemaTextField": {
-      "additionalProperties": false,
-      "properties": {
-        "binding": {
-          "$ref": "#/definitions/UISchemaUIElementBinding"
-        },
-        "element_type": {
-          "const": "text_field",
-          "type": "string"
-        },
-        "ellipsis": {
-          "$ref": "#/definitions/UISchemaDisplayEllipsis",
-          "description": "settings to limit the text length"
-        },
-        "enabled": {
-          "anyOf": [
-            {
-              "$ref": "#/definitions/InterpretedExpression"
-            },
-            {
-              "type": "boolean"
-            }
-          ]
-        },
-        "is_identifier": {
-          "type": "boolean"
-        },
-        "layout": {
-          "$ref": "#/definitions/UISchemaUIElementElementLayout",
-          "description": "positioning, spatial dimensions and positioning - how the element interacts on the layout"
-        },
-        "mask_identifier": {
-          "type": "boolean"
-        },
-        "multiline": {
-          "type": "boolean"
-        },
-        "readonly": {
-          "type": "boolean"
-        },
-        "style": {
-          "$ref": "#/definitions/UISchemaUIElementStyleBasics",
-          "description": "how the element itself appears"
-        },
-        "text": {
-          "$ref": "#/definitions/InterpretedExpression"
-        },
-        "value": {
-          "$ref": "#/definitions/InterpretedExpression"
-        },
-        "visible": {
-          "anyOf": [
-            {
-              "$ref": "#/definitions/InterpretedExpression"
-            },
-            {
-              "type": "boolean"
-            }
-          ]
-        }
-      },
-      "required": [
-        "element_type"
-      ],
-      "type": "object"
-    },
     "UISchemaUIElementBinding": {
       "additionalProperties": false,
+      "description": "settings that to bind a BoundUIElement to the data provider",
       "properties": {
         "field_name": {
           "type": "string"
@@ -724,30 +1242,51 @@
       ],
       "type": "object"
     },
-    "UISchemaUIElementElementLayout": {
+    "UISchemaUIElementElementInColumnsLayout": {
       "additionalProperties": false,
       "properties": {
+        "column_span": {
+          "description": "optional number of columns this element spans within a columns orchestration strategy",
+          "type": "number"
+        },
         "max_height": {
-          "$ref": "#/definitions/UISchemaUIElementLayoutDimension"
+          "$ref": "#/definitions/UISchemaUIElementLayoutDimension",
+          "description": "this can either be a number, in which case the unit is depends in the element type, or 'max', in which case the element can be as tall as possible Lookup the particular layout on which the element appears to find out about available options."
         },
         "max_width": {
-          "$ref": "#/definitions/UISchemaUIElementLayoutDimension"
+          "$ref": "#/definitions/UISchemaUIElementLayoutDimension",
+          "description": "this can either be a number, in which case the unit depends on the element type, or 'max', in which case the element can be as wide as possible. Lookup the particular layout on which the element appears to find out about available options."
         },
         "min_height": {
-          "$ref": "#/definitions/UISchemaUIElementLayoutDimension"
+          "$ref": "#/definitions/UISchemaUIElementLayoutDimension",
+          "description": "this can either be a number, in which case the unit depends on the element type, or 'max', in which case the element will be as tall as possible Lookup the particular layout on which the element appears to find out about available options."
         },
         "min_width": {
-          "$ref": "#/definitions/UISchemaUIElementLayoutDimension"
+          "$ref": "#/definitions/UISchemaUIElementLayoutDimension",
+          "description": "this can either be a number, in which case the unit depends on the element type, or 'max', in which case the element will be as wide as possible. Lookup the particular layout on which the element appears to find out about available options."
+        }
+      },
+      "type": "object"
+    },
+    "UISchemaUIElementElementLayoutBase": {
+      "additionalProperties": false,
+      "description": "How an element is positioned in the layout. The optional layout property defines how an element is positioned within its parent layout. All the attributes in this section are optional and 💡 depend on the layout on which the element appears. So consult the description of the particular layout type (orchestration strategy) to find out about    actual layout options.",
+      "properties": {
+        "max_height": {
+          "$ref": "#/definitions/UISchemaUIElementLayoutDimension",
+          "description": "this can either be a number, in which case the unit is depends in the element type, or 'max', in which case the element can be as tall as possible Lookup the particular layout on which the element appears to find out about available options."
         },
-        "padding": {
-          "anyOf": [
-            {
-              "$ref": "#/definitions/NumberOrString"
-            },
-            {
-              "$ref": "#/definitions/UISchemaLayoutPadding"
-            }
-          ]
+        "max_width": {
+          "$ref": "#/definitions/UISchemaUIElementLayoutDimension",
+          "description": "this can either be a number, in which case the unit depends on the element type, or 'max', in which case the element can be as wide as possible. Lookup the particular layout on which the element appears to find out about available options."
+        },
+        "min_height": {
+          "$ref": "#/definitions/UISchemaUIElementLayoutDimension",
+          "description": "this can either be a number, in which case the unit depends on the element type, or 'max', in which case the element will be as tall as possible Lookup the particular layout on which the element appears to find out about available options."
+        },
+        "min_width": {
+          "$ref": "#/definitions/UISchemaUIElementLayoutDimension",
+          "description": "this can either be a number, in which case the unit depends on the element type, or 'max', in which case the element will be as wide as possible. Lookup the particular layout on which the element appears to find out about available options."
         }
       },
       "type": "object"
@@ -764,236 +1303,184 @@
         {
           "type": "string"
         }
-      ]
+      ],
+      "description": "typical setting for a dimension that allows to be a number (in which case the element decides on the unit), the expression 'max' or a valid css setting that can include the unit, like \"10rem\" or so. This basic version only accepts static css settings and nothing dynamic (like \"calc(10px + 5vh)\" or so)"
     },
     "UISchemaUIElementStyleBasics": {
       "additionalProperties": false,
+      "description": "visual design - how the element itself appears. Elements implement more specific descendants of this interface",
       "properties": {
         "css_classes": {
+          "description": "optional list of css classes. You can either state static css class names or use expressions that get interpreted and can return a class name.\n\n⚠️ Use this sparingly. Don't set classes that would clash with other indirect style settings or for which a more guided setting exists. E.g. Don't assign a class that sets max-height or any of the properties that you find in  {@link  UISchemaUIElementElementLayoutBase } .\n\nNote that an expression is only sent to the host for interpretation if it starts with a prefix that the host set on the ui-component (property `interpretedExpressionPrefix`). By default, that prefix is unset, so nothing gets sent to the host for interpretation.",
           "items": {
-            "$ref": "#/definitions/InterpretedExpression"
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "$ref": "#/definitions/InterpretedExpression"
+              }
+            ]
           },
           "type": "array"
         },
         "css_styles": {
-          "items": {
-            "$ref": "#/definitions/InterpretedExpression"
+          "additionalProperties": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "$ref": "#/definitions/InterpretedExpression"
+              }
+            ]
           },
-          "type": "array"
+          "description": "optional dictionary of direct css style settings. You can either state direct css expressions (like \"text-align: center\") or interpreted expressions that get interpreted by the host and return such a css style expression.\n\nYou can use all valid css expressions, including things like `calc(1vh - 5px)` or variables like `--my-css-variable`\n\n⚠️ Don't set styles directly that would interfere with other indirect style settings or for which a more guided setting exists. E.g. Don't set max-height or any of the properties that you find in  {@link  UISchemaUIElementElementLayoutBase } .\n\nNote that an expression is only sent to the host for interpretation if it starts with a prefix that the host set on the ui-component (property `interpretedExpressionPrefix`). By default, that prefix is unset, so nothing gets sent to the host for interpretation.",
+          "type": "object"
         }
       },
-      "type": "object"
-    },
-    "UISchemaUIElements": {
-      "allOf": [
-        {
-          "if": {
-            "properties": {
-              "element_type": {
-                "const": "layout",
-                "type": "string"
-              }
-            }
-          },
-          "then": {
-            "$ref": "#/definitions/UISchemaLayoutElement"
-          }
-        },
-        {
-          "if": {
-            "properties": {
-              "element_type": {
-                "const": "button",
-                "type": "string"
-              }
-            }
-          },
-          "then": {
-            "$ref": "#/definitions/UISchemaButton"
-          }
-        },
-        {
-          "if": {
-            "properties": {
-              "element_type": {
-                "const": "text_field",
-                "type": "string"
-              }
-            }
-          },
-          "then": {
-            "$ref": "#/definitions/UISchemaTextField"
-          }
-        },
-        {
-          "if": {
-            "properties": {
-              "element_type": {
-                "const": "date_time_field",
-                "type": "string"
-              }
-            }
-          },
-          "then": {
-            "$ref": "#/definitions/UISchemaDateTimeField"
-          }
-        },
-        {
-          "if": {
-            "properties": {
-              "element_type": {
-                "const": "line",
-                "type": "string"
-              }
-            }
-          },
-          "then": {
-            "$ref": "#/definitions/UISchemaLine"
-          }
-        },
-        {
-          "if": {
-            "properties": {
-              "element_type": {
-                "const": "selection",
-                "type": "string"
-              }
-            }
-          },
-          "then": {
-            "$ref": "#/definitions/UISchemaComboBox"
-          }
-        },
-        {
-          "if": {
-            "properties": {
-              "element_type": {
-                "const": "template_label",
-                "type": "string"
-              }
-            }
-          },
-          "then": {
-            "$ref": "#/definitions/UISchemaTemplateLabel"
-          }
-        },
-        {
-          "if": {
-            "properties": {
-              "element_type": {
-                "const": "bool",
-                "type": "string"
-              }
-            }
-          },
-          "then": {
-            "$ref": "#/definitions/UISchemaBoolField"
-          }
-        },
-        {
-          "if": {
-            "properties": {
-              "element_type": {
-                "const": "file",
-                "type": "string"
-              }
-            }
-          },
-          "then": {
-            "$ref": "#/definitions/UISchemaFile"
-          }
-        }
-      ],
-      "description": "union type for all UIElement types",
-      "properties": {
-        "element_type": {
-          "enum": [
-            "layout",
-            "button",
-            "text_field",
-            "date_time_field",
-            "line",
-            "selection",
-            "template_label",
-            "bool",
-            "file"
-          ]
-        }
-      },
-      "required": [
-        "element_type"
-      ],
       "type": "object"
     },
     "UISchemaUIRootLayoutElement": {
-      "additionalProperties": false,
-      "properties": {
-        "default_element_visibility": {
-          "anyOf": [
-            {
-              "$ref": "#/definitions/InterpretedExpression"
+      "anyOf": [
+        {
+          "additionalProperties": false,
+          "properties": {
+            "default_element_visibility": {
+              "anyOf": [
+                {
+                  "$ref": "#/definitions/InterpretedExpression"
+                },
+                {
+                  "type": "boolean"
+                }
+              ],
+              "description": "defines whether an element in the layout is visible if it does not have a visibility setting of its own."
             },
-            {
-              "type": "boolean"
-            }
-          ]
-        },
-        "element_type": {
-          "const": "layout",
-          "type": "string"
-        },
-        "enabled": {
-          "anyOf": [
-            {
-              "$ref": "#/definitions/InterpretedExpression"
+            "element_type": {
+              "const": "layout",
+              "type": "string"
             },
-            {
+            "layout": {
+              "$ref": "#/definitions/UISchemaUIElementElementLayoutBase",
+              "description": "optional spatial dimensions and positioning for the root layout element"
+            },
+            "orchestration_strategy": {
+              "const": "columns",
+              "description": "settings for how the layout renders its elements. Aka layout type.",
+              "type": "string"
+            },
+            "order": {
+              "description": "all visible child elements must be listed here in order of their appearance within the layout. If this is missing all elements will show in random order.",
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "readonly": {
+              "description": "if true all child elements will be set to readonly",
               "type": "boolean"
+            },
+            "room": {
+              "$ref": "#/definitions/NumberOrString",
+              "description": "defines the room between elements. How this is interpreted depends on the particular orchestration stratefy, which defines the layout type"
+            },
+            "style": {
+              "$ref": "#/definitions/UISchemaUIElementStyleBasics",
+              "description": "optional visual design - how the element itself appears"
+            },
+            "ui_elements": {
+              "$ref": "#/definitions/Dictionary%3CUISchemaElementOnLayout%3C%22columns%22%3E%3E"
+            },
+            "visible": {
+              "anyOf": [
+                {
+                  "$ref": "#/definitions/InterpretedExpression"
+                },
+                {
+                  "type": "boolean"
+                }
+              ],
+              "description": "optional. Determines if the element is visible. Defaults to a layout setting or true."
             }
-          ]
-        },
-        "layout": {
-          "$ref": "#/definitions/UISchemaUIElementElementLayout",
-          "description": "positioning, spatial dimensions and positioning - how the element interacts on the layout"
-        },
-        "orchestration_strategy": {
-          "description": "settings for how the layout renders its elements",
-          "type": "string"
-        },
-        "order": {
-          "items": {
-            "type": "string"
           },
-          "type": "array"
+          "required": [
+            "element_type",
+            "orchestration_strategy",
+            "ui_elements"
+          ],
+          "type": "object"
         },
-        "readonly": {
-          "type": "boolean"
-        },
-        "style": {
-          "$ref": "#/definitions/UISchemaUIElementStyleBasics",
-          "description": "how the element itself appears"
-        },
-        "ui_elements": {
-          "$ref": "#/definitions/Dictionary%3CUISchemaUIElements%3E",
-          "description": "elements grouped in this layout"
-        },
-        "visible": {
-          "anyOf": [
-            {
-              "$ref": "#/definitions/InterpretedExpression"
+        {
+          "additionalProperties": false,
+          "properties": {
+            "default_element_visibility": {
+              "anyOf": [
+                {
+                  "$ref": "#/definitions/InterpretedExpression"
+                },
+                {
+                  "type": "boolean"
+                }
+              ],
+              "description": "defines whether an element in the layout is visible if it does not have a visibility setting of its own."
             },
-            {
+            "element_type": {
+              "const": "layout",
+              "type": "string"
+            },
+            "layout": {
+              "$ref": "#/definitions/UISchemaUIElementElementLayoutBase",
+              "description": "optional spatial dimensions and positioning for the root layout element"
+            },
+            "orchestration_strategy": {
+              "const": "scroll",
+              "description": "settings for how the layout renders its elements. Aka layout type.",
+              "type": "string"
+            },
+            "order": {
+              "description": "all visible child elements must be listed here in order of their appearance within the layout. If this is missing all elements will show in random order.",
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "readonly": {
+              "description": "if true all child elements will be set to readonly",
               "type": "boolean"
+            },
+            "room": {
+              "$ref": "#/definitions/NumberOrString",
+              "description": "defines the room between elements. How this is interpreted depends on the particular orchestration stratefy, which defines the layout type"
+            },
+            "style": {
+              "$ref": "#/definitions/UISchemaUIElementStyleBasics",
+              "description": "optional visual design - how the element itself appears"
+            },
+            "ui_elements": {
+              "$ref": "#/definitions/Dictionary%3CUISchemaElementOnLayout%3C%22scroll%22%3E%3E"
+            },
+            "visible": {
+              "anyOf": [
+                {
+                  "$ref": "#/definitions/InterpretedExpression"
+                },
+                {
+                  "type": "boolean"
+                }
+              ],
+              "description": "optional. Determines if the element is visible. Defaults to a layout setting or true."
             }
-          ]
+          },
+          "required": [
+            "element_type",
+            "orchestration_strategy",
+            "ui_elements"
+          ],
+          "type": "object"
         }
-      },
-      "required": [
-        "element_type",
-        "orchestration_strategy",
-        "ui_elements"
       ],
-      "type": "object"
+      "description": "The root element. Every ui schema must have one and it must be a UISchemaLayoutElement"
     }
   }
 }

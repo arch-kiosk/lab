@@ -1,18 +1,30 @@
 {
-  "$schema": "https://typedoc.org/schema.json",
-  "entryPoints": ["./src/index.ts"],
-  "out": "./docs/api",
-  "plugin": ["typedoc-plugin-markdown", "typedoc-vitepress-theme"],
-  "theme": "default",
-  "entryPointStrategy": "resolve",
-
-  "readme": "none",
-  "entryFileName": "index.md",
-  "modulesFileName": "index.md",
-
-  "exclude": ["**/node_modules/**", "**/*.spec.ts", "**/*.test.ts"],
-  "excludeExternals": true,
-  "excludeInternal": true,
-  "excludePrivate": true,
-  "excludeProtected": false
+    "$schema": "https://typedoc.org/schema.json",
+    "entryPoints": [
+        "./src/index.ts"
+    ],
+    "out": "./docs/api",
+    "plugin": [
+        "typedoc-plugin-markdown",
+        "typedoc-plugin-frontmatter",
+        "typedoc-vitepress-theme"
+    ],
+    "theme": "default",
+    "frontmatterGlobals": {
+        "outline": [2, 4]
+    },
+    "entryPointStrategy": "resolve",
+    "sort": ["source-order"],
+    "readme": "none",
+    "entryFileName": "index.md",
+    "modulesFileName": "index.md",
+    "exclude": [
+        "**/node_modules/**",
+        "**/*.spec.ts",
+        "**/*.test.ts"
+    ],
+    "excludeExternals": true,
+    "excludeInternal": true,
+    "excludePrivate": true,
+    "excludeProtected": false
 }

@@ -33,9 +33,9 @@ export class UIElementLine extends UIElement {
                 ? 'ui-line-transparent'
                 : '')
 
-        let style = context.uicomponent
-            .getPaddingStyle(context.elementDefinition.element_type.padding)
-            .replace('padding', 'margin')
+        // let style = context.uicomponent
+        //     .getPaddingStyle(context.elementDefinition.element_type.padding)
+        //     .replace('padding', 'margin')
 
         const cssStyle = this.addStyle(
             style,

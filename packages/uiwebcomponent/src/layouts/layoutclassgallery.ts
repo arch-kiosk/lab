@@ -97,7 +97,7 @@ export class UIGalleryLayoutClass extends UIListLayout {
             return html` <div
                 class="table-header"
                 style="${this.getTableHeaderStyle(
-                    renderContext.layoutDefinition.ui_elements[id].layout,
+                    renderContext.elementDefinition.ui_elements[id].layout,
                 )}"
                 data-id="${id}"
                 @click="${allAllowed || orderAllowed.includes(id)
@@ -109,7 +109,7 @@ export class UIGalleryLayoutClass extends UIListLayout {
                     : html`<span class="${cssClass}"><i></i></span>`}
                 <span class="table-header-text"
                     >${renderContext.resolve(
-                        renderContext.layoutDefinition.ui_elements[id].element_type.text,
+                        renderContext.elementDefinition.ui_elements[id].element_type.text,
                     )}</span
                 >
             </div>`
@@ -118,7 +118,7 @@ export class UIGalleryLayoutClass extends UIListLayout {
     }
 
     public renderHeaders(renderContext: UILayoutRenderContext, elements: string[]) {
-        const settings = renderContext.layoutDefinition
+        const settings = renderContext.elementDefinition
             .layout_settings as UISchemaListLayoutSettings
         const orderAllowed = settings.allow_ordering_by || []
         const allAllowed = settings.allow_ordering_by == undefined
@@ -146,7 +146,7 @@ export class UIGalleryLayoutClass extends UIListLayout {
         style: string,
         renderElement: (id: string, entry: UISchemaBaseUIElement, layouter: UILayout) => TemplateResult,
     ): TemplateResult {
-        const elements = this.getOrderedElements(renderContext.layoutDefinition)
+        const elements = this.getOrderedElements(renderContext.elementDefinition)
 
         const items: TemplateResult[] = []
         renderContext.resetCursor()
@@ -159,7 +159,7 @@ export class UIGalleryLayoutClass extends UIListLayout {
                     @click="${this.itemClicked}"
                 >
                     ${elements.map((id) =>
-                        renderElement(id, renderContext.layoutDefinition.ui_elements[id], layouter),
+                        renderElement(id, renderContext.elementDefinition.ui_elements[id], layouter),
                     )}
                 </div>
             `)

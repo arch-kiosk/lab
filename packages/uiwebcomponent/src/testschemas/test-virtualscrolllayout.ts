@@ -18,7 +18,7 @@ export function configureTestSchemaVirtualScrollLayout(uiComponent: UIComponent)
         }
         return [rc, undefined] as ValidationResultsReturnType<typeof value>
     }
-    dataProvider.onValidateRecord = (recordIndex, _record) => {
+    dataProvider.onValidateRecord = (_recordIndex, _record) => {
         const rc : Array<DataProviderValidationResult> = []
 
         if (_record["text_input"] === "asdf") {
@@ -50,29 +50,33 @@ function getUiSchema(): UISchema {
             cardinality: 'N',
         },
         root: {
-            element_type: 'xlayout',
+            element_type: 'layout',
             orchestration_strategy: 'scroll',
             layout: {
-                max_height: '50vh',
-                padding: '.5rem',
-
+                max_height: '40vh',
             },
             ui_elements: {
                 row_layout: {
                     element_type: 'layout',
                     orchestration_strategy: 'columns',
                     layout: {
-                        padding: '.5em',
-                        max_height: 'calc(3.5rem * 1.2)'
+                        max_height: 'calc(4rem * 1.2)'
                     },
                     ui_elements: {
                         uid: {
+                            binding: {
+                                field_name: 'uid'
+                            },
                             element_type: 'text_field',
+                            display_identifier: true,
                             value: '${uid}',
                             text: 'uid',
                             visible: '${text_input}'
                         },
                         text_input: {
+                            binding: {
+                                field_name: 'text_input'
+                            },
                             element_type: 'text_field',
                             value: '${text_input}',
                             text: 'text',

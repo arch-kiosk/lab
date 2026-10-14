@@ -44,11 +44,10 @@ export class RenderContext {
 
     public resolve(expression?: string | Array<string|undefined>, id?: string): unknown {
         if (expression === undefined) return ''
-        const expressions = typeof(expression) === "string" ? [expression] : expression
 
         // value = replaceData(value, this.data)
         if (this.uicomponent.dataProvider && expression != undefined) {
-            return this.uicomponent.dataProvider.resolve(expressions, id, this.dataContext?.recordIndex)
+            return this.uicomponent.dataProvider.resolve(expression, id, this.dataContext?.recordIndex)
         }
         return expression
     }
@@ -106,11 +105,11 @@ export class UIElementRenderContext extends RenderContext {
 }
 
 export class UILayoutRenderContext extends RenderContext {
-    layoutDefinition: UISchemaLayoutElement
+    elementDefinition: UISchemaLayoutElement
 
     constructor(component: UIComponent, layoutDefinition: UISchemaLayoutElement, dataContext: RenderContextDataContext, parentLayout?: UILayout) {
         super(component, dataContext, parentLayout)
-        this.layoutDefinition = layoutDefinition
+        this.elementDefinition = layoutDefinition
     }
 
     resetCursor() {
