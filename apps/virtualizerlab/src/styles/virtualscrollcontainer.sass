@@ -1,71 +1,73 @@
-div
-  box-sizing: border-box
 
-:host
+virtual-scroll-container
   display: block
   height: 100%
   width: 100%
   position: relative
-.dev-telemetry
-  width: 10em
-  //height: 2em
-  font-size: 12px
-  padding: 5px
-  position: absolute
-  right: 2em
-  top: -1em
-  z-index: 1
-  font-family: var(--uic-standard-text-font, var(--font-standard, var(--standard-text-font, "Noto Sans", sans-serif)))
-  border: darkslategrey 1px solid
-  background: #FFEEAA
-#dev-row-count
-  white-space: pre
-  color: black
 
-lit-virtualizer
-  max-height: 100vh
+  div
+    box-sizing: border-box
 
-.scroll-container
-  height: 100%
-  width: 100%
-  overflow-y: auto
+  .dev-telemetry
+    width: 10em
+    //height: 2em
+    font-size: 12px
+    padding: 5px
+    position: absolute
+    right: 2em
+    top: -1em
+    z-index: 1
+    font-family: var(--uic-standard-text-font, var(--font-standard, var(--standard-text-font, "Noto Sans", sans-serif)))
+    border: darkslategrey 1px solid
+    background: #FFEEAA
+  #dev-row-count
+    white-space: pre
+    color: black
 
-.scroll-track
-  width: 100%
-  position: relative
+  lit-virtualizer
+    max-height: 100vh
 
-.virtual-row
-  position: absolute
-  top: 0
-  left: 0
-  width: 100%
-  //padding: 0.75rem 1rem
-  //border-bottom: 1px solid #e0e0e0
-  display: flex
-  flex-direction: row
-.row-selector
-  align-self: stretch
-  min-width: 24px
-  background-color: #5cad6c
-  border: 1px solid black
-  border-right: 2px solid black
-  margin-right: 2px
-  &.active
-    background-color: red
-.row-content
-  width: 100%
-  height: 100%
+  .scroll-container
+    height: 100%
+    width: 100%
+    overflow-y: auto
 
-.sk-wave-bar
-  align-self: center
-  height: 75%
-  width: 85%
-  border-radius: 4px
-  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%)
-  background-size: 200% 100%
-  animation: sk-wave 1.5s infinite ease-in-out
+  .scroll-track
+    width: 100%
+    position: relative
 
-@keyframes sk-wave
+  .virtual-row
+    position: absolute
+    top: 0
+    left: 0
+    width: 100%
+    //padding: 0.75rem 1rem
+    //border-bottom: 1px solid #e0e0e0
+    display: flex
+    flex-direction: row
+  .row-selector
+    align-self: stretch
+    min-width: 24px
+    background-color: #5cad6c
+    border: 1px solid black
+    border-right: 2px solid black
+    margin-right: 2px
+    &.active
+      background-color: red
+  .row-content
+    width: 100%
+    height: 100%
+
+  .sk-wave-bar
+    align-self: center
+    height: 75%
+    width: 85%
+    border-radius: 4px
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%)
+    background-size: 200% 100%
+    animation: virtual-scroll-container-sk-wave 1.5s infinite ease-in-out
+
+@keyframes virtual-scroll-container-sk-wave
   0%
     background-position: 200% 0
   100%

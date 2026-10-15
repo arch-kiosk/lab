@@ -1,15 +1,19 @@
 // oxlint-disable typescript/no-explicit-any
-import { LitElement, html, PropertyValues, unsafeCSS, HTMLTemplateResult } from 'lit'
+import { LitElement, html, PropertyValues, HTMLTemplateResult } from 'lit'
 import { when } from 'lit/directives/when.js'
 import { customElement, property, state } from 'lit/decorators.js'
 import { repeat } from 'lit/directives/repeat.js'
 import { createRef, ref, Ref } from 'lit/directives/ref.js'
 import { VirtualizerController } from '@tanstack/lit-virtual'
 import type { VirtualItem } from '@tanstack/virtual-core'
-
-import local_css from './styles/virtualscrollcontainer.sass?inline'
 import { VirtualScrollContainerDataProvider } from '@arch-kiosk/appfoundation/dataprovider'
 
+import local_css from './styles/virtualscrollcontainer.sass?inline'
+const cssString = typeof local_css === 'string'
+    ? local_css
+    : (local_css as any)?.default || String(local_css)
+const sheet = new CSSStyleSheet()
+sheet.replaceSync(cssString)
 
 export type VirtualScrollContainerDataNotification = {
     currentRecord?: number
@@ -24,7 +28,7 @@ export type RowRenderer = (
 
 @customElement('virtual-scroll-container')
 export class VirtualScrollContainer extends LitElement {
-    static styles = unsafeCSS(local_css)
+    // static styles = unsafeCSS(local_css)
     static {
         // Runs once when the class is defined, BEFORE any instances are created
         this.disableWarning?.('change-in-update')
@@ -50,6 +54,22 @@ export class VirtualScrollContainer extends LitElement {
 
     protected createRenderRoot() {
         return this // Light DOM so layout flex/grid CSS continues to work
+    }
+
+    connectedCallback() {
+        super.connectedCallback()
+        this.injectStyles()
+    }
+
+    private injectStyles() {
+        // Determine whether the component is inside a ShadowRoot or the global Document
+        const rootNode = this.getRootNode() as ShadowRoot | Document
+
+        if (rootNode && 'adoptedStyleSheets' in rootNode) {
+            if (!rootNode.adoptedStyleSheets.includes(sheet)) {
+                rootNode.adoptedStyleSheets = [...rootNode.adoptedStyleSheets, sheet]
+            }
+        }
     }
 
     private virtualizerController = new VirtualizerController<HTMLDivElement, Element>(this, {
@@ -133,7 +153,7 @@ export class VirtualScrollContainer extends LitElement {
         if (!this.dataProvider) return
 
         if (this.recalcRowHeight) {
-            const firstLoadedRow = this.shadowRoot?.querySelector<HTMLElement>('.virtual-row[data-loaded]')
+            const firstLoadedRow = this.querySelector<HTMLElement>('.virtual-row[data-loaded]')
             if (firstLoadedRow?.offsetHeight) {
                 const measuredHeight = firstLoadedRow.offsetHeight
                 if (measuredHeight !== this.rowHeight) {
@@ -160,7 +180,7 @@ export class VirtualScrollContainer extends LitElement {
             const dpTelemetry = dataProvider.getTelemetry() ?? { _: '' }
             let dpTelemetryText = ('cached' in dpTelemetry && 'capacity' in dpTelemetry) ? `\ncache ${dpTelemetry.cached}/${dpTelemetry.capacity}` : ''
             dpTelemetryText += ('newDrafts' in dpTelemetry && 'modDrafts' in dpTelemetry) ? `\ndrafts +${dpTelemetry.newDrafts as string}/#${dpTelemetry.modDrafts as string}` : ''
-            const domRows = this.shadowRoot?.querySelectorAll('.virtual-row').length ?? 0
+            const domRows = this.querySelectorAll('.virtual-row').length ?? 0
             this.devTelemetryRef.value.textContent = `${domRows} rows in DOM, ${dpTelemetryText}`
         }
     }
