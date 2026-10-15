@@ -105,7 +105,7 @@
         {
           "properties": {
             "layout": {
-              "$ref": "#/definitions/UISchemaUIElementElementInColumnsLayout"
+              "$ref": "#/definitions/UISchemaUIElementElementLayoutBase"
             }
           },
           "type": "object"
@@ -139,7 +139,7 @@
               "description": "for type iconButton: The icon, which must resolve to a FontAwesome icon code."
             },
             "layout": {
-              "$ref": "#/definitions/UISchemaUIElementElementInColumnsLayout"
+              "$ref": "#/definitions/UISchemaUIElementElementLayoutBase"
             },
             "style": {
               "$ref": "#/definitions/UISchemaUIElementStyleBasics",
@@ -201,7 +201,7 @@
               "description": "optional. Determines if a field can be navigated to (receive the focus). Default is true."
             },
             "layout": {
-              "$ref": "#/definitions/UISchemaUIElementElementInColumnsLayout"
+              "$ref": "#/definitions/UISchemaUIElementElementLayoutBase"
             },
             "multiline": {
               "description": "is this a multiline field, so should line feeds or carriage returns be accepted?",
@@ -274,7 +274,7 @@
               "type": "boolean"
             },
             "layout": {
-              "$ref": "#/definitions/UISchemaUIElementElementInColumnsLayout"
+              "$ref": "#/definitions/UISchemaUIElementElementLayoutBase"
             },
             "readonly": {
               "description": "optional. Determines if a field takes inputs right now. The element might still receive the caret or focus (unlike enabled=false elements), you just cannot change the value. but you might e.g. be able to copy the input value onto the clipboard. Default is false.",
@@ -318,7 +318,7 @@
               "type": "string"
             },
             "layout": {
-              "$ref": "#/definitions/UISchemaUIElementElementInColumnsLayout"
+              "$ref": "#/definitions/UISchemaUIElementElementLayoutBase"
             },
             "style": {
               "$ref": "#/definitions/UISchemaUIElementStyleBasics",
@@ -382,7 +382,7 @@
               "description": "Either a list of static selection values or more refined settings via UISchemaLookupSettings"
             },
             "layout": {
-              "$ref": "#/definitions/UISchemaUIElementElementInColumnsLayout"
+              "$ref": "#/definitions/UISchemaUIElementElementLayoutBase"
             },
             "readonly": {
               "description": "optional. Determines if a field takes inputs right now. The element might still receive the caret or focus (unlike enabled=false elements), you just cannot change the value. but you might e.g. be able to copy the input value onto the clipboard. Default is false.",
@@ -426,7 +426,7 @@
               "type": "string"
             },
             "layout": {
-              "$ref": "#/definitions/UISchemaUIElementElementInColumnsLayout"
+              "$ref": "#/definitions/UISchemaUIElementElementLayoutBase"
             },
             "style": {
               "$ref": "#/definitions/UISchemaUIElementStyleBasics",
@@ -465,7 +465,7 @@
               "type": "string"
             },
             "layout": {
-              "$ref": "#/definitions/UISchemaUIElementElementInColumnsLayout"
+              "$ref": "#/definitions/UISchemaUIElementElementLayoutBase"
             },
             "mask_identifier": {
               "$ref": "#/definitions/InterpretedExpression",
@@ -523,7 +523,7 @@
               "description": "optional. Determines if a field can be navigated to (receive the focus). Default is true."
             },
             "layout": {
-              "$ref": "#/definitions/UISchemaUIElementElementInColumnsLayout"
+              "$ref": "#/definitions/UISchemaUIElementElementLayoutBase"
             },
             "readonly": {
               "description": "optional. Determines if a field takes inputs right now. The element might still receive the caret or focus (unlike enabled=false elements), you just cannot change the value. but you might e.g. be able to copy the input value onto the clipboard. Default is false.",
@@ -593,7 +593,7 @@
               "type": "string"
             },
             "layout": {
-              "$ref": "#/definitions/UISchemaUIElementElementInColumnsLayout"
+              "$ref": "#/definitions/UISchemaUIElementElementLayoutBase"
             },
             "resolution": {
               "type": "string"
@@ -1242,32 +1242,6 @@
       ],
       "type": "object"
     },
-    "UISchemaUIElementElementInColumnsLayout": {
-      "additionalProperties": false,
-      "properties": {
-        "column_span": {
-          "description": "optional number of columns this element spans within a columns orchestration strategy",
-          "type": "number"
-        },
-        "max_height": {
-          "$ref": "#/definitions/UISchemaUIElementLayoutDimension",
-          "description": "this can either be a number, in which case the unit is depends in the element type, or 'max', in which case the element can be as tall as possible Lookup the particular layout on which the element appears to find out about available options."
-        },
-        "max_width": {
-          "$ref": "#/definitions/UISchemaUIElementLayoutDimension",
-          "description": "this can either be a number, in which case the unit depends on the element type, or 'max', in which case the element can be as wide as possible. Lookup the particular layout on which the element appears to find out about available options."
-        },
-        "min_height": {
-          "$ref": "#/definitions/UISchemaUIElementLayoutDimension",
-          "description": "this can either be a number, in which case the unit depends on the element type, or 'max', in which case the element will be as tall as possible Lookup the particular layout on which the element appears to find out about available options."
-        },
-        "min_width": {
-          "$ref": "#/definitions/UISchemaUIElementLayoutDimension",
-          "description": "this can either be a number, in which case the unit depends on the element type, or 'max', in which case the element will be as wide as possible. Lookup the particular layout on which the element appears to find out about available options."
-        }
-      },
-      "type": "object"
-    },
     "UISchemaUIElementElementLayoutBase": {
       "additionalProperties": false,
       "description": "How an element is positioned in the layout. The optional layout property defines how an element is positioned within its parent layout. All the attributes in this section are optional and 💡 depend on the layout on which the element appears. So consult the description of the particular layout type (orchestration strategy) to find out about    actual layout options.",
@@ -1341,6 +1315,15 @@
       },
       "type": "object"
     },
+    "UISchemaUILevels": {
+      "enum": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "type": "number"
+    },
     "UISchemaUIRootLayoutElement": {
       "anyOf": [
         {
@@ -1391,6 +1374,9 @@
             },
             "ui_elements": {
               "$ref": "#/definitions/Dictionary%3CUISchemaElementOnLayout%3C%22columns%22%3E%3E"
+            },
+            "ui_level": {
+              "$ref": "#/definitions/UISchemaUILevels"
             },
             "visible": {
               "anyOf": [
@@ -1459,6 +1445,9 @@
             },
             "ui_elements": {
               "$ref": "#/definitions/Dictionary%3CUISchemaElementOnLayout%3C%22scroll%22%3E%3E"
+            },
+            "ui_level": {
+              "$ref": "#/definitions/UISchemaUILevels"
             },
             "visible": {
               "anyOf": [

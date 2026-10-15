@@ -251,13 +251,13 @@ export interface UISchemaUIElementElementLayoutBase {
     max_width?: UISchemaUIElementLayoutDimension
 }
 
-export interface UISchemaUIElementElementInColumnsLayout extends UISchemaUIElementElementLayoutBase {
-    /** optional number of columns this element spans within a columns orchestration strategy */
-    column_span?: number
-}
+// export interface UISchemaUIElementElementInColumnsLayout extends UISchemaUIElementElementLayoutBase {
+//     /** optional number of columns this element spans within a columns orchestration strategy */
+//     column_span?: number
+// }
 
 export interface UISchemaOrchestrationStrategyElementLayouts {
-    "columns": UISchemaUIElementElementInColumnsLayout
+    "columns": UISchemaUIElementElementLayoutBase
     "scroll": UISchemaUIElementElementLayoutBase
 }
 
@@ -325,6 +325,8 @@ export type UISchemaElementOnLayout<S extends UISchemaOrchestrationStrategyKeys>
     layout?: UISchemaOrchestrationStrategyElementLayouts[S]
 }
 
+export type UISchemaUILevels = 0 | 1 | 2 | 3
+
 /**
  * A LayoutElement groups other elements (among which can be layouts again),
  * can have an appearance of its own and also controls data flow.
@@ -333,6 +335,7 @@ export type UISchemaLayoutElement = {
     [S in UISchemaOrchestrationStrategyKeys]: UISchemaBaseUIElement &
     UISchemaLayoutSettings<S> & {
     element_type: 'layout'
+    ui_level?: UISchemaUILevels
     ui_elements: Dictionary<UISchemaElementOnLayout<S>>
 }
 }[UISchemaOrchestrationStrategyKeys]

@@ -1,7 +1,8 @@
 import {
+    UISchema,
     UISchemaDynamicUIElement,
     UISchemaElementOnLayout,
-    UISchemaLayoutElement, UISchemaOrchestrationStrategyKeys,
+    UISchemaLayoutElement, UISchemaOrchestrationStrategyKeys, UISchemaUILevels,
 } from '../uischema'
 import { UIElementRenderContext, UILayoutRenderContext } from '../uielementrendercontext'
 import { html, nothing, ReactiveController, TemplateResult } from 'lit'
@@ -13,17 +14,18 @@ import { UIElement } from '#src/uielement'
 export abstract class UILayout implements ReactiveController {
     layoutDefinition: UISchemaLayoutElement
     _id: string = '?'
-    protected validation=false
+    protected validation = false
     reactiveControllerHost: UIComponent
     abstract cssClass: string
     public renderElementLabels: boolean = true
-    public abstract cardinality: "1" | "N"
+    public abstract cardinality: '1' | 'N'
+    public uilevel: UISchemaUILevels = 0
 
     constructor(
         id: string,
         reactiveControllerHost: UIComponent,
         layoutDefinition: UISchemaLayoutElement,
-        recordValidation = false
+        recordValidation = false,
     ) {
         this._id = id
         this.reactiveControllerHost = reactiveControllerHost
@@ -45,7 +47,7 @@ export abstract class UILayout implements ReactiveController {
                 new CustomEvent('rerender-request', {
                     bubbles: true,
                     composed: true, // Allows crossing Shadow DOM boundaries if needed
-                })
+                }),
             )
         } else {
             // Fallback to updating the master component if triggered outside a DOM context
@@ -77,7 +79,7 @@ export abstract class UILayout implements ReactiveController {
     }
 
 
-    public dataChanged(event: InputEvent, recordIndex?:number) {
+    public dataChanged(event: InputEvent, recordIndex?: number) {
         // const element=this.reactiveControllerHost.getSchemaElement(elementId)
         const domElement = event.target as HTMLInputElement
         if (recordIndex !== undefined && domElement) {
@@ -87,25 +89,27 @@ export abstract class UILayout implements ReactiveController {
                 this.requestRerender(domElement)
             }
         } else {
-            console.log("no record index or dom element", recordIndex, domElement)
+            console.log('no record index or dom element', recordIndex, domElement)
         }
         event.stopPropagation()
     }
 
     protected renderRecordValidation(_layoutId: string, renderContext: UILayoutRenderContext): unknown {
         const validationInfo = renderContext.uicomponent.dataProvider?.getRecordValidationInformation(renderContext.dataContext.recordIndex)
-        return validationInfo && validationInfo.length > 0? html`
-            <div style="position: absolute; right: 0; left: auto; background-color: lightcoral" class="layout-validation">${validationInfo.map((vi) => html`${vi.result as string}`)}</div>
-        `:nothing
+        return validationInfo && validationInfo.length > 0 ? html`
+            <div style="position: absolute; right: 0; left: auto; background-color: lightcoral"
+                 class="layout-validation">
+                ${validationInfo.map((vi) => html`${vi.result as string}`)}
+            </div>
+        ` : nothing
     }
-
 
 
     public renderLayout(
         layoutId: string,
         renderContext: UILayoutRenderContext,
         renderElement: UIElementRenderer,
-    ): TemplateResultOrNothing{
+    ): TemplateResultOrNothing {
         const layoutDefinition = renderContext.elementDefinition
         const v = UIElement.isVisible(renderContext, layoutId)
         console.log(`${layoutId} visible is ${v}`)
@@ -115,13 +119,17 @@ export abstract class UILayout implements ReactiveController {
 
         const cssClasses = UIElement.getCSSClasses(renderContext, layoutDefinition.style?.css_classes)
         const cssStyles = UIElement.getCSSStyles(renderContext, layoutDefinition.style?.css_styles)
-
-        if (renderContext.parentLayout)
+        if (renderContext.parentLayout) {
             renderContext.parentLayout.adjustElementStyles({
-                cssClasses: cssClasses,
-                cssStyles: cssStyles
-            },
-        )
+                    cssClasses: cssClasses,
+                    cssStyles: cssStyles,
+                },
+            )
+            if (layoutDefinition.ui_level === undefined) {
+                this.uilevel = renderContext.parentLayout.uilevel ?? 0 as UISchemaUILevels
+            }
+        }
+        this.uilevel = layoutDefinition.ui_level ?? this.uilevel
 
         const elements = this.getOrderedElements(renderContext.elementDefinition)
         let style: string = ''
@@ -131,30 +139,30 @@ export abstract class UILayout implements ReactiveController {
 
         // style += (style ? ';' : '')
         // style += this.reactiveControllerHost.getPaddingStyle(renderContext.layoutDefinition.layout?.padding)
-        const recordNr = renderContext.dataContext?renderContext.dataContext.recordIndex:undefined
+        const recordNr = renderContext.dataContext ? renderContext.dataContext.recordIndex : undefined
         // if (recordNr) renderContext.uicomponent.dataProvider?.getRecord(recordNr, true)
-        console.log(`rendering layout ${this._id} for record`,renderContext.dataContext.record)
+        console.log(`rendering layout ${this._id} for record`, renderContext.dataContext.record)
 
         const renderedElements = elements.map((id) =>
             renderElement(id, renderContext.elementDefinition.ui_elements[id], this, renderContext.dataContext),
         )
-        const recordUid = renderContext.dataContext?renderContext.dataContext.recordUID as string:undefined
+        const recordUid = renderContext.dataContext ? renderContext.dataContext.recordUID as string : undefined
         if (renderContext.parentLayout) {
-            style = (style ? style + ";" : "") + renderContext.parentLayout.renderLayoutStyles(renderContext.elementDefinition, {
+            style = (style ? style + ';' : '') + renderContext.parentLayout.renderLayoutStyles(renderContext.elementDefinition, {
                 cssClasses: cssClasses,
-                cssStyles: cssStyles
+                cssStyles: cssStyles,
             })
             console.log(`rendering layout ${this._id} with styles`, (renderContext.elementDefinition as UISchemaElementOnLayout<UISchemaOrchestrationStrategyKeys>).layout)
 
         }
         return this.renderHtmlTemplate(
-                recordNr,
-                layoutId,
-                renderContext,
-                cssClasses,
-                (style ? style + ";" : "") + Object.entries(cssStyles).map(([key, val]) => `${key}:${val}`).join(";"),
-                recordUid,
-                renderedElements)
+            recordNr,
+            layoutId,
+            renderContext,
+            cssClasses,
+            (style ? style + ';' : '') + Object.entries(cssStyles).map(([key, val]) => `${key}:${val}`).join(';'),
+            recordUid,
+            renderedElements)
     }
 
     protected renderHtmlTemplate(recordNr: number | undefined,
@@ -165,13 +173,15 @@ export abstract class UILayout implements ReactiveController {
                                  renderedElements: TemplateResultOrNothing[]) {
         return html`
             ${this.validation && recordNr !== undefined ? this.renderRecordValidation(layoutId, renderContext) : nothing}
-            <div id="${renderContext.getScopedId(layoutId)}" class="${[this.cssClass, ...cssClasses].join(" ")}" 
-                 style="${style}" 
-                 data-record-nr="${recordNr ?? nothing}" 
+            <div id="${renderContext.getScopedId(layoutId)}"
+                 class="${[this.cssClass, ...cssClasses].join(' ')}"
+                 style=${style} 
+                 data-record-nr="${recordNr ?? nothing}"
                  data-record-uid="${recordUid ?? nothing}"
+                 ui-level=${'l'+this.uilevel}
                  @input="${(event: InputEvent) => this.dataChanged(event, recordNr)}"
             >
-            ${renderedElements}
+                ${renderedElements}
             </div>
         `
     }
@@ -179,10 +189,13 @@ export abstract class UILayout implements ReactiveController {
     renderElement<A>(
         elementDefinition: UISchemaElementOnLayout<UISchemaOrchestrationStrategyKeys>,
         elementRenderContext: A,
-        elementRenderer:(context: A) => TemplateResult
+        elementRenderer: (context: A) => TemplateResult,
     ): TemplateResult {
         return html`
-            <div class="element-container" part="${elementDefinition.element_type}" style="${this.renderLayoutStyles(elementDefinition, elementRenderContext)}">${elementRenderer(elementRenderContext)}</div>
+            <div class="element-container" part="${elementDefinition.element_type}"
+                 style="${this.renderLayoutStyles(elementDefinition, elementRenderContext)}">
+                ${elementRenderer(elementRenderContext)}
+            </div>
         `
     }
 
@@ -191,7 +204,8 @@ export abstract class UILayout implements ReactiveController {
             const ht: Array<TemplateResult> = []
             for (const t of texts) {
                 ht.push(
-                    html`<span class="developer-info"">[${t == undefined ? 'undefined' : t}]</span>`,
+                    html`<span
+                            class="developer-info"">[${t == undefined ? 'undefined' : t}]</span>`,
                 )
             }
             return ht
@@ -206,9 +220,9 @@ export abstract class UILayout implements ReactiveController {
                            style="${errorState ? 'color: red' : nothing}"
                     >${text ? text : nothing}
                         ${this.devInfo(
-                            context,
-                            elementDefinition.text,
-                            elementDefinition.value,
+                                context,
+                                elementDefinition.text,
+                                elementDefinition.value,
                         )}
                     </label>
             `

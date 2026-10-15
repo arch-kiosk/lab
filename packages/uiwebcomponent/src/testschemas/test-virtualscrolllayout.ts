@@ -58,6 +58,7 @@ function getUiSchema(): UISchema {
             ui_elements: {
                 row_layout: {
                     element_type: 'layout',
+                    ui_level: 1,
                     orchestration_strategy: 'columns',
                     layout: {
                         max_height: 'calc(4rem * 1.2)'

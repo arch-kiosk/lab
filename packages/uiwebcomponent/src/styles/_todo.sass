@@ -1,0 +1,254 @@
+button
+  width: var(--ui-button-width, 60px)
+  height: var(--ui-button-height, 60px)
+  border-radius: calc(var(--ui-button-height, 60px) / 2)
+  border-style: solid
+  border-width: 2px
+  background-color: $col-bg-button
+  color: $col-button
+  border-color: $col-bg-button-dk
+  font-family: $font-headline
+  font-size: $font-size-h4
+  font-weight: bold
+  //padding-bottom: 3px
+  //margin-bottom: 2px
+  &:hover, &:focus
+    outline: none
+    background-color: $col-bg-button-lt
+  &:active
+    padding-top: 3px
+    color: $col-button
+    background-color: $col-bg-button-dk
+    border-color: $col-bg-button-lt
+
+button:disabled
+  opacity: .3
+
+.modal-round-button
+  box-sizing: border-box
+  //background-repeat: no-repeat
+  //background-position: center
+  //background-size: 25px 25px
+  margin-left: 25px
+  background-image: none
+  display: inline-block
+  font-style: normal
+  font-variant: normal
+  text-rendering: auto
+  -webkit-font-smoothing: antialiased
+  font-family: $font-fontawesome
+  //padding-top: 4px
+  font-weight: 900
+  font-size: $font-size-button
+  line-height: $font-size-button
+  vertical-align: center
+  text-align: center
+
+.modal-button
+  @extend .modal-round-button
+
+.modal-ok
+  @extend .modal-round-button
+  &:after
+    content: var(--icon-bt-ok)
+
+.modal-next
+  @extend .modal-round-button
+  &:after
+    padding-left: 2px
+    content: var(--icon-bt-next)
+
+.modal-back
+  @extend .modal-round-button
+  &:after
+    padding-right: 2px
+    content: var(--icon-bt-back)
+
+.modal-cancel
+  @extend .modal-round-button
+  &:after
+    content: var(--icon-bt-cancel)
+
+.modal-close
+  @extend .modal-round-button
+  &:before
+    content: var(--icon-bt-close)
+
+.modal-delete
+  @extend .modal-round-button
+  background-color: $col-bg-alert
+  &:before
+    color: $col-alert
+    background-color: $col-bg-alert
+    content: var(--icon-bt-trash)
+  &:hover, &:focus
+    border-color: $col-bd-alert
+    background-color: $col-bg-alert-lt
+    background-size: 75%
+  &:active
+    border-color: $col-bd-alert
+    background-color: $col-bg-alert-dk
+
+.file-broken
+  display: flex
+  width: 64px
+  height: 64px
+  position: relative
+
+
+.developer-info
+  background-color: darkgreen
+  color: lightyellow
+  //margin-left: 1em
+  font-size: .7em
+  display: inline-block
+  //height: 0px
+  //width: 0px
+  //overflow: hidden
+  word-wrap: anywhere
+
+.uicomponent-version
+  position: absolute
+  transform: translateX(-40px)
+  background-color: rgba(0,150,0,.4)
+  color: white
+  --standard-text-font: "Noto Sans", sans-serif
+  font-family: $font-standard
+  padding: .2em .5em
+  left: auto
+  right: 0px
+  z-index: 10
+  box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px
+
+.input-right-align
+  text-align: right
+
+.identifier-link
+  //border-bottom: 2px black dashed
+  text-decoration: underline
+  text-decoration-style: dotted
+  cursor: pointer
+
+.footsteps
+  transform: rotate(270deg)
+  display: inline-block
+  margin-right: .5em
+
+.text-cell
+  @extend .ui-field
+  display: table-cell
+  background-color: $col-bg-lt
+table
+  display: table
+  table-layout: fixed
+  border-collapse: collapse
+  overflow-y: inherit
+  width: 100%
+thead
+  tr
+    position: relative
+    z-index: 1
+
+.table-header
+  @extend .ui-field
+  display: table-cell
+  text-align: left
+  background-color: $col-bg-dk
+  color: $col-accent
+  padding: 2px
+  font-family: var(--uic-font-monospace)
+  //font-size: .9em
+  font-weight: normal
+  flex-direction: row
+  z-index: 5
+th
+  position: sticky
+  top: 0
+
+.table-header-icon
+  text-align: center
+  background-color: $col-bg
+  color: $col-accent
+  padding: 2px 4px
+  z-index: 5
+.table-header-icon-secondary
+  @extend .table-header-icon
+  background-color: $col-bg
+  color: $col-primary
+  opacity: .5
+td
+  border: 1px solid $col-bg
+  input, textarea
+    width: 100%
+
+.input-checkbox
+  width: 1.2em
+  margin-left: 0
+.read-only-image
+  @extend .read-only-textarea
+  display: flex
+  //width: 100%
+  border: 2px solid $col-bg
+  &:hover, &active
+    border: 2px solid $col-accent
+.gallery-item.gallery-item-selected
+  border: 2px solid $col-bg-ack
+  -webkit-box-shadow: 0px 0px 15px -1px $col-bg-ack-dk
+  box-shadow: 0px 0px 15px -1px $col-bg-ack-dk
+
+.image-center
+  margin: auto //this is what centers a read-only-image within its parent.
+  overflow: auto
+.image-left-align
+  margin: 0 //this is what centers a read-only-image within its parent.
+  overflow: auto
+.file-element-description
+  text-align: center
+  white-space: pre-wrap
+
+.combobox-div
+  @extend .text-field-div
+  margin-bottom: 0
+vaadin-date-picker
+  padding: 0px
+vaadin-date-picker, vaadin-time-picker, vaadin-combo-box
+  margin-left: calc(-1 * (0.375em + var(--lumo-border-radius-m) / 4 - 1px))
+  margin-right: calc(-1 * (0.375em + var(--lumo-border-radius-m) / 4 - 1px))
+  padding-top: 0px
+vaadin-date-picker > input, vaadin-time-picker > input, vaadin-combo-box > input
+  --_lumo-text-field-overflow-mask-image: white
+  --lumo-text-field-size: 22px
+  background-color: white
+  max-height: 30px
+vaadin-date-picker > input:disabled, vaadin-time-picker > input:disabled, vaadin-combo-box > input:disabled
+  background-color: $col-bg-lt
+  --lumo-disabled-text-color: $col-primary
+
+
+.date-time-frame
+  background-color: $col-bg-lt
+  display: flex
+  flex-direction: row
+  align-items: center
+.time-zone-marker
+  display: inline-block
+  border-right: solid 1px $col-bg-dk
+  width: 28px
+  padding: 4px 4px
+  font-size: $font-size-standard
+.time-zone-marker:before
+  content: ""
+.date-time-popover
+  position: absolute
+  display: none
+  background-color: $col-bg-ack
+  color: $col-primary-bg-ack
+  padding: 5px
+  font-family: $font-standard
+  font-size: $font-size-standard
+  font-weight: normal
+
+.templateLabel
+  height: 30px
+  line-height: 30px
+  vertical-align: middle

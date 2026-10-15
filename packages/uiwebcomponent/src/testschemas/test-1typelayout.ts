@@ -91,6 +91,7 @@ function getUiSchema(): UISchema {
             element_type: 'layout',
             orchestration_strategy: 'columns',
             order: ['uid', 'text_input', 'sub_layout'],
+            ui_level: 2,
             layout: {
                 max_height: '50vh',
             },
@@ -108,7 +109,7 @@ function getUiSchema(): UISchema {
                     style: {
                       css_styles: {
                           "--ui-col-bg-1-input": "yellow",
-                          // "--ui-col-primary-bg-1": "contrast-color(var(--ui-col-bg-1-input))"
+                          "--ui-col-primary-bg-1": "contrast-color(var(--ui-col-bg-1-input))"
                       }
                     },
                     layout: {
@@ -116,7 +117,6 @@ function getUiSchema(): UISchema {
                         min_width: 'max',
                         max_height: '',
                         min_height: '',
-                        column_span: 25
                     },
                     element_type: 'text_field',
                     value: '${text_input}',
@@ -135,14 +135,15 @@ function getUiSchema(): UISchema {
                 },
                 sub_layout: {
                     element_type: 'layout',
-                    visible: "some_lua_expression(asdf)",
+                    // visible: "some_lua_expression(asdf)",
                     orchestration_strategy: 'columns',
+                    ui_level: 0,
                     layout: {
                         min_width: "max"
                     },
                     style: {
                         'css_styles': {
-                            'background-color': 'lightpink',
+                            // 'background-color': 'lightpink',
                             'padding': "1em"
                         },
                     },

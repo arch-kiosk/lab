@@ -1,0 +1,137 @@
+//color sass variables
+:host
+  --uic-lighter-prc: 20%
+  --uic-darker-prc: 20%
+
+//body colors in layer notation
+@function col($level, $name, $default)
+  @return var(--uic-col-#{$level}-#{$name}, var(--col-#{$level}-#{$name}, #{$default}))
+
+[ui-level="l0"]
+  --col-bg: #{col(l0, bg, #fdfdfd)}
+  --col-bg-button: #{col(l0, bg-button, #353535)}
+  --col-bg-input: #{col(l0, bg-input, #fff)}
+  --col-bg-ack: #{col(l0, bg-ack, #70b77e)}
+  --col-bg-warn: #{col(l0, bg-warn, #FABC02)}
+  --col-bg-alert: #{col(l0, bg-alert, #A22C02)}
+  --col-primary: #{col(l0, primary, contrast-color(var(--col-bg)))}
+  --col-accent: #{col(l0, accent, #237AA9)}
+
+[ui-level="l1"]
+  --col-bg: #{col(l1, bg, #fdfdfd)}
+  --col-primary: #{col(l1, primary, contrast-color(var(--col-bg)))}
+  --col-accent: #{col(l1, accent, #1d6a95)}
+
+  --col-bg-button: #{col(l1, bg-button, #353535)}
+  --col-bg-input: #{col(l1, bg-input, #fff)}
+  --col-bg-ack: #{col(l1, bg-ack, #63aa71)}
+  --col-bg-warn: #{col(l1, bg-warn, #eab002)}
+  --col-bg-alert: #{col(l1, bg-alert, #962802)}
+
+[ui-level="l2"]
+  --col-bg: #{col(l2, bg, #fdfdfd)}
+  --col-bg-button: #{col(l2, bg-button, #222222)}
+  --col-bg-input: #{col(l2, bg-input, #fff)}
+  --col-bg-ack: #{col(l2, bg-ack, #569e63)}
+  --col-bg-warn: #{col(l2, bg-warn, #dca402)}
+  --col-bg-alert: #{col(l2, bg-alert, #8a2402)}
+  --col-primary: #{col(l2, primary, contrast-color(var(--col-bg)))}
+  --col-accent: #{col(l2, accent, #185a7e)}
+
+[ui-level="l3"]
+  --col-bg: #{col(l3, bg, #ffffff)}
+  --col-bg-button: #{col(l3, bg-button, #111111)}
+  --col-bg-input: #{col(l3, bg-input, #fff)}
+  --col-bg-ack: #{col(l3, bg-ack, #4a9157)}
+  --col-bg-warn: #{col(l3, bg-warn, #ce9902)}
+  --col-bg-alert: #{col(l3, bg-alert, #7e2002)}
+  --col-primary: #{col(l3, primary, contrast-color(var(--col-bg)))}
+  --col-accent: #{col(l3, accent, #124967)}
+
+@each $level in l0, l1, l2, l3
+  [ui-level="#{$level}"]
+    --col-bg-lt: #{col($level, bg-lt, color-mix(in srgb, var(--col-bg), #fff var(--uic-lighter-prc)))}
+    --col-bg-dk: #{col($level, bg-dk, color-mix(in srgb, var(--col-bg), #000 var(--uic-darker-prc)))}
+
+    --col-bg-button-lt: #{col($level, bg-button-lt, color-mix(in srgb, var(--col-bg-button), #fff var(--uic-lighter-prc)))}
+    --col-bg-button-dk: #{col($level, bg-button-dk, color-mix(in srgb, var(--col-bg-button), #000 var(--uic-darker-prc)))}
+    --col-bg-input-lt: #{col($level, bg-input-lt, color-mix(in srgb, var(--col-bg-input), #fff var(--uic-lighter-prc)))}
+    --col-bg-input-dk: #{col($level, bg-input-dk, color-mix(in srgb, var(--col-bg-input), #000 var(--uic-darker-prc)))}
+
+    --col-bg-ack-lt: #{col($level, bg-ack-lt, color-mix(in srgb, var(--col-bg-ack), #fff var(--uic-lighter-prc)))}
+    --col-bg-ack-dk: #{col($level, bg-ack-dk, color-mix(in srgb, var(--col-bg-ack), #000 var(--uic-darker-prc)))}
+    --col-bg-warn-lt: #{col($level, bg-warn-lt, color-mix(in srgb, var(--col-bg-warn), #fff var(--uic-lighter-prc)))}
+    --col-bg-warn-dk: #{col($level, bg-warn-dk, color-mix(in srgb, var(--col-bg-warn), #000 var(--uic-darker-prc)))}
+    --col-bg-alert-lt: #{col($level, bg-alert-lt, color-mix(in srgb, var(--col-bg-alert), #fff var(--uic-lighter-prc)))}
+    --col-bg-alert-dk: #{col($level, bg-alert-dk, color-mix(in srgb, var(--col-bg-alert), #000 var(--uic-darker-prc)))}
+
+    --col-button: #{col($level, button, contrast-color(var(--col-bg-button)))}
+    --col-input: #{col($level, input, contrast-color(var(--col-bg-input)))}
+    --col-ack: #{col($level, ack, contrast-color(var(--col-bg-ack)))}
+    --col-warn: #{col($level, warn, contrast-color(var(--col-bg-warn)))}
+    --col-alert: #{col($level, alert, contrast-color(var(--col-bg-alert)))}
+
+    --col-bd-primary: #{col($level, bd-primary, var(--col-bg-lt))}
+    --col-bd-accent: #{col($level, bd-accent, var(--col-bg-dk))}
+    --col-bd-button: #{col($level, bd-button, color-mix(in srgb, var(--col-bg-button), #000 var(--uic-darker-prc)))}
+    --col-bd-input: #{col($level, bd-input, color-mix(in srgb, var(--col-bg-input), #000 var(--uic-darker-prc)))}
+    --col-bd-ack: #{col($level, bd-ack, color-mix(in srgb, var(--col-bg-ack), #000 var(--uic-darker-prc)))}
+    --col-bd-warn: #{col($level, bd-warn, color-mix(in srgb, var(--col-bg-warn), #000 var(--uic-darker-prc)))}
+    --col-bd-alert: #{col($level, bd-alert, color-mix(in srgb, var(--col-bg-alert), #000 var(--uic-darker-prc)))}
+
+
+
+// Only for convenience: Sass variables for all the color settings
+$col-bg: var(--col-bg)
+$col-bg-button: var(--col-bg-button)
+$col-bg-input: var(--col-bg-input)
+$col-bg-ack: var(--col-bg-ack)
+$col-bg-warn: var(--col-bg-warn)
+$col-bg-alert: var(--col-bg-alert)
+
+// Derived background colors
+$col-bg-lt: var(--col-bg-lt)
+$col-bg-dk: var(--col-bg-dk)
+$col-bg-button-lt: var(--col-bg-button-lt)
+$col-bg-button-dk: var(--col-bg-button-dk)
+$col-bg-input-lt: var(--col-bg-input-lt)
+$col-bg-input-dk: var(--col-bg-input-dk)
+$col-bg-ack-lt: var(--col-bg-ack-lt)
+$col-bg-ack-dk: var(--col-bg-ack-dk)
+$col-bg-warn-lt: var(--col-bg-warn-lt)
+$col-bg-warn-dk: var(--col-bg-warn-dk)
+$col-bg-alert-lt: var(--col-bg-alert-lt)
+$col-bg-alert-dk: var(--col-bg-alert-dk)
+
+// Foreground colors
+$col-primary: var(--col-primary)
+$col-accent: var(--col-accent)
+$col-button: var(--col-button)
+$col-input: var(--col-input)
+$col-ack: var(--col-ack)
+$col-warn: var(--col-warn)
+$col-alert: var(--col-alert)
+$col-primary-bg-ack: var(--col-primary-bg-ack)
+$col-primary-bg-warn: var(--col-primary-bg-ack)
+$col-primary-bg-alert: var(--col-primary-bg-ack)
+$col-accent-bg-ack: var(--col-accent-bg-ack)
+$col-accent-bg-warn: var(--col-accent-bg-ack)
+$col-accent-bg-alert: var(--col-accent-bg-ack)
+
+// Border colors
+$col-bd-primary: var(--col-bd-primary)
+$col-bd-accent: var(--col-bd-accent)
+$col-bd-button: var(--col-bd-button)
+$col-bd-input: var(--col-bd-input)
+$col-bd-ack: var(--col-bd-ack)
+$col-bd-warn: var(--col-bd-warn)
+$col-bd-alert: var(--col-bd-alert)
+
+//gradients
+//$col-bg-body-gradient: linear-gradient(to right bottom, $col-bg-body-darker, $col-bg-body-lighter)
+//$col-bg-gradient: linear-gradient(to right bottom, $col-bg-darker, $col-bg-lighter)
+//$col-bg-2-gradient: linear-gradient(to right bottom, $col-bg-2-darker, $col-bg-2-lighter)
+//$col-bg-3-gradient: linear-gradient(to right bottom, $col-bg-3-darker, $col-bg-3-lighter)
+//$col-bg-ack-gradient: linear-gradient(to right bottom, $col-bg-ack-darker, $col-bg-ack-lighter)
+//$col-bg-att-gradient: linear-gradient(to right bottom, $col-bg-att-darker, $col-bg-att-lighter)
+//$col-bg-alert-gradient: linear-gradient(135deg, $col-bg-alert-darker, $col-bg-alert-lighter)

@@ -2,35 +2,40 @@
 // basic styles for kiosk applications
 // sass constants are in constants.sass!
 @use "_constants" as *
+@use "_colors" as *
+
+
 
 \:host
   box-sizing: border-box
-  background-color: $col-bg-1
+  background-color: $col-bg
+  --lumo-contrast-10pct: rgba(0,0,0,0)
+  --lumo-contrast-60pct: $col-accent
+  --lumo-text-field-size: 1em
+  --lumo-font-size: $font-size-standard
+  --lumo-font-family: $font-standard
+  width: 100%
 
-@mixin ifscreen($param)
-  @media screen and (max-width: $param)
-    @content
+*,
+*::before,
+*::after
+  box-sizing: inherit
 
-div, thead
-  -webkit-touch-callout: none
+div,thead
   -webkit-user-select: none
-  -khtml-user-select: none
-  -moz-user-select: none
-  -ms-user-select: none
   user-select: none
 
-.read-only-textarea, .multiline-textarea, .templateLabel, .file-element-description
-  -webkit-touch-callout: text
+.read-only-textarea, .multiline-textarea, .templateLabel, .file-element-description, input, select, textarea
+  user-select: text
   -webkit-user-select: text
-  -khtml-user-select: text
   -moz-user-select: text
   -ms-user-select: text
-  user-select: text
 
 html
-  font-family: $standard-text
+  font-family: $font-standard
   font-size: $font-size-standard
-  line-height: $line-height-std
+  line-height: var(--uic-line-height-standard)
+
 body
   height: 100%
   width: 100%
@@ -38,26 +43,28 @@ body
     text-decoration: none
 
 label
-  font-family: $monospace
-  font-size: .9em
+  font-family: $font-monospace
+  font-size: $font-size-small
+
 input, select, textarea
-  -webkit-user-select: text
-  -moz-user-select: text
-  -ms-user-select: text
-  box-sizing: border-box
-  border-radius: 0px
-  user-select: text
-  font-family: $standard-text
-  background-color: $col-bg-1-input
-  border: none
+  border-radius: 0
+  font-family: $font-standard
+  font-size: $font-size-standard
+  background-color: $col-bg-input
+  line-height: $line-height-standard
+  border: 1px solid $col-bd-input
   height: 30px
-  color: $col-primary-bg-1
+  color: $col-primary
   padding: $input-padding
-  //margin-bottom: 2px
+  width: 100%
   &:focus
     outline: none
-  &:focus
-    border-bottom: 2px solid rgba(0, 0, 0, 1)
+    border-bottom: 2px solid $col-accent
+  &:disabled
+    background-color: $col-bg-lt
+    color: $col-primary
+    -webkit-text-fill-color: currentcolor
+    opacity: 1
 
 h1
   font-size: $font-size-h1
@@ -70,100 +77,34 @@ h4
 small, .font-small
   font-size: $font-size-small
 
-button
-  width: var(--ui-button-width, 60px)
-  height: var(--ui-button-height, 60px)
-  border-radius: calc(var(--ui-button-height, 60px) / 2)
-  border-style: solid
-  border-width: 2px
-  background-color: $col-bg-btn
-  color: $col-primary-bg-btn
-  border-color: $col-bg-btn-darker
-  font-family: $headline-text
-  font-size: $font-size-h4
-  font-weight: bold
-  //padding-bottom: 3px
-  //margin-bottom: 2px
-  &:hover, &:focus
-    outline: none
-    background-color: $col-bg-btn-lighter
-  &:active
-    padding-top: 3px
-    color: $col-primary-bg-btn
-    background-color: $col-bg-btn-darker
-    border-color: $col-bg-btn-darker
 
-button:disabled
-  opacity: .3
-
-.modal-round-button
-  box-sizing: border-box
-  //background-repeat: no-repeat
-  //background-position: center
-  //background-size: 25px 25px
-  margin-left: 25px
-  background-image: none
-  display: inline-block
+i
+  font-family: $font-fontawesome
   font-style: normal
   font-variant: normal
   text-rendering: auto
   -webkit-font-smoothing: antialiased
-  font-family: $fontawesome-font-family
-  //padding-top: 4px
   font-weight: 900
-  font-size: var(--ui-button-font-size, 24px)
-  line-height: var(--ui-button-font-size, 24px)
-  vertical-align: center
-  text-align: center
+  font-size: $font-size-standard
 
-.modal-button
-  @extend .modal-round-button
+.element-wrapper
+  padding: 5px
+//grid-column-start: 1
 
-.modal-ok
-  @extend .modal-round-button
-  &:after
-    content: var(--icon-bt-ok)
+.element-wrapper.new-line
+  grid-column-start: 1
 
-.modal-next
-  @extend .modal-round-button
-  &:after
-    padding-left: 2px
-    content: var(--icon-bt-next)
+.light-background
+  background-color: $col-bg-lt
 
-.modal-back
-  @extend .modal-round-button
-  &:after
-    padding-right: 2px
-    content: var(--icon-bt-back)
+@keyframes skeleton-loading
+  0%
+    background-position: 100% 0
+  100%
+    background-position: 0 0
 
-.modal-cancel
-  @extend .modal-round-button
-  &:after
-    content: var(--icon-bt-cancel)
-
-.modal-close
-  @extend .modal-round-button
-  &:before
-    content: var(--icon-bt-close)
-
-.modal-delete
-  @extend .modal-round-button
-  background-color: $col-bg-alert
-  color: $col-primary-bg-alert
-  &:before
-    content: var(--icon-bt-trash)
-  &:hover, &:focus
-    border-color: $col-bg-alert
-    background-color: $col-bg-alert-lighter
-    background-size: 75%
-  &:active
-    border-color: $col-bg-alert
-    background-color: $col-bg-alert-darker
-    color: $col-primary-bg-alert
-
-.file-broken
-  display: flex
-  width: 64px
-  height: 64px
-  position: relative
-
+.skeleton
+  background: linear-gradient(90deg, $col-bg-input-lt 25%, $col-bg-input-dk 37%, $col-bg-input 63%)
+  background-size: 400% 100%
+  animation: skeleton-loading 1.4s ease infinite
+  border-radius: 4px

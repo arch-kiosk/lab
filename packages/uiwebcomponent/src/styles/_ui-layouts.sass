@@ -1,0 +1,61 @@
+@use "constants" as *
+@use "basics" as *
+@use "colors" as *
+
+.ui-layout
+  background-color: $col-bg
+
+.ui-column-layout
+  @extend .ui-layout
+  display: grid
+  grid-template-columns: repeat(auto-fill, minmax(200px, max-content))
+  align-items: end
+  grid-row-gap: 1em
+
+.ui-stack-layout
+  @extend .ui-layout
+  display: flex
+  flex-direction: column
+.ui-right-align-layout
+  @extend .ui-layout
+  display: flex
+  flex-direction: row
+  justify-content: end
+.ui-table-layout
+  @extend .ui-layout
+.ui-line
+  width: 100%
+  height: 1px
+  margin-top: 1em
+  margin-bottom: 1em
+  border-top: solid 1px $col-accent
+
+.ui-gallery-layout
+  display: grid
+  width: 100%
+  height: 100%
+  background-color: $col-bg
+  grid-template-columns: repeat(auto-fill, minmax(200px, max-content))
+.gallery-item
+  display: flex
+  flex-direction: column
+  box-shadow: 3px 3px 6px rgb(200, 200, 200)
+  box-sizing: content-box
+  border-radius: 10px
+  margin-right: 12px
+  margin-bottom: 20px
+  .read-only-image
+    background: none
+
+.gallery-sub-item
+  @extend .ui-field
+  overflow: hidden
+  .ui-field
+    margin-top: 1px
+
+.gallery-sub-item:first-child
+  flex-grow: 1
+
+.gallery-headers
+  display: flex
+  flex-direction: row-reverse

@@ -1,0 +1,30 @@
+@use "constants" as *
+@use "basics" as *
+@use "colors" as *
+
+.ui-line-transparent
+  height: 0
+  opacity: 0
+  margin: 0
+  border: none
+
+
+.text-field-div, .read-only-textarea
+  display: flex
+  flex-direction: column
+  //margin-bottom: .5em
+  textarea
+    min-height: 5em
+
+textarea, .read-only-textarea
+  min-height: calc(3rem * $line-height-standard)
+
+.read-only-textarea
+  background-color: $col-bg
+  color: $col-primary
+  //max-height: 5em
+  overflow-y: auto
+  padding: $input-padding
+
+.multiline-textarea
+  white-space: pre-wrap
