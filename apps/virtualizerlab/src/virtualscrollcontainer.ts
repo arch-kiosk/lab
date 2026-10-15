@@ -48,6 +48,10 @@ export class VirtualScrollContainer extends LitElement {
 
     private recalcRowHeight = true
 
+    protected createRenderRoot() {
+        return this // Light DOM so layout flex/grid CSS continues to work
+    }
+
     private virtualizerController = new VirtualizerController<HTMLDivElement, Element>(this, {
         count: 0,
         getScrollElement: () => this.scrollContainerRef.value ?? null,
