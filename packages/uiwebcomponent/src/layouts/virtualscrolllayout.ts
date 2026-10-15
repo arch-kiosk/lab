@@ -2,7 +2,7 @@ import {
     Dictionary,
     UISchemaError,
     UISchemaBaseUIElement,
-    UISchemaLayoutElement,
+    UISchemaLayoutElement, UISchemaUILevels,
 } from '../uischema'
 import { html, TemplateResult } from 'lit'
 import { createRef, Ref, ref } from 'lit/directives/ref.js'
@@ -104,10 +104,17 @@ export class UIVirtualScrollLayout extends UILayout {
         if (renderUIElement) {
             this.renderUIElement = renderUIElement
         }
+        if (renderContext.elementDefinition.ui_level === undefined) {
+            this.uilevel = renderContext.parentLayout?.uilevel ?? 0 as UISchemaUILevels
+        }
+        this.uilevel = renderContext.elementDefinition.ui_level ?? this.uilevel
+
         return html`
             <virtual-scroll-container ${ref(this.virtualLayoutRef)}
-                                      id="${renderContext.getScopedId(layoutId)}"
-                                      class="${this.cssClass}" style="${style}"">
+                                      id=${renderContext.getScopedId(layoutId)}
+                                      ui-level=${"l"+this.uilevel}
+                                      class=${this.cssClass}
+                                      style=${style}>
             </virtual-scroll-container>
         `
     }

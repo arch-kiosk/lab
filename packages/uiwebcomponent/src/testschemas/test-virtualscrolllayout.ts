@@ -51,6 +51,7 @@ function getUiSchema(): UISchema {
         },
         root: {
             element_type: 'layout',
+            ui_level: 2,
             orchestration_strategy: 'scroll',
             layout: {
                 max_height: '40vh',

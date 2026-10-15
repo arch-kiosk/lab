@@ -2,8 +2,16 @@
 @use "basics" as *
 @use "colors" as *
 
+:host
+  virtual-scroll-container
+    .row-selector
+      background-color: $col-bg-ack-lt
+    .row-selector.active
+      background-color: $col-bg-ack-dk
+
 .ui-layout
   background-color: $col-bg
+
 
 .ui-column-layout
   @extend .ui-layout
