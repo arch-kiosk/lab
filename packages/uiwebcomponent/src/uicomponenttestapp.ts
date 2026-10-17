@@ -1,25 +1,26 @@
 import { customElement } from 'lit/decorators.js'
 import { html, LitElement, unsafeCSS } from 'lit'
 import { createRef, Ref, ref } from 'lit/directives/ref.js'
-// import local_css from "./styles/lab-app.sass?inline"
+import local_css from "./styles/lap-app.sass?inline"
 import './uicomponent'
 import { UIComponent } from './uicomponent'
 import { configureTestSchema1TypeLayout } from '#src/testschemas/test-1typelayout'
 import { configureTestSchemaVirtualScrollLayout } from '#src/testschemas/test-virtualscrolllayout'
+import { buildColorMatrix, renderColorMatrix } from './testcolormatrix'
 
 @customElement('ui-component-test-app')
 export class UIComponentTestApp extends LitElement {
-    // static styles = unsafeCSS(local_css)
+    static styles = unsafeCSS(local_css)
     // private dataProvider = new ConcreteDataProvider(10, 3)
 
-    static styles = unsafeCSS(`
-        #ui2::part(text_field) {
-            --ui-col-bg-1-input: black;
-            --ui-col-primary-bg-1: contrast-color(var(--ui-col-bg-1-input));
-        }
-    `)
     uiComponentRef1: Ref<UIComponent> = createRef()
     uiComponentRef2: Ref<UIComponent> = createRef()
+    private mode: 'colors' | 'test' = 'colors'
+
+    firstUpdated() {
+        // Run your script logic here directly on the Shadow/Light DOM
+        buildColorMatrix.bind(this)()
+    }
 
     updated() {
         const uiComponent1 = this.uiComponentRef1.value
@@ -31,6 +32,9 @@ export class UIComponentTestApp extends LitElement {
     }
 
     render() {
+        if (this.mode === "colors") {
+            return renderColorMatrix()
+        }
         return html`
             <style>
                 

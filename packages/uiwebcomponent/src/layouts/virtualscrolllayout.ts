@@ -2,7 +2,7 @@ import {
     Dictionary,
     UISchemaError,
     UISchemaBaseUIElement,
-    UISchemaLayoutElement, UISchemaUILevels,
+    UISchemaLayoutElement, UISchemaUILevels, UISchemaElementOnLayout,
 } from '../uischema'
 import { html, TemplateResult } from 'lit'
 import { createRef, Ref, ref } from 'lit/directives/ref.js'
@@ -77,30 +77,29 @@ export class UIVirtualScrollLayout extends UILayout {
         renderContext: UILayoutRenderContext,
         renderUIElement: UIElementRenderer,
     ): TemplateResult {
-        // const layoutSchema = renderContext.entry as UISchemaLayout
-        // const elements = this.getOrderedElements(layoutSchema)
-        // const renderedElements = elements.map((id) =>
-        //   renderElement(id, layoutSchema.ui_elements[id], layouter),
-        // )
         console.log(`rendering VirtualScrollLayout ${this._id}`)
         let style: string = ''
         this.renderContext = renderContext
+        const layoutDefinition = renderContext.elementDefinition as UISchemaElementOnLayout<"scroll">
+
         if (this.renderContext.parentLayout) {
             style = this.renderContext.parentLayout.renderLayoutStyles(renderContext.elementDefinition)
         }
-        // style += style
-        //     ? ';'
-        //     : '' + this.reactiveControllerHost.getPaddingStyle(renderContext.layoutDefinition?.layout?.padding)
+
         // This is only an emergency break to make sure the scroll layout always has a height.
         // It will be overridden by the height set in the schema definition
-        let max_height = 'max-height: 100vh;'
-        if (renderContext.elementDefinition.layout?.max_height) {
-            if (typeof (renderContext.elementDefinition.layout?.max_height) === 'string' ||
-                typeof (renderContext.elementDefinition.layout?.max_height) === 'number') {
-                max_height += `max-height: ${renderContext.elementDefinition.layout?.max_height}` + ';'
+
+        let maxHeight = 'max-height: 100vh;'
+
+        // The scroll layout is an exception to the rule right now: It interprets its own layout section. Normally that is
+        // the job of the parent layout. But the ScrollLayout is not supposed to have a parent layout.
+        if (layoutDefinition.layout?.max_height) {
+            if (typeof (layoutDefinition.layout?.max_height) === 'string' ||
+                typeof (layoutDefinition.layout?.max_height) === 'number') {
+                maxHeight += `max-height: ${layoutDefinition.layout?.max_height}` + ';'
             }
         }
-        style = max_height + style
+        style = maxHeight + style
         if (renderUIElement) {
             this.renderUIElement = renderUIElement
         }
@@ -184,7 +183,7 @@ export class UIVirtualScrollLayout extends UILayout {
     }
 
     private getSubLayoutHeight(scrollContainer: VirtualScrollContainer, subLayoutId: string) {
-        const subLayoutDefinition = this.reactiveControllerHost.getSchemaElement(subLayoutId)
+        const subLayoutDefinition = this.reactiveControllerHost.getSchemaElement(subLayoutId) as UISchemaElementOnLayout<'scroll'>
         let layoutHeight = subLayoutDefinition.layout?.max_height
         if (layoutHeight !== undefined) {
             if (typeof (layoutHeight) === 'string') {
