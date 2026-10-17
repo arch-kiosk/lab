@@ -135,7 +135,6 @@ function getUiSchema(): UISchema {
                 },
                 sub_layout: {
                     element_type: 'layout',
-                    // visible: "some_lua_expression(asdf)",
                     orchestration_strategy: 'columns',
                     ui_level: 0,
                     layout: {

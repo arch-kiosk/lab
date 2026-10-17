@@ -34,6 +34,7 @@ export default defineConfig({
     // },
     themeConfig: {
         logo: "/assets/kiosk_spider.svg",
+        outline: [2, 3],
         nav: [
             { text: "Home", link: "/" },
             { text: "API Reference", link: "/api/" },
@@ -46,6 +47,7 @@ export default defineConfig({
                 useTitleFromFileHeading: true,
                 hyphenToSpace: true,
                 capitalizeFirst: true,
+
             },
         ]),
     },

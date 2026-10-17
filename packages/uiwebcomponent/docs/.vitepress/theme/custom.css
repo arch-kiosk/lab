@@ -3,13 +3,21 @@
 /* 1. Define your own custom root color palette aliases */
 :root {
     --kiosk-sand: #ffeeaa;
-    --kiosk-reddish: #a05a2c;
+    --kiosk-reddish: #f88b43;
     --kiosk-light: #a4c700;
     --kiosk-dark: #88aa00;
     --kiosk-darker: #698b00;
-    --vp-nav-logo-height: 35px;
 }
 
+.VPHero .name {
+    font-family: 'Kumbh Sans', sans-serif;
+    font-weight: 900;
+}
+.VPHero .text {
+    font-family: 'Kumbh Sans', sans-serif;
+    font-weight: 600;
+    font-size: 36px;
+}
 /* 2. OVERRIDE LIGHT MODE: Force override the primary theme variables */
 :root {
     --vp-c-brand-1: var(--kiosk-reddish);
@@ -18,6 +26,13 @@
 
     /* Home Hero Button text/background overrides */
     --vp-home-hero-name-color: var(--kiosk-reddish);
+    --vp-nav-logo-height: 35px;
+    --vp-home-hero-name-color: transparent;
+    --vp-home-hero-name-background: -webkit-linear-gradient(120deg, #a05a2c, #F88B43);
+    --vp-c-brand-1: #698B00;
+    --vp-c-brand-2: #A4C700;
+    --vp-button-brand-bg:#698B00;
+
 }
 
 /* 3. OVERRIDE DARK MODE: VitePress applies a .dark utility class to the html tag */
