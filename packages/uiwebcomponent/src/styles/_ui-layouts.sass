@@ -49,7 +49,8 @@
   box-shadow: 3px 3px 6px rgb(200, 200, 200)
   box-sizing: content-box
   border-radius: 10px
-  margin-right: 12px
+  // Use logical margin instead of margin-right
+  margin-inline-end: 12px
   margin-bottom: 20px
   .read-only-image
     background: none
@@ -65,4 +66,7 @@
 
 .gallery-headers
   display: flex
+  // Use :dir() pseudo-class or standard flex positioning if direction flipping is needed
   flex-direction: row-reverse
+  &:dir(rtl)
+    flex-direction: row

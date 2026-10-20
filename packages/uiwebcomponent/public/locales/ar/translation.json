@@ -1,0 +1,19 @@
+{
+  "uic": {
+    "layout-error-N-cardinality-only-root": "التخطيطات ذات التعددية N مسموح بها فقط كتخطيطات جذرية (root). التخطيط {{layoutElementId}} ليس تخطيطاً جذرياً. يجب أن يكون هذا خطأ برمجياً.",
+    "layout-error-no-cardinality": "لا توجد تعددية للتخطيط {{layoutElementId}}",
+    "layout-error-no-orchestration-strategy": "لا توجد استراتيجية تنسيق (orchestration) للتخطيط {{layoutElementId}}",
+    "layout-error-unknown-cardinality": "تعددية غير معروفة {{cardinality}} للتخطيط {{layoutElementId}}",
+    "layout-error-unknown-orchestration-strategy": "استراتيجية تنسيق غير معروفة {{orchestration_strategy}} في التخطيط {{layoutElementId}}",
+    "layout-unspecific-creation-error": "لا يمكن إنشاء التخطيط {{layoutElementId}}",
+    "schema-error-element-id-redundant": "يوجد خطأ في تعريف المخطط (schema): معرف العنصر {{id}} مستخدم أكثر من مرة في مخطط واجهة المستخدم. تم التخطي.",
+    "schema-error-illegal-element-id": "يوجد خطأ في تعريف المخطط (schema): معرف العنصر {{id}} غير صالح. يجب أن يبدأ بحرف ويليه أحرف وأرقام فقط. تم تخطي العنصر.",
+    "schema-error-must-equal": "{{path}}: يجب أن يكون مساوياً للثابت {{expected}}",
+    "schema-error-must-one-of": "{{path}}: يجب أن يكون واحداً من [{{allowed}}]",
+    "schema-error-no-element-type": "ui-component: معرف العنصر {{id}} يفتقر إلى \"element_type\": تم التخطي.",
+    "schema-error-property-required": "{{path}} يفتقر إلى الخاصية المطلوبة {{property}}",
+    "schema-error-redundant-dsd-binding": "يوجد خطأ في تعريف المخطط (schema): حقل DSD المسسمى {{fieldName}} تم ربطه مرة أخرى في العنصر {{id}} في مخطط واجهة المستخدم",
+    "schema-error-unknown-property": "{{path}} خاصية غير معروفة \"{{property}}\" غير مسموح بها",
+    "schema-error-unspecific": "لا يمكن التحقق من صحة تعريف المخطط (schema) أو معالجته: {{e}}"
+  }
+}

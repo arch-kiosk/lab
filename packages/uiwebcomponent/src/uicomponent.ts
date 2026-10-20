@@ -400,10 +400,12 @@ export class UIComponent extends LitElement {
                 }
             } else if (cardinality === 'N') {
                 if (layoutElementId !== 'root') {
-                    throw new UISchemaError(
-                        this.i18NST("uic.layout-error-N-cardinality-only-root",
-                            'Layouts for N cardinality are only allowed as root layouts. Layout {{layoutElementId}} is not root. This must be a programming error.', [layoutElementId])
-                    )
+                    //i18N: this is a comment for the translator
+                    const msg= this.i18NST(
+                        "uic.layout-error-N-cardinality-only-root",
+                        'Layouts for N cardinality are only allowed as root layouts. Layout {{layoutElementId}} is not root. This must be a programming error.', [layoutElementId])
+
+                    throw new UISchemaError(msg)
                 }
                 switch (layoutSchema.orchestration_strategy) {
                     // case "columns":

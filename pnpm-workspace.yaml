@@ -33,6 +33,8 @@ catalog:
   '@voidzero-dev/vite-plus-core': ^1.0.0
   typedoc-plugin-frontmatter: ^1.3.2
   i18next: ^26.5.2
+  i18next-parser: ^9.4.0
+  i18next-cli: ^1.77.0
 overrides:
   vite: "catalog:"
   vitest: "catalog:"
@@ -45,7 +47,9 @@ peerDependencyRules:
     vitest: "*"
 allowBuilds:
   "@parcel/watcher": false
+  '@swc/core': true
   "@vaadin/vaadin-usage-statistics": false
+  esbuild: set this to true or false
 patchedDependencies:
   '@vaadin/vaadin-usage-statistics': patches/@vaadin__vaadin-usage-statistics.patch
 minimumReleaseAgeExclude:
