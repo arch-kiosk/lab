@@ -36,14 +36,17 @@
         "@vaadin/combo-box": "^25.2.4",
         "@vaadin/date-picker": "^25.2.4",
         "@vaadin/date-time-picker": "^25.2.4",
-        "@voidzero-dev/vite-plus-core": "catalog:",
         "ajv": "catalog:",
         "better-ajv-errors": "catalog:",
         "delay": "catalog:",
         "lit": "^3.3.3",
         "luxon": "^3.7.2"
     },
+    "peerDependencies": {
+        "i18next": "catalog:"
+    },
     "devDependencies": {
+        "@voidzero-dev/vite-plus-core": "catalog:",
         "@babel/core": "^7.29.7",
         "@babel/preset-env": "^7.29.7",
         "@types/jest": "^30.0.0",

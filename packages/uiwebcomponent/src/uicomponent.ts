@@ -7,7 +7,7 @@ import './layouts/uirenderboundary'
 // @ts-ignore
 import local_css from './styles/ui-component.sass?inline'
 import { UIConfigurableElementFactory } from './uielementfactory'
-
+import { I18NMock } from './i18nsimpleprovider'
 import {
     Dictionary,
     UISchemaError,
@@ -20,7 +20,7 @@ import {
     UIComponentDataProvider,
     UIComponentTimeZoneInfoProvider,
     UIInputData,
-    UIElementWithId,
+    UIElementWithId, UIComponenti18NTCallback, TemplateResultOrNothing,
 } from './sharedtypes'
 
 export type { UIComponentDataProvider, UIComponentTimeZoneInfoProvider } from './sharedtypes'
@@ -59,11 +59,19 @@ export class UIComponent extends LitElement {
     @state()
     private uiElementFactory?: UIConfigurableElementFactory
 
+    /** for debugging purposes
+    * adds i18N keys to the error messages if no external i18N provider is assigned */
+    @property()
+    reportErrorKeys: boolean = false
+
     @property()
     uiSchema: UISchema | null = null
 
     @property()
     dataProvider: UIComponentDataProvider | null = null
+
+    @property()
+    i18NTProvider?: UIComponenti18NTCallback
 
     @property({ type: String, attribute: 'override-css' })
     overrideCss: string = ''
@@ -117,7 +125,7 @@ export class UIComponent extends LitElement {
             this.flatElementList = {}
             this.bindingToElementList = {}
             this.schemaProcessor = new UISchemaProcessor(this.uiSchema)
-            this._showError = this.schemaProcessor.processSchemaDefinition()
+            this._showError = this.schemaProcessor.processSchemaDefinition(this)
             if (!this._showError) {
                 this.flatElementList = this.schemaProcessor.flatElementList
                 this.bindingToElementList = this.schemaProcessor.bindingToElementList
@@ -209,6 +217,24 @@ export class UIComponent extends LitElement {
     // protected getSchemaElement(id: string) {
     //   return this._element_list[id]
     // }
+
+    public i18NST(key: string, defaultValue:string, values: string[], escapeValues=false) {
+        const options: Record<string, unknown> & {defaultValue: string} = {defaultValue: defaultValue}
+
+        defaultValue.matchAll(/\{\{\s*([a-zA-Z0-9_]+)\s*\}\}/g).forEach((match, index) => {
+            const paramName = match[1];
+            options[paramName] = values[index];
+        });
+        return this.i18NT(key, options, escapeValues)
+    }
+
+    public i18NT(key: string, options:Record<string,unknown> & {defaultValue: string}, escapeValues=false) : string {
+        if (!escapeValues) {
+            options["interpolation"] = {"escapeValue": false}
+        }
+        if (this.i18NTProvider) return this.i18NTProvider(key, options)
+        return I18NMock.t(key,options, this.reportErrorKeys)
+    }
 
     public gotoRecord(uid: string) {
         throw Error('gotoRecord not implemented')
@@ -367,13 +393,16 @@ export class UIComponent extends LitElement {
                     //   return new UIStackLayoutClass(layoutElementId, layoutSettings)
                     default:
                         throw new UISchemaError(
-                            `Unknown orchestration strategy ${layoutSchema.orchestration_strategy}`,
+                            this.i18NT("uic.render-layout-error-unspecific",
+                                {defaultValue: 'Unknown orchestration strategy {{orchestration_strategy}}',
+                                    orchestration_strategy: layoutSchema.orchestration_strategy})
                         )
                 }
             } else if (cardinality === 'N') {
                 if (layoutElementId !== 'root') {
                     throw new UISchemaError(
-                        'Layouts for N cardinality are only allowed as root layouts.',
+                        this.i18NST("uic.layout-error-N-cardinality-only-root",
+                            'Layouts for N cardinality are only allowed as root layouts. Layout {{layoutElementId}} is not root. This must be a programming error.', [layoutElementId])
                     )
                 }
                 switch (layoutSchema.orchestration_strategy) {
@@ -388,26 +417,31 @@ export class UIComponent extends LitElement {
                         break
                     default:
                         throw new UISchemaError(
-                            `Unknown orchestration strategy ${layoutSchema.orchestration_strategy}`,
+                            this.i18NST("uic.layout-error-unknown-orchestration-strategy", `Unknown orchestration strategy {{orchestration_strategy}} in layout {{layoutElementId}}`,
+                                [layoutSchema.orchestration_strategy, layoutElementId])
                         )
                 }
             } else {
                 if (cardinality) {
                     throw new UISchemaError(
-                        `Unknown cardinality ${cardinality as string} for layout ${layoutElementId}`,
+                        this.i18NST("uic.layout-error-unknown-cardinality", `Unknown cardinality {{cardinality}} for layout {{layoutElementId}}`,
+                            [cardinality as string, layoutElementId])
                     )
                 } else {
-                    throw new UISchemaError(`no cardinality for layout ${layoutElementId}`)
+                    throw new UISchemaError(this.i18NST("uic.layout-error-no-cardinality", `no cardinality for layout {{layoutElementId}}`,
+                        [layoutElementId]))
                 }
             }
         } else {
-            throw new UISchemaError(`no orchestration strategy for layout ${layoutElementId}`)
+            throw new UISchemaError(this.i18NST("uic.layout-error-no-orchestration-strategy", `no orchestration strategy for layout {{layoutElementId}}`,
+                [layoutElementId]))
         }
         if (newLayout) {
             this.layouts[layoutElementId] = newLayout
             return newLayout
         } else {
-            throw new UISchemaError(`can't create layout ${layoutElementId}`)
+            throw new UISchemaError(this.i18NST("uic.layout-unspecific-creation-error",`can't create layout {{layoutElementId}}`,
+                [layoutElementId]))
         }
     }
 
@@ -488,7 +522,7 @@ export class UIComponent extends LitElement {
             )
 
         } catch (e) {
-            return html`cannot create layout ${id}: ${e}`
+            return html`${this.i18NT("uic.render-layout-error-unspecific", {defaultValue: 'An error occurred when rendering the layout {{id}}: {{error}}', id: id, error: (e as Error).message ?? String(e)})}`
         }
 
         // const layoutType: string = entry.layout_settings?.type || "sheet"
@@ -542,7 +576,7 @@ export class UIComponent extends LitElement {
     protected render() {
         console.log('ui component rerender')
         // noinspection JSMismatchedCollectionQueryUpdate
-        const itemTemplates: TemplateResult[] = []
+        const itemTemplates: TemplateResultOrNothing[] = []
         let rootLayout
         if (this.showDevelopmentInfo) {
             itemTemplates.push(html`
@@ -564,7 +598,7 @@ export class UIComponent extends LitElement {
                     this.uiSchema.data_binding.cardinality,
                 )
             } catch (e) {
-                this._showError += `\nCannot initialize root Layout: ${(e as Error).message ?? String(e)}"`
+                this._showError += `\n${this.i18NT("uic.error-init-root-layout", {defaultValue: 'Cannot initialize root Layout: {{error}}', error: (e as Error).message ?? String(e)})}`
             }
             if (!this._showError) {
                 try {
@@ -574,7 +608,7 @@ export class UIComponent extends LitElement {
                         itemTemplates.push(this.renderBootSpinner())
                     }
                 } catch (e) {
-                    this._showError += `\nAn error occurred when rendering this component:"${e as string}"`
+                    this._showError += `\n${this.i18NT("uic.unspecific-render-error", {defaultValue: 'An error occurred when rendering this component:{{error}}', error: (e as Error).message ?? String(e)})}`
                 }
             }
         }

@@ -1,4 +1,5 @@
 import { UIComponent, UISchema } from '#src/uicomponent'
+import i18next from 'i18next';
 import { ConcreteDataProvider } from './teststaticdataprovider'
 import {
     DataProviderValidationResult,
@@ -41,7 +42,23 @@ export function configureTestSchema1TypeLayout(uiComponent: UIComponent) {
     const dataProvider = getDataProvider()
     uiComponent.dataProvider = dataProvider
     uiComponent.interpretedExpressionPrefix = '#'
+    i18next.init({lng: 'en', debug: true,
+        resources: {
+            en: {
+                translation: {
+                    "uic.schema-error-must-equal": "{{path}}: must be equal to constant {{expected}}"
+                }
+            },
+            de: {
+                translation: {
+                    "uic.schema-error-must-equal": "{{path}}: muss gleich {{expected}} sein"
+                }
+            }
+        }})
 
+    uiComponent.i18NTProvider = (key: string, options: Record<string, unknown>): string => {
+        return i18next.t(key, options)
+    }
     setTimeout(() => dataProvider.getRecord(0, false, (index) => {
         dataProvider.setActiveRecord(index)
         uiComponent.requestUpdate()
@@ -136,7 +153,7 @@ function getUiSchema(): UISchema {
                 sub_layout: {
                     element_type: 'layout',
                     orchestration_strategy: 'columns',
-                    ui_level: 0,
+                    ui_level: 3,
                     layout: {
                         min_width: "max"
                     },

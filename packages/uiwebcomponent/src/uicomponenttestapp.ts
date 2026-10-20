@@ -15,7 +15,7 @@ export class UIComponentTestApp extends LitElement {
 
     uiComponentRef1: Ref<UIComponent> = createRef()
     uiComponentRef2: Ref<UIComponent> = createRef()
-    private mode: 'colors' | 'test' = 'colors'
+    private mode: 'colors' | 'test' = 'test'
 
     firstUpdated() {
         // Run your script logic here directly on the Shadow/Light DOM

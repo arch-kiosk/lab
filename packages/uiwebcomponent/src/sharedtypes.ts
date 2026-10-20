@@ -50,6 +50,8 @@ export {type Dictionary} from './uischema'
 
 export type UIComponentTimeZoneInfoProvider = (tzIndex: number) => ApiTimeZoneInfo
 
+export type UIComponenti18NTCallback = (key: string, options: Record<string,unknown> & {defaultValue: string}) => string
+
 export type UIComponentMoveToNextRowProvider = (lastUID: string) => string
 
 export type UIComponentSetSortOrderProvider = (sortOrder: Array<string>) => void
