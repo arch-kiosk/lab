@@ -52,6 +52,7 @@ export class UIComponent extends LitElement {
     // _element_list: { [key: string]: UISchemaUIElement } = {}
     // _selection_data: { [key: string]: { [key: string]: string } } = {}
 
+
     @state()
     private pluginManager?: PluginManager<AppContext, EventCatalog>
 
@@ -72,6 +73,9 @@ export class UIComponent extends LitElement {
 
     @property()
     i18NTProvider?: UIComponenti18NTCallback
+
+    @property({ type: String, attribute: 'current-locale' })
+    currentLocale: string = ""
 
     @property({ type: String, attribute: 'override-css' })
     overrideCss: string = ''
@@ -121,7 +125,7 @@ export class UIComponent extends LitElement {
 
     protected willUpdate(_changedProperties: PropertyValues) {
         // super.willUpdate(_changedProperties);
-        if (_changedProperties.has('uiSchema') && this.uiSchema) {
+        if ((_changedProperties.has('uiSchema') || _changedProperties.has('currentLocale')) && this.uiSchema) {
             this.flatElementList = {}
             this.bindingToElementList = {}
             this.schemaProcessor = new UISchemaProcessor(this.uiSchema)
@@ -394,7 +398,7 @@ export class UIComponent extends LitElement {
                     default:
                         throw new UISchemaError(
                             this.i18NT("uic.render-layout-error-unspecific",
-                                {defaultValue: 'Unknown orchestration strategy {{orchestration_strategy}}',
+                                {defaultValue: 'Totally unknown orchestration strategy {{orchestration_strategy}}',
                                     orchestration_strategy: layoutSchema.orchestration_strategy})
                         )
                 }
@@ -576,7 +580,7 @@ export class UIComponent extends LitElement {
     }
 
     protected render() {
-        console.log('ui component rerender')
+        console.log(`ui component ${this.id} rerender with language ${this.currentLocale}`)
         // noinspection JSMismatchedCollectionQueryUpdate
         const itemTemplates: TemplateResultOrNothing[] = []
         let rootLayout
@@ -619,7 +623,7 @@ export class UIComponent extends LitElement {
             console.log(this._showError)
             itemTemplates.push(html`
                 <div
-                        style="background-color: var(--col-bg-alert); color: var(--col-primary-bg-alert); padding: .5em; font-family: monospace;white-space: pre-line;"
+                        style="user-select: text; background-color: var(--col-bg-alert); color: var(--col-primary-bg-alert); padding: .5em; font-family: monospace;white-space: pre-line;"
                 >
                     ${this._showError}
                 </div>`)

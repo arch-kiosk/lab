@@ -2,10 +2,10 @@
 export default {
     locales: ['en', 'de', 'ar'],
     extract: {
-        output: 'public/locales/{{language}}/{{namespace}}.json',
+        output: 'src/locales/{{language}}/{{namespace}}.json',
         input: ['src/**/*.{ts,js,html}'],
         // defaultValue: (lng, ns, key, options) => options.defaultValue || '',
-        functions: ['i18NST','*.i18NST'],
+        functions: ['i18NST','*.i18NST','*.i18NT'],
 
         // Tell the parser how to extract the default value when the 2nd argument is a string literal
         defaultValue: (lng, ns, key, options) => {
