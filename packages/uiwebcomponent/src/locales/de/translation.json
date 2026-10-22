@@ -1,0 +1,22 @@
+{
+  "uic": {
+    "error-init-root-layout": "Das root layout kann nicht initialisiert werden: {{error}}",
+    "layout-error-N-cardinality-only-root": "Layouts für N-Kardinalität sind nur als Root-Layouts zulässig. Das Layout {{layoutElementId}} ist kein Root-Layout. Dies muss ein Programmierfehler sein.",
+    "layout-error-no-cardinality": "Keine Kardinalität für Layout {{layoutElementId}} angegeben.",
+    "layout-error-no-orchestration-strategy": "Keine Orchestrierungsstrategie für Layout {{layoutElementId}} angegeben.",
+    "layout-error-unknown-cardinality": "Unbekannte Kardinalität {{cardinality}} für Layout {{layoutElementId}}.",
+    "layout-error-unknown-orchestration-strategy": "Unbekannte Orchestrierungsstrategie {{orchestration_strategy}} in Layout {{layoutElementId}}.",
+    "layout-unspecific-creation-error": "Layout {{layoutElementId}} kann nicht erstellt werden.",
+    "render-layout-error-unspecific": "Völlig unbekannte orchestration strategy {{orchestration_strategy}}",
+    "schema-error-element-id-redundant": "Fehler in der Schemadefinition: Die Element-ID {{id}} wird in der UI-Schema-Definition mehrfach verwendet. Übersprungen.",
+    "schema-error-illegal-element-id": "Fehler in der Schemadefinition: Die Element-ID {{id}} ist ungültig. \nSie muss mit einem Buchstaben beginnen, gefolgt von ausschließlich Buchstaben und Zahlen. Element übersprungen.",
+    "schema-error-must-equal": "{{path}}: muss mit der Konstanten {{expected}} übereinstimmen.",
+    "schema-error-must-one-of": "{{path}}: muss einer der folgenden Werte sein: [{{allowed}}].",
+    "schema-error-no-element-type": "ui-component: Element-ID {{id}} fehlt das Attribut \"element_type\": übersprungen.",
+    "schema-error-property-required": "{{path}}: Erforderliche Eigenschaft {{property}} fehlt.",
+    "schema-error-redundant-dsd-binding": "Fehler in der Schemadefinition: Das DSD-Feld {{fieldName}} wurde im Element {{id}} im UI-Schema erneut gebunden.",
+    "schema-error-unknown-property": "{{path}}: Unbekannte Eigenschaft \"{{property}}\" ist nicht zulässig.",
+    "schema-error-unspecific": "Schemadefinition kann nicht validiert oder verarbeitet werden: {{e}}",
+    "unspecific-render-error": "Ein unspezifischer Fehler verhinderte das Erzeugen der Komponente: {{error}}"
+  }
+}
