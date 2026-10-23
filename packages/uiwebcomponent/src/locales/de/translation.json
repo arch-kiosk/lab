@@ -7,6 +7,8 @@
     "layout-error-unknown-cardinality": "Unbekannte Kardinalität {{cardinality}} für Layout {{layoutElementId}}.",
     "layout-error-unknown-orchestration-strategy": "Unbekannte Orchestrierungsstrategie {{orchestration_strategy}} in Layout {{layoutElementId}}.",
     "layout-unspecific-creation-error": "Layout {{layoutElementId}} kann nicht erstellt werden.",
+    "missing_parent_layout": "{{ui_element_name}}: render context fehlt ein parent_layout",
+    "no": "nein",
     "render-layout-error-unspecific": "Völlig unbekannte orchestration strategy {{orchestration_strategy}}",
     "schema-error-element-id-redundant": "Fehler in der Schemadefinition: Die Element-ID {{id}} wird in der UI-Schema-Definition mehrfach verwendet. Übersprungen.",
     "schema-error-illegal-element-id": "Fehler in der Schemadefinition: Die Element-ID {{id}} ist ungültig. \nSie muss mit einem Buchstaben beginnen, gefolgt von ausschließlich Buchstaben und Zahlen. Element übersprungen.",
@@ -17,6 +19,8 @@
     "schema-error-redundant-dsd-binding": "Fehler in der Schemadefinition: Das DSD-Feld {{fieldName}} wurde im Element {{id}} im UI-Schema erneut gebunden.",
     "schema-error-unknown-property": "{{path}}: Unbekannte Eigenschaft \"{{property}}\" ist nicht zulässig.",
     "schema-error-unspecific": "Schemadefinition kann nicht validiert oder verarbeitet werden: {{e}}",
-    "unspecific-render-error": "Ein unspezifischer Fehler verhinderte das Erzeugen der Komponente: {{error}}"
+    "unspecific-render-error": "Ein unspezifischer Fehler verhinderte das Erzeugen der Komponente: {{error}}",
+    "wrong_element_type": "{{ui_element_name}}: render mit falschem element_type {{element_type}} ausgeführt.",
+    "yes": "ja"
   }
 }

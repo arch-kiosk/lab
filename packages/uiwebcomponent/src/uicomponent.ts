@@ -451,6 +451,16 @@ export class UIComponent extends LitElement {
         }
     }
 
+    public getUIElementClass(elementType: string) {
+        if (!this.uiElementFactory) {
+            this.uiElementFactory = new UIConfigurableElementFactory()
+            this.pluginManager?.fireSynchronously('registerUIElements', this.uiElementFactory)
+        }
+        return this.uiElementFactory.getUIElementClass(
+            elementType,
+        )
+    }
+
     /**
      *
      * @param id the id here is the id of the element in the element tree of the ui definition! It is not a unique id within the html document.
@@ -464,14 +474,8 @@ export class UIComponent extends LitElement {
         dataContext: RenderContextDataContext,
     ) {
         try {
-            if (!this.uiElementFactory) {
-                this.uiElementFactory = new UIConfigurableElementFactory()
-                this.pluginManager?.fireSynchronously('registerUIElements', this.uiElementFactory)
-            }
             const renderContext = new UIElementRenderContext(this, elementDefinition, dataContext, parentLayout)
-            const uiElementClass = this.uiElementFactory.getUIElementClass(
-                elementDefinition.element_type,
-            )
+            const uiElementClass = this.getUIElementClass(elementDefinition.element_type)
             if ('binding' in renderContext.elementDefinition) {
                 renderContext.elementDefinition.readonly =
                     renderContext.elementDefinition.readonly ||

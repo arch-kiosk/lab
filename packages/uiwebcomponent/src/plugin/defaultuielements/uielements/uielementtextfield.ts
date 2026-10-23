@@ -15,25 +15,26 @@ export class UIElementTextField extends UIElement {
         return this.renderElement(context, id, true)
     }
 
-    static checkElementDefinition(context: UIElementRenderContext): UISchemaTextField {
+    static checkElementDefinition(id: string, context: UIElementRenderContext): UISchemaTextField {
         if (!context.parentLayout)
-            throw 'UIElementTextField.render: render context is missing parentLayout'
+            throw context.uicomponent.i18NST('uic.missing_parent_layout', '{{ui_element_name}}: render context is missing parentLayout', [id])
         if (context.elementDefinition.element_type !== 'text_field')
-            throw `'UIElementTextField.render: render called with wrong element type ${context.elementDefinition.element_type}`
+            throw context.uicomponent.i18NST('uic.wrong_element_type', '{{ui_element_name}}: render called with wrong element type {{element_type}}', [id, context.elementDefinition.element_type])
+
         return context.elementDefinition
     }
 
-    static getValidationInfo(context: UIElementRenderContext, id: string) {
-        const validationInfo = {
-            hasError: false,
-            results: context.getFieldValidationInfo(id),
-        }
-        validationInfo.hasError = Boolean(
-            validationInfo.results
-            && validationInfo.results.find((v) => v.result === 'error'),
-        )
-        return validationInfo
-    }
+    // static getValidationInfo(context: UIElementRenderContext, id: string) {
+    //     const validationInfo = {
+    //         hasError: false,
+    //         results: context.getFieldValidationInfo(id),
+    //     }
+    //     validationInfo.hasError = Boolean(
+    //         validationInfo.results
+    //         && validationInfo.results.find((v) => v.result === 'error'),
+    //     )
+    //     return validationInfo
+    // }
 
     static renderElement(context: UIElementRenderContext, id: string, skeleton = false): TemplateResultOrNothing {
 
@@ -41,7 +42,7 @@ export class UIElementTextField extends UIElement {
            First of all: prepare what is needed for the rendering part
            ============================================ */
 
-        const elementDefinition = this.checkElementDefinition(context)
+        const elementDefinition = this.checkElementDefinition(id, context)
         const parentLayout = context.parentLayout!
 
         let [value, text] = this.batchResolve(
@@ -54,7 +55,7 @@ export class UIElementTextField extends UIElement {
             return nothing
         }
 
-        const validationInfo = skeleton ? undefined : this.getValidationInfo(context, id)
+        const validationInfo = skeleton ? undefined : this.getValidationInfo(context, elementDefinition.binding.field_name)
 
         const cssClasses = this.getCSSClasses(context, elementDefinition.style?.css_classes)
 

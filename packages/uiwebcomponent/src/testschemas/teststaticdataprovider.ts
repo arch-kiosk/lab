@@ -7,6 +7,7 @@ const MAX_RECORDS = 50
 interface MyDataRecord extends VirtualScrollContainerDataRecord {
     text_input: string
     // oxlint-disable-next-line typescript/no-explicit-any
+    yesno_field: boolean,
     data: any
 }
 
@@ -15,7 +16,9 @@ export class ConcreteDataProvider extends BufferedDataProvider implements UIComp
     private records: Array<MyDataRecord> = Array.from({ length: MAX_RECORDS }, (_v, k) => ({
         uid: crypto.randomUUID() as string,
         text_input: `value ${k}`,
-        data: {},
+        yesno_field: true,
+        data: {
+        },
     }))
 
     protected recalcDbRecordCount(): Promise<boolean> {
@@ -31,17 +34,22 @@ export class ConcreteDataProvider extends BufferedDataProvider implements UIComp
     public resolve(valueExpression: unknown | Array<unknown|undefined>, _?: string, recordIndex?: number): unknown {
         let valueExpressions = Array.isArray(valueExpression)?valueExpression:[valueExpression]
         let result: unknown[] = []
-        let record: undefined | MyDataRecord = recordIndex === undefined ? undefined : this.getRecord(recordIndex, true) as MyDataRecord | undefined
+        let record: undefined | MyDataRecord = recordIndex === undefined
+            ? undefined
+            : this.getRecord(recordIndex, true) as MyDataRecord | undefined
 
         for (const toResolve of valueExpressions) {
-                const expression = typeof(toResolve) === "string" ? this.getSingleExpressionContent(toResolve??"") : undefined
+                const expression = typeof(toResolve) === "string"
+                    ? this.getSingleExpressionContent(toResolve??"")
+                    : undefined
                 if (!expression) {
                     result.push(toResolve)
                     continue
                 }
                 if (record) {
                     if (expression in record) {
-                        result.push( `${record[expression]}`)
+                        result.push( record[expression])
+                        console.log(`resolved ${expression} to type `, typeof(record[expression]))
                         continue
                     } else {
                         console.log(`unknown expression ${expression} in record`, record)

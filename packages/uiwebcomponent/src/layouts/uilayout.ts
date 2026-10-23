@@ -1,5 +1,5 @@
 import {
-    UISchema,
+    UISchema, UISchemaBoundUIElement,
     UISchemaDynamicUIElement,
     UISchemaElementOnLayout,
     UISchemaLayoutElement, UISchemaOrchestrationStrategyKeys, UISchemaUILevels,
@@ -79,14 +79,21 @@ export abstract class UILayout implements ReactiveController {
     }
 
 
-    public dataChanged(event: InputEvent, recordIndex?: number) {
+    public dataChangedEvent(event: InputEvent, recordIndex?: number) {
         // const element=this.reactiveControllerHost.getSchemaElement(elementId)
         const domElement = event.target as HTMLInputElement
         if (recordIndex !== undefined && domElement) {
             const elementId = this.reactiveControllerHost.unScopeId(domElement.id)
             if (elementId) {
-                this.reactiveControllerHost.dataProvider?.dataChanged(recordIndex, elementId, domElement.value)
-                this.requestRerender(domElement)
+                const elementDefinition = this.reactiveControllerHost.getSchemaElement(elementId)
+                if ("binding" in elementDefinition) {
+                    const elementClass = this.reactiveControllerHost.getUIElementClass(
+                        elementDefinition.element_type,
+                    )
+                    const value = elementClass.getDomValue(elementId, domElement)
+                    this.reactiveControllerHost.dataProvider?.dataChanged(recordIndex, elementDefinition.binding.field_name, value)
+                    this.requestRerender(domElement)
+                }
             }
         } else {
             console.log('no record index or dom element', recordIndex, domElement)
@@ -179,7 +186,7 @@ export abstract class UILayout implements ReactiveController {
                  data-record-nr="${recordNr ?? nothing}"
                  data-record-uid="${recordUid ?? nothing}"
                  ui-level=${'l'+this.uilevel}
-                 @input="${(event: InputEvent) => this.dataChanged(event, recordNr)}"
+                 @input="${(event: InputEvent) => this.dataChangedEvent(event, recordNr)}"
             >
                 ${renderedElements}
             </div>

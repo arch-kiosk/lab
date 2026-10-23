@@ -1,6 +1,10 @@
 import { UIComponent, UISchema } from '#src/uicomponent'
 import i18next from 'i18next';
 import { ConcreteDataProvider } from './teststaticdataprovider'
+import enTranslation from '#src/locales/en/translation.json'
+import arTranslation from '#src/locales/ar/translation.json'
+import deTranslation from '#src/locales/de/translation.json'
+
 import {
     DataProviderValidationResult,
     ValidationResultsReturnType,
@@ -9,7 +13,9 @@ import { _ } from 'ajv'
 
 class Type1DataProvider extends ConcreteDataProvider {
     resolve(valueExpression: unknown | Array<unknown | undefined>, _?: string, recordIndex?: number): unknown {
-        const expressions: unknown[] = Array.isArray(valueExpression) ? valueExpression : [valueExpression]
+        const expressions: unknown[] = Array.isArray(valueExpression)
+            ? valueExpression
+            : [valueExpression]
         expressions.forEach((exp, idx) => {
             let result: unknown |undefined
             if (typeof(exp) === "string") {
@@ -42,21 +48,21 @@ export function configureTestSchema1TypeLayout(uiComponent: UIComponent) {
     const dataProvider = getDataProvider()
     uiComponent.dataProvider = dataProvider
     uiComponent.interpretedExpressionPrefix = '#'
-    i18next.init({lng: 'en', debug: true,
+    i18next.init({lng: 'de-DE', debug: true,
         resources: {
             en: {
-                translation: {
-                    "uic.schema-error-must-equal": "{{path}}: must be equal to constant {{expected}}"
-                }
+                translation: enTranslation
+            },
+            ar: {
+                translation: arTranslation
             },
             de: {
-                translation: {
-                    "uic.schema-error-must-equal": "{{path}}: muss gleich {{expected}} sein"
-                }
+                translation: deTranslation
             }
         }})
 
     uiComponent.i18NTProvider = (key: string, options: Record<string, unknown>): string => {
+        console.log(`rerender translating ${key} to language ${i18next.language}`)
         return i18next.t(key, options)
     }
     setTimeout(() => dataProvider.getRecord(0, false, (index) => {
@@ -66,13 +72,19 @@ export function configureTestSchema1TypeLayout(uiComponent: UIComponent) {
 
     dataProvider.onValidateField = (_, fieldId, value) => {
         const rc: Array<DataProviderValidationResult> = []
+        console.log(`dataProvider.onValidate ${fieldId}`)
         if (fieldId === 'text_input') {
             if (!value || value as string === '') {
                 rc.push({ result: 'error', msg: 'Please enter a value for this field' })
             }
         }
+        if (fieldId === 'yesno_field' && value) {
+            rc.push({ result: 'error', msg: 'Please enter a value for this field' })
+            console.log(`yesno_field has value ${value}`)
+        }
         return [rc, undefined] as ValidationResultsReturnType<typeof value>
     }
+
     dataProvider.onValidateRecord = (recordIndex, _record) => {
         const rc: Array<DataProviderValidationResult> = []
 
@@ -170,6 +182,15 @@ function getUiSchema(): UISchema {
                             },
                             element_type: 'text_field',
                             text: 'text1 field',
+                        },
+                        'bool1': {
+                            binding: {
+                                field_name: 'yesno_field',
+                            },
+                            readonly: true,
+                            element_type: 'bool',
+                            value: "${yesno_field}",
+                            text: 'yes no',
                         },
                     },
 

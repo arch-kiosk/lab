@@ -2,10 +2,9 @@
 import {
     ApiTimeZoneInfo,
     InterpretedExpression,
-    UISchemaBaseUIElement, UISchemaIdentifierDisplay, UISchemaLayoutPadding,
-    UISchemaTextField,
+    UISchemaBaseUIElement, UISchemaIdentifierDisplay
 } from '#src/uischema'
-import { html, TemplateResult, nothing } from 'lit'
+import { html} from 'lit'
 import {type TemplateResultOrNothing} from './sharedtypes'
 import { UIElementRenderContext } from '#src/uielementrendercontext'
 
@@ -13,6 +12,21 @@ export class UIElement {
     // eslint-disable-next-line typescript/no-explicit-any
     static resolve(context: UIElementRenderContext, expression?: string, id?: string): unknown | undefined {
         return expression ? context.resolve(expression, id) : undefined
+    }
+
+    /**
+     * generic handler to retrieve the current value from the DOM element. While this works for simple HTMLInput elements it can be overridden by a UIElement type
+     * to fetch the user input from HTML in a different way.
+     * This is called by the Layout, which intercepts onInput events.
+     * @param _elementId: The schema id of the element (not used in the generic version)
+     * @param domElement: The HTMLElement from which to retrieve the input
+     * @returns either undefined or the value of whatever data type this kind of element deals with.
+     */
+    static getDomValue(_elementId: string, domElement: HTMLElement) : unknown {
+        if ("value" in domElement) {
+            return domElement.value
+        } else
+            return undefined
     }
 
     static batchResolve(context: UIElementRenderContext, expressions?: Array<string|undefined>, id?: string): Array<unknown> | undefined {
@@ -26,8 +40,22 @@ export class UIElement {
         return context.getTimeZoneInfo(tzIndex)
     }
 
-    static renderSkeleton(_context: UIElementRenderContext, id: string): TemplateResultOrNothing {
+    static renderSkeleton(_context: UIElementRenderContext, _id: string): TemplateResultOrNothing {
         return html``
+    }
+
+    static getValidationInfo(context: UIElementRenderContext, binding_field_name: string) {
+        const validationInfo = {
+            hasError: false,
+            results: context.getFieldValidationInfo(binding_field_name),
+        }
+        console.log(`${binding_field_name} validation`, validationInfo)
+
+        validationInfo.hasError = Boolean(
+            validationInfo.results
+            && validationInfo.results.find((v) => v.result === 'error'),
+        )
+        return validationInfo
     }
 
     static renderElement(_context: UIElementRenderContext, id: string): TemplateResultOrNothing {

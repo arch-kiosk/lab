@@ -7,6 +7,8 @@
     "layout-error-unknown-cardinality": "Unknown cardinality {{cardinality}} for layout {{layoutElementId}}",
     "layout-error-unknown-orchestration-strategy": "Unknown orchestration strategy {{orchestration_strategy}} in layout {{layoutElementId}}",
     "layout-unspecific-creation-error": "can't create layout {{layoutElementId}}",
+    "missing_parent_layout": "{{ui_element_name}}: render context is missing parentLayout",
+    "no": "no",
     "render-layout-error-unspecific": "Totally unknown orchestration strategy {{orchestration_strategy}}",
     "schema-error-element-id-redundant": "There is an error in the schema definition: the element id {{id}} is used more than once in the UI schema. Skipped.",
     "schema-error-illegal-element-id": "There is an error in the schema definition: the element id {{id}} is illegal. \n                    It must start with a letter followed by only letters and numbers. Element skipped.",
@@ -17,6 +19,8 @@
     "schema-error-redundant-dsd-binding": "There is an error in the schema definition: dsd field {{fieldName}} bound again in element {{id}} in UI schema",
     "schema-error-unknown-property": "{{path}} unknown property \"{{property}}\" is not allowed",
     "schema-error-unspecific": "Cannot validate or process schema definition: {{e}}",
-    "unspecific-render-error": "An error occurred when rendering this component:{{error}}"
+    "unspecific-render-error": "An error occurred when rendering this component:{{error}}",
+    "wrong_element_type": "{{ui_element_name}}: render called with wrong element type {{element_type}}",
+    "yes": "yes"
   }
 }

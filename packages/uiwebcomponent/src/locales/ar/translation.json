@@ -7,6 +7,8 @@
     "layout-error-unknown-cardinality": "تعددية غير معروفة {{cardinality}} للتخطيط {{layoutElementId}}",
     "layout-error-unknown-orchestration-strategy": "استراتيجية تنسيق غير معروفة {{orchestration_strategy}} في التخطيط {{layoutElementId}}",
     "layout-unspecific-creation-error": "لا يمكن إنشاء التخطيط {{layoutElementId}}",
+    "missing_parent_layout": "{{ui_element_name}}: سياق Render يفتقد إلى parentLayout",
+    "no": "لا",
     "render-layout-error-unspecific": "استراتيجية تنسيق غير معروفة تماماً {{orchestration_strategy}}",
     "schema-error-element-id-redundant": "يوجد خطأ في تعريف المخطط (schema): معرف العنصر {{id}} مستخدم أكثر من مرة في مخطط واجهة المستخدم. تم التخطي.",
     "schema-error-illegal-element-id": "يوجد خطأ في تعريف المخطط (schema): معرف العنصر {{id}} غير صالح. يجب أن يبدأ بحرف ويليه أحرف وأرقام فقط. تم تخطي العنصر.",
@@ -17,6 +19,8 @@
     "schema-error-redundant-dsd-binding": "يوجد خطأ في تعريف المخطط (schema): حقل DSD المسمى {{fieldName}} تم ربطه مرة أخرى في العنصر {{id}} في مخطط واجهة المستخدم",
     "schema-error-unknown-property": "{{path}} خاصية غير معروفة \"{{property}}\" غير مسموح بها",
     "schema-error-unspecific": "لا يمكن التحقق من صحة تعريف المخطط (schema) أو معالجته: {{e}}",
-    "unspecific-render-error": "حدث خطأ أثناء عرض (render) هذا المكون: {{error}}"
+    "unspecific-render-error": "حدث خطأ أثناء عرض (render) هذا المكون: {{error}}",
+    "wrong_element_type": "{{ui_element_name}}: استدعاءRender بعنصر من النوع الخاطئ {{element_type}}",
+    "yes": "نعم"
   }
 }
