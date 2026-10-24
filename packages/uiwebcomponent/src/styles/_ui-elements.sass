@@ -39,3 +39,94 @@ textarea, .read-only-textarea
   //height: $line-height-loose em
   line-height: $line-height-loose
   vertical-align: middle
+
+button
+  width: $button-size
+  height: $button-size
+  border-radius: calc($button-size / 2)
+  border-style: solid
+  border-width: 2px
+  background-color: $col-bg-button
+  color: $col-primary-button
+  border-color: $col-bg-button-dk
+  font-family: $font-headline
+  font-size: $font-size-h4
+  font-weight: bold
+  //padding-bottom: 3px
+  //margin-bottom: 2px
+  &:hover, &:focus
+    outline: none
+    background-color: $col-bg-button-lt
+  &:active
+    padding-top: 3px
+    color: $col-primary-button
+    background-color: $col-bg-button-dk
+    border-color: $col-bg-button-lt
+
+button:disabled
+  opacity: .3
+
+.modal-round-button
+  box-sizing: border-box
+  //background-repeat: no-repeat
+  //background-position: center
+  //background-size: 25px 25px
+  margin-left: 25px
+  background-image: none
+  display: inline-block
+  font-style: normal
+  font-variant: normal
+  text-rendering: auto
+  -webkit-font-smoothing: antialiased
+  font-family: $font-fontawesome
+  //padding-top: 4px
+  font-weight: 900
+  font-size: $font-size-button
+  line-height: $font-size-button
+  vertical-align: center
+  text-align: center
+
+.modal-button
+  @extend .modal-round-button
+
+.modal-ok
+  @extend .modal-round-button
+  &:after
+    content: var(--icon-bt-ok)
+
+.modal-next
+  @extend .modal-round-button
+  &:after
+    padding-left: 2px
+    content: var(--icon-bt-next)
+
+.modal-back
+  @extend .modal-round-button
+  &:after
+    padding-right: 2px
+    content: var(--icon-bt-back)
+
+.modal-cancel
+  @extend .modal-round-button
+  &:after
+    content: var(--icon-bt-cancel)
+
+.modal-close
+  @extend .modal-round-button
+  &:before
+    content: var(--icon-bt-close)
+
+.modal-delete
+  @extend .modal-round-button
+  background-color: $col-bg-alert
+  &:before
+    color: $col-bg-alert
+    background-color: $col-bg-alert
+    content: var(--icon-bt-trash)
+  &:hover, &:focus
+    border-color: $col-bd-dk-alert
+    background-color: $col-bg-alert-lt
+    background-size: 75%
+  &:active
+    border-color: $col-bd-dk-alert
+    background-color: $col-bg-alert-dk

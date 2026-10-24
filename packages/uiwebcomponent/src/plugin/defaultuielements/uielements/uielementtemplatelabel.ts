@@ -3,8 +3,7 @@ import { nothing, html } from 'lit'
 import { styleMap } from 'lit/directives/style-map.js'
 
 import {
-    UISchemaTextField,
-
+    UISchemaTemplateLabel
 } from '#src/uischema'
 import { UIElementRenderContext } from '#src/uielementrendercontext'
 import { TemplateResultOrNothing } from '#src/sharedtypes'
@@ -15,7 +14,7 @@ export class UIElementTemplateLabel extends UIElement {
         return this.renderElement(context, id, true)
     }
 
-    static checkElementDefinition(id: string, context: UIElementRenderContext): UISchemaTextField {
+    static checkElementDefinition(id: string, context: UIElementRenderContext): UISchemaTemplateLabel {
         if (!context.parentLayout)
             throw context.uicomponent.i18NST('uic.missing_parent_layout', '{{ui_element_name}}: render context is missing parentLayout', [id])
         if (context.elementDefinition.element_type !== 'template_label')
@@ -77,13 +76,13 @@ export class UIElementTemplateLabel extends UIElement {
         //     cssStyles["border"] = "1px dotted red"
         // }
 
-        if (
-            elementDefinition.ellipsis?.max_characters &&
-            typeof value === 'string' &&
-            value.length > elementDefinition.ellipsis.max_characters
-        ) {
-            value = value.slice(0, Math.max(0, elementDefinition.ellipsis.max_characters - 2)) + '..'
-        }
+        // if (
+        //     elementDefinition.ellipsis?.max_characters &&
+        //     typeof value === 'string' &&
+        //     value.length > elementDefinition.ellipsis.max_characters
+        // ) {
+        //     value = value.slice(0, Math.max(0, elementDefinition.ellipsis.max_characters - 2)) + '..'
+        // }
 
         parentLayout.adjustElementStyles({
                 cssClasses: cssClasses,

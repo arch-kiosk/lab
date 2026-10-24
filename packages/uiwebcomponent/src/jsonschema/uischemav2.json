@@ -134,6 +134,17 @@
               "const": "button",
               "type": "string"
             },
+            "enabled": {
+              "anyOf": [
+                {
+                  "$ref": "#/definitions/InterpretedExpression"
+                },
+                {
+                  "type": "boolean"
+                }
+              ],
+              "description": "optional. Determines if a field can be navigated to (receive the focus). Default is true."
+            },
             "icon": {
               "$ref": "#/definitions/InterpretedExpression",
               "description": "for type iconButton: The icon, which must resolve to a FontAwesome icon code."
@@ -144,14 +155,6 @@
             "style": {
               "$ref": "#/definitions/UISchemaUIElementStyleBasics",
               "description": "optional visual design - how the element itself appears"
-            },
-            "text": {
-              "$ref": "#/definitions/InterpretedExpression",
-              "description": "optional. the text for the label or name of the field on the ui"
-            },
-            "value": {
-              "$ref": "#/definitions/InterpretedExpression",
-              "description": "optional. the expression that defines what value is being displayed in the input part of the element"
             },
             "visible": {
               "anyOf": [
@@ -166,6 +169,7 @@
             }
           },
           "required": [
+            "button_type",
             "element_type"
           ],
           "type": "object"
@@ -217,11 +221,11 @@
             },
             "text": {
               "$ref": "#/definitions/InterpretedExpression",
-              "description": "optional. the text for the label or name of the field on the ui"
+              "description": "optional. the text for the label or name of the field on the ui Some elements do not interpret this property because they don't show a label. Refer to the element's documentation"
             },
             "value": {
               "$ref": "#/definitions/InterpretedExpression",
-              "description": "optional. the expression that defines what value is being displayed in the input part of the element"
+              "description": "optional. the expression that defines what value is being displayed in the input part of the element Some elements do not interpret this property or do not show it as a direct value Refer to the element's documentation"
             },
             "visible": {
               "anyOf": [
@@ -286,11 +290,11 @@
             },
             "text": {
               "$ref": "#/definitions/InterpretedExpression",
-              "description": "optional. the text for the label or name of the field on the ui"
+              "description": "optional. the text for the label or name of the field on the ui Some elements do not interpret this property because they don't show a label. Refer to the element's documentation"
             },
             "value": {
               "$ref": "#/definitions/InterpretedExpression",
-              "description": "optional. the expression that defines what value is being displayed in the input part of the element"
+              "description": "optional. the expression that defines what value is being displayed in the input part of the element Some elements do not interpret this property or do not show it as a direct value Refer to the element's documentation"
             },
             "visible": {
               "anyOf": [
@@ -394,11 +398,11 @@
             },
             "text": {
               "$ref": "#/definitions/InterpretedExpression",
-              "description": "optional. the text for the label or name of the field on the ui"
+              "description": "optional. the text for the label or name of the field on the ui Some elements do not interpret this property because they don't show a label. Refer to the element's documentation"
             },
             "value": {
               "$ref": "#/definitions/InterpretedExpression",
-              "description": "optional. the expression that defines what value is being displayed in the input part of the element"
+              "description": "optional. the expression that defines what value is being displayed in the input part of the element Some elements do not interpret this property or do not show it as a direct value Refer to the element's documentation"
             },
             "visible": {
               "anyOf": [
@@ -420,46 +424,12 @@
           "type": "object"
         },
         {
-          "properties": {
-            "element_type": {
-              "const": "template_label",
-              "type": "string"
-            },
-            "layout": {
-              "$ref": "#/definitions/UISchemaUIElementElementLayoutBase"
-            },
-            "style": {
-              "$ref": "#/definitions/UISchemaUIElementStyleBasics",
-              "description": "optional visual design - how the element itself appears"
-            },
-            "text": {
-              "$ref": "#/definitions/InterpretedExpression",
-              "description": "optional. the text for the label or name of the field on the ui"
-            },
-            "value": {
-              "$ref": "#/definitions/InterpretedExpression",
-              "description": "optional. the expression that defines what value is being displayed in the input part of the element"
-            },
-            "visible": {
-              "anyOf": [
-                {
-                  "$ref": "#/definitions/InterpretedExpression"
-                },
-                {
-                  "type": "boolean"
-                }
-              ],
-              "description": "optional. Determines if the element is visible. Defaults to a layout setting or true."
-            }
-          },
-          "required": [
-            "element_type"
-          ],
-          "type": "object"
-        },
-        {
           "additionalProperties": false,
           "properties": {
+            "display_identifier": {
+              "$ref": "#/definitions/UISchemaIdentifierDisplay",
+              "description": "Defines that the value represents an identifier.\n\nEither simply boolean `true` or a  {@link  UISchemaIdentifierDisplay }  section that allows masking. If absent, the value is not rendered or treated as an identifier."
+            },
             "element_type": {
               "const": "template_label",
               "type": "string"
@@ -467,21 +437,17 @@
             "layout": {
               "$ref": "#/definitions/UISchemaUIElementElementLayoutBase"
             },
-            "mask_identifier": {
-              "$ref": "#/definitions/InterpretedExpression",
-              "description": "Optional. Instead of showing the actual identifier, resolves expression and shows the result"
-            },
             "style": {
               "$ref": "#/definitions/UISchemaUIElementStyleBasics",
               "description": "optional visual design - how the element itself appears"
             },
             "text": {
               "$ref": "#/definitions/InterpretedExpression",
-              "description": "optional. the text for the label or name of the field on the ui"
+              "description": "optional. the text for the label or name of the field on the ui Some elements do not interpret this property because they don't show a label. Refer to the element's documentation"
             },
             "value": {
               "$ref": "#/definitions/InterpretedExpression",
-              "description": "optional. the expression that defines what value is being displayed in the input part of the element"
+              "description": "optional. the expression that defines what value is being displayed in the input part of the element Some elements do not interpret this property or do not show it as a direct value Refer to the element's documentation"
             },
             "visible": {
               "anyOf": [
@@ -535,11 +501,11 @@
             },
             "text": {
               "$ref": "#/definitions/InterpretedExpression",
-              "description": "optional. the text for the label or name of the field on the ui"
+              "description": "optional. the text for the label or name of the field on the ui Some elements do not interpret this property because they don't show a label. Refer to the element's documentation"
             },
             "value": {
               "$ref": "#/definitions/InterpretedExpression",
-              "description": "optional. the expression that defines what value is being displayed in the input part of the element"
+              "description": "optional. the expression that defines what value is being displayed in the input part of the element Some elements do not interpret this property or do not show it as a direct value Refer to the element's documentation"
             },
             "visible": {
               "anyOf": [
@@ -604,11 +570,11 @@
             },
             "text": {
               "$ref": "#/definitions/InterpretedExpression",
-              "description": "optional. the text for the label or name of the field on the ui"
+              "description": "optional. the text for the label or name of the field on the ui Some elements do not interpret this property because they don't show a label. Refer to the element's documentation"
             },
             "value": {
               "$ref": "#/definitions/InterpretedExpression",
-              "description": "optional. the expression that defines what value is being displayed in the input part of the element"
+              "description": "optional. the expression that defines what value is being displayed in the input part of the element Some elements do not interpret this property or do not show it as a direct value Refer to the element's documentation"
             },
             "visible": {
               "anyOf": [
@@ -665,6 +631,17 @@
               "const": "button",
               "type": "string"
             },
+            "enabled": {
+              "anyOf": [
+                {
+                  "$ref": "#/definitions/InterpretedExpression"
+                },
+                {
+                  "type": "boolean"
+                }
+              ],
+              "description": "optional. Determines if a field can be navigated to (receive the focus). Default is true."
+            },
             "icon": {
               "$ref": "#/definitions/InterpretedExpression",
               "description": "for type iconButton: The icon, which must resolve to a FontAwesome icon code."
@@ -675,14 +652,6 @@
             "style": {
               "$ref": "#/definitions/UISchemaUIElementStyleBasics",
               "description": "optional visual design - how the element itself appears"
-            },
-            "text": {
-              "$ref": "#/definitions/InterpretedExpression",
-              "description": "optional. the text for the label or name of the field on the ui"
-            },
-            "value": {
-              "$ref": "#/definitions/InterpretedExpression",
-              "description": "optional. the expression that defines what value is being displayed in the input part of the element"
             },
             "visible": {
               "anyOf": [
@@ -697,6 +666,7 @@
             }
           },
           "required": [
+            "button_type",
             "element_type"
           ],
           "type": "object"
@@ -748,11 +718,11 @@
             },
             "text": {
               "$ref": "#/definitions/InterpretedExpression",
-              "description": "optional. the text for the label or name of the field on the ui"
+              "description": "optional. the text for the label or name of the field on the ui Some elements do not interpret this property because they don't show a label. Refer to the element's documentation"
             },
             "value": {
               "$ref": "#/definitions/InterpretedExpression",
-              "description": "optional. the expression that defines what value is being displayed in the input part of the element"
+              "description": "optional. the expression that defines what value is being displayed in the input part of the element Some elements do not interpret this property or do not show it as a direct value Refer to the element's documentation"
             },
             "visible": {
               "anyOf": [
@@ -817,11 +787,11 @@
             },
             "text": {
               "$ref": "#/definitions/InterpretedExpression",
-              "description": "optional. the text for the label or name of the field on the ui"
+              "description": "optional. the text for the label or name of the field on the ui Some elements do not interpret this property because they don't show a label. Refer to the element's documentation"
             },
             "value": {
               "$ref": "#/definitions/InterpretedExpression",
-              "description": "optional. the expression that defines what value is being displayed in the input part of the element"
+              "description": "optional. the expression that defines what value is being displayed in the input part of the element Some elements do not interpret this property or do not show it as a direct value Refer to the element's documentation"
             },
             "visible": {
               "anyOf": [
@@ -925,11 +895,11 @@
             },
             "text": {
               "$ref": "#/definitions/InterpretedExpression",
-              "description": "optional. the text for the label or name of the field on the ui"
+              "description": "optional. the text for the label or name of the field on the ui Some elements do not interpret this property because they don't show a label. Refer to the element's documentation"
             },
             "value": {
               "$ref": "#/definitions/InterpretedExpression",
-              "description": "optional. the expression that defines what value is being displayed in the input part of the element"
+              "description": "optional. the expression that defines what value is being displayed in the input part of the element Some elements do not interpret this property or do not show it as a direct value Refer to the element's documentation"
             },
             "visible": {
               "anyOf": [
@@ -951,46 +921,12 @@
           "type": "object"
         },
         {
-          "properties": {
-            "element_type": {
-              "const": "template_label",
-              "type": "string"
-            },
-            "layout": {
-              "$ref": "#/definitions/UISchemaUIElementElementLayoutBase"
-            },
-            "style": {
-              "$ref": "#/definitions/UISchemaUIElementStyleBasics",
-              "description": "optional visual design - how the element itself appears"
-            },
-            "text": {
-              "$ref": "#/definitions/InterpretedExpression",
-              "description": "optional. the text for the label or name of the field on the ui"
-            },
-            "value": {
-              "$ref": "#/definitions/InterpretedExpression",
-              "description": "optional. the expression that defines what value is being displayed in the input part of the element"
-            },
-            "visible": {
-              "anyOf": [
-                {
-                  "$ref": "#/definitions/InterpretedExpression"
-                },
-                {
-                  "type": "boolean"
-                }
-              ],
-              "description": "optional. Determines if the element is visible. Defaults to a layout setting or true."
-            }
-          },
-          "required": [
-            "element_type"
-          ],
-          "type": "object"
-        },
-        {
           "additionalProperties": false,
           "properties": {
+            "display_identifier": {
+              "$ref": "#/definitions/UISchemaIdentifierDisplay",
+              "description": "Defines that the value represents an identifier.\n\nEither simply boolean `true` or a  {@link  UISchemaIdentifierDisplay }  section that allows masking. If absent, the value is not rendered or treated as an identifier."
+            },
             "element_type": {
               "const": "template_label",
               "type": "string"
@@ -998,21 +934,17 @@
             "layout": {
               "$ref": "#/definitions/UISchemaUIElementElementLayoutBase"
             },
-            "mask_identifier": {
-              "$ref": "#/definitions/InterpretedExpression",
-              "description": "Optional. Instead of showing the actual identifier, resolves expression and shows the result"
-            },
             "style": {
               "$ref": "#/definitions/UISchemaUIElementStyleBasics",
               "description": "optional visual design - how the element itself appears"
             },
             "text": {
               "$ref": "#/definitions/InterpretedExpression",
-              "description": "optional. the text for the label or name of the field on the ui"
+              "description": "optional. the text for the label or name of the field on the ui Some elements do not interpret this property because they don't show a label. Refer to the element's documentation"
             },
             "value": {
               "$ref": "#/definitions/InterpretedExpression",
-              "description": "optional. the expression that defines what value is being displayed in the input part of the element"
+              "description": "optional. the expression that defines what value is being displayed in the input part of the element Some elements do not interpret this property or do not show it as a direct value Refer to the element's documentation"
             },
             "visible": {
               "anyOf": [
@@ -1066,11 +998,11 @@
             },
             "text": {
               "$ref": "#/definitions/InterpretedExpression",
-              "description": "optional. the text for the label or name of the field on the ui"
+              "description": "optional. the text for the label or name of the field on the ui Some elements do not interpret this property because they don't show a label. Refer to the element's documentation"
             },
             "value": {
               "$ref": "#/definitions/InterpretedExpression",
-              "description": "optional. the expression that defines what value is being displayed in the input part of the element"
+              "description": "optional. the expression that defines what value is being displayed in the input part of the element Some elements do not interpret this property or do not show it as a direct value Refer to the element's documentation"
             },
             "visible": {
               "anyOf": [
@@ -1135,11 +1067,11 @@
             },
             "text": {
               "$ref": "#/definitions/InterpretedExpression",
-              "description": "optional. the text for the label or name of the field on the ui"
+              "description": "optional. the text for the label or name of the field on the ui Some elements do not interpret this property because they don't show a label. Refer to the element's documentation"
             },
             "value": {
               "$ref": "#/definitions/InterpretedExpression",
-              "description": "optional. the expression that defines what value is being displayed in the input part of the element"
+              "description": "optional. the expression that defines what value is being displayed in the input part of the element Some elements do not interpret this property or do not show it as a direct value Refer to the element's documentation"
             },
             "visible": {
               "anyOf": [

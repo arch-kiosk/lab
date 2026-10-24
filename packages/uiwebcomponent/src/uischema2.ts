@@ -116,12 +116,15 @@ export interface UISchemaBaseUIElement {
  */
 export interface UISchemaDynamicUIElement extends UISchemaBaseUIElement {
 
-    /** optional. the text for the label or name of the field on the ui */
-    //todo: should this stay optional now that it is in DynamicUIElement?
+    /** optional. the text for the label or name of the field on the ui
+     * Some elements do not interpret this property because they don't show
+     * a label. Refer to the element's documentation */
+
     text?: InterpretedExpression
 
-    /** optional. the expression that defines what value is being displayed in the input part of the element */
-    //todo: should this stay optional now that it is in DynamicUIElement?
+    /** optional. the expression that defines what value is being displayed in the input part of the element
+    * Some elements do not interpret this property or do not show it as a direct value
+    * Refer to the element's documentation */
     value?: InterpretedExpression
 }
 
@@ -358,11 +361,14 @@ export type UISchemaUIRootLayoutElement = UISchemaLayoutElement & {
 /**
  * A Button element shows some type of button.
  */
-export interface UISchemaButton extends UISchemaDynamicUIElement {
+export interface UISchemaButton extends UISchemaBaseUIElement {
     element_type: 'button'
 
+    /** optional. Determines if a field can be navigated to (receive the focus). Default is true. */
+    enabled?: InterpretedExpression | boolean
+
     /** the type of button determines the appearance */
-    button_type?: 'okButton' | 'cancelButton' | 'iconButton'
+    button_type: 'okButton' | 'cancelButton' | 'iconButton'
 
     /** for type iconButton: The icon, which must resolve to a FontAwesome icon code.*/
     icon?: InterpretedExpression

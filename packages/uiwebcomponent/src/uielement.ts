@@ -82,7 +82,25 @@ export class UIElement {
             }
             if (typeof(visible) === "string") {
                 const r = context.resolve(visible, id)
-                console.log(`Layout ${id} resolves visible to`, r)
+                console.log(`element ${id} resolves visible to`, r)
+                return Boolean(r)
+            }
+        }
+        return true
+    }
+
+    static isEnabled(context: UIElementRenderContext, id: string) {
+        if (!("enabled" in context.elementDefinition)) return true
+
+        const enabled =
+            context.elementDefinition.enabled
+
+        if (enabled !== undefined) {
+            if (enabled === 'false' || enabled === false) return false
+            if (enabled === 'true' || enabled === true) return true
+            if (typeof(enabled) === "string") {
+                const r = context.resolve(enabled, id)
+                console.log(`element ${id} resolves enabled to`, r)
                 return Boolean(r)
             }
         }

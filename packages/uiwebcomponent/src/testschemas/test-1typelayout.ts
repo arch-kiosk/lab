@@ -135,27 +135,21 @@ function getUiSchema(): UISchema {
                     visible: '${text_input}',
                 },
                 "text_label_2": {
-                    // binding: {
-                    //     field_name: 'text_field_2',
-                    // },
                     layout: {
                         max_width: '',
                         min_width: 'max',
                         max_height: '',
                         min_height: '',
                     },
-                   // style: {
-                    //     css_styles: {
-                    //         "--ui-col-bg-1-input": "yellow",
-                    //         "--ui-col-primary-bg-1": "contrast-color(var(--ui-col-bg-1-input))"
-                    //     }
-                    // },
                     element_type: 'template_label',
                     value: '${text_input}',
-                    display_identifier: {
-
-                    },
+                    display_identifier: true,
                     text: 'text_label',
+                },
+                "button_1": {
+                    element_type: 'button',
+                    button_type: 'iconButton',
+                    icon: ''
                 },
                 text_input: {
                     binding: {

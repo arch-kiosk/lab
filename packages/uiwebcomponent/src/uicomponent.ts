@@ -331,6 +331,7 @@ export class UIComponent extends LitElement {
     //   return dataValue ? dataValue : ""
     // }
 
+    //todo: obsolete
     protected fieldChangedById(id: string) {
         throw Error('fieldChangedById not implemented')
         // const options = {
@@ -343,6 +344,7 @@ export class UIComponent extends LitElement {
         // this.dispatchEvent(new CustomEvent("dataChanged", options))
     }
 
+    //todo: obsolete
     protected fieldChanged = (e: Event) => {
         if ('currentTarget' in e) {
             const id = (<HTMLElement>e.currentTarget).id
