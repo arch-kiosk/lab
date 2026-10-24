@@ -164,9 +164,11 @@ export class UIElementTextField extends UIElement {
                                     ? context.uicomponent.gotoIdentifier
                                     : nothing}
                     >
-                            <span>${isIdentifier
+                            <span>
+                                ${isIdentifier
                                     ? html`<i class="footsteps"></i>`
-                                    : nothing}${isIdentifier && maskedValue
+                                    : nothing}
+                                ${isIdentifier && maskedValue
                                     ? maskedValue || nothing
                                     : html`${value || nothing}`}
                             </span>

@@ -449,14 +449,24 @@ export interface UISchemaLookupSettings {
 }
 
 /**
- * a label that shows a dynamic value but has no input functionality
+ * a label that shows a dynamic value but has no input functionality.
+ * Note that enabled or readonly have no impact on this element.
  */
-export type UISchemaTemplateLabel = UISchemaDynamicUIElement & UISchemaIdentifierDisplay & {
+export type UISchemaTemplateLabel = UISchemaDynamicUIElement & {
     element_type: 'template_label'
+
+    /**
+     * Defines that the value represents an identifier.
+     *
+     * Either simply boolean `true` or a {@link UISchemaIdentifierDisplay} section that allows masking.
+     * If absent, the value is not rendered or treated as an identifier.
+     */
+    display_identifier?: UISchemaIdentifierDisplay
 }
 
 /**
  * An input element that allows to set a boolean state (presumably a checkbox)
+ * In read-only state it shows YES or NO instead of a checkbox.
  * */
 export interface UISchemaBoolField extends UISchemaBoundUIElement {
     element_type: 'bool'

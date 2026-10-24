@@ -119,13 +119,13 @@ function getUiSchema(): UISchema {
         root: {
             element_type: 'layout',
             orchestration_strategy: 'columns',
-            order: ['uid', 'text_input', 'sub_layout'],
+            order: ['uid', '...', 'text_input', 'sub_layout'],
             ui_level: 2,
             layout: {
                 max_height: '50vh',
             },
             ui_elements: {
-                uid: {
+                "uid": {
                     binding: {
                         field_name: 'uid',
                     },
@@ -134,7 +134,33 @@ function getUiSchema(): UISchema {
                     text: 'uid',
                     visible: '${text_input}',
                 },
+                "text_label_2": {
+                    // binding: {
+                    //     field_name: 'text_field_2',
+                    // },
+                    layout: {
+                        max_width: '',
+                        min_width: 'max',
+                        max_height: '',
+                        min_height: '',
+                    },
+                   // style: {
+                    //     css_styles: {
+                    //         "--ui-col-bg-1-input": "yellow",
+                    //         "--ui-col-primary-bg-1": "contrast-color(var(--ui-col-bg-1-input))"
+                    //     }
+                    // },
+                    element_type: 'template_label',
+                    value: '${text_input}',
+                    display_identifier: {
+
+                    },
+                    text: 'text_label',
+                },
                 text_input: {
+                    binding: {
+                        field_name: 'text_field',
+                    },
                     style: {
                       css_styles: {
                           "--ui-col-bg-1-input": "yellow",
@@ -151,16 +177,6 @@ function getUiSchema(): UISchema {
                     value: '${text_input}',
                     text: 'text',
                     multiline: true,
-                    // style: {
-                    //     css_classes: ['my-class', '#getSomeClass()'],
-                    //     css_styles: {
-                    //         "text-align": "center",
-                    //         "background-color": "var(--col-bg-1)",
-                    //         "border-radius": "calc(1rem - 10px)"}
-                    // },
-                    binding: {
-                        field_name: 'text_field',
-                    },
                 },
                 sub_layout: {
                     element_type: 'layout',

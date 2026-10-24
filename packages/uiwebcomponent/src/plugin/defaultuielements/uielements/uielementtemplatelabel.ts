@@ -1,63 +1,130 @@
 import { UIElement } from '#src/uielement'
-import { UIElementRenderContext } from '#src/uielementrendercontext'
-
-// import {html} from "lit/static-html.js";
 import { nothing, html } from 'lit'
+import { styleMap } from 'lit/directives/style-map.js'
+
+import {
+    UISchemaTextField,
+
+} from '#src/uischema'
+import { UIElementRenderContext } from '#src/uielementrendercontext'
+import { TemplateResultOrNothing } from '#src/sharedtypes'
 
 export class UIElementTemplateLabel extends UIElement {
-    static renderLabel(context: UIElementRenderContext, id: string, text: string) {
-        return context.parentLayout.renderElementLabels &&
-            context.elementDefinition.element_type.text
-            ? html`
-                  <label for="${id}"
-                      >${text}
-                      ${this.devInfo(
-                          context,
-                          context.elementDefinition.element_type.text,
-                          context.elementDefinition.element_type.value,
-                      )}
-                  </label>
-              `
-            : nothing
+
+    static renderSkeleton(context: UIElementRenderContext, id: string) {
+        return this.renderElement(context, id, true)
     }
 
-    static render(context: UIElementRenderContext, id: string) {
-        const value = this.resolve(context, context.elementDefinition.element_type.value)
-        if (!this.isVisible(context, value)) {
-            return html`${nothing}`
+    static checkElementDefinition(id: string, context: UIElementRenderContext): UISchemaTextField {
+        if (!context.parentLayout)
+            throw context.uicomponent.i18NST('uic.missing_parent_layout', '{{ui_element_name}}: render context is missing parentLayout', [id])
+        if (context.elementDefinition.element_type !== 'template_label')
+            throw context.uicomponent.i18NST('uic.wrong_element_type', '{{ui_element_name}}: render called with wrong element type {{element_type}}', [id, context.elementDefinition.element_type])
+
+        return context.elementDefinition
+    }
+
+    // static getValidationInfo(context: UIElementRenderContext, id: string) {
+    //     const validationInfo = {
+    //         hasError: false,
+    //         results: context.getFieldValidationInfo(id),
+    //     }
+    //     validationInfo.hasError = Boolean(
+    //         validationInfo.results
+    //         && validationInfo.results.find((v) => v.result === 'error'),
+    //     )
+    //     return validationInfo
+    // }
+
+    static renderElement(context: UIElementRenderContext, id: string, skeleton = false): TemplateResultOrNothing {
+
+        /* ============================================
+           First of all: prepare what is needed for the rendering part
+           ============================================ */
+        const elementDefinition = this.checkElementDefinition(id, context)
+        const parentLayout = context.parentLayout!
+
+        let [value, text] = this.batchResolve(
+            context,
+            [elementDefinition.value, elementDefinition.text],
+            id
+        ) as [string | undefined, string]
+
+        if (!this.isVisible(context, id, value)) {
+            return nothing
         }
-        const text = this.resolve(context, context.elementDefinition.element_type.text)
-        const htmlClass = this.getStyleSetting(
-            context.elementDefinition.element_type,
-            'classes',
-            '',
+
+        // const validationInfo = skeleton ? undefined : this.getValidationInfo(context, elementDefinition.binding.field_name)
+
+        const cssClasses = this.getCSSClasses(context, elementDefinition.style?.css_classes)
+
+        const cssStyles = this.getCSSStyles(context, elementDefinition.style?.css_styles)
+
+        const isIdentifier = this.isIdentifier(context)
+
+        if (isIdentifier) {
+            cssClasses.push('identifier-link')
+        }
+
+        if (skeleton) {
+            cssClasses.push('skeleton')
+        }
+
+        const maskIdentifier = this.maskIdentifier(context, elementDefinition.display_identifier)
+        const maskedValue = maskIdentifier? this.resolve(context, maskIdentifier, id) : null
+
+        // if (validationInfo?.hasError) {
+        //     cssStyles["border"] = "1px dotted red"
+        // }
+
+        if (
+            elementDefinition.ellipsis?.max_characters &&
+            typeof value === 'string' &&
+            value.length > elementDefinition.ellipsis.max_characters
+        ) {
+            value = value.slice(0, Math.max(0, elementDefinition.ellipsis.max_characters - 2)) + '..'
+        }
+
+        parentLayout.adjustElementStyles({
+                cssClasses: cssClasses,
+                cssStyles: cssStyles
+            },
         )
-        const cssStyle = this.addStyle(
-            '',
-            this.getStyleTextAlign(context.elementDefinition.element_type),
-        )
-        this.addStyle(
-            cssStyle,
-            context.uicomponent
-                .getPaddingStyle(context.elementDefinition.layout?.padding)
-                .replace('padding', 'margin'),
-        )
-        return context.parentLayout.renderElement(
-            context.elementDefinition.layout,
-            html`
-                ${this.renderLabel(context, id, text)}
+
+        /* ============================================
+            Enough preparation, let's render.
+        ============================================ */
+
+        //todo: I don't like this in the ui-component. The dataprovider must do this if necessary
+        //if (typeof value === 'string') {
+        //     value = value.replaceAll('\r\n', '\n')
+        //     value = value.replaceAll('\r', '\n')
+        // }
+        cssClasses.push("template-label")
+        return parentLayout.renderElement(
+            elementDefinition,
+            {
+                cssClasses: cssClasses,
+                cssStyles: cssStyles
+            },
+            (erc) => html`
+                ${parentLayout.renderLabel(context, id, text, false)}
                 <div
-                    class="templateLabel ${htmlClass}"
-                    id=${id}
-                    style="${cssStyle ? cssStyle : nothing}"
+                        style=${styleMap(erc.cssStyles)}
+                        id=${context.getScopedId(id)}
+                        class=${erc.cssClasses.join(' ')}
                 >
-                    ${this.devInfo(
-                        context,
-                        context.elementDefinition.element_type.text,
-                        context.elementDefinition.element_type.value,
-                    )}${value || nothing}
+                            <span>
+                                ${isIdentifier
+                                        ? html`<i class="footsteps"></i>`
+                                        : nothing}
+                                ${isIdentifier && maskedValue
+                                        ? maskedValue || nothing
+                                        : html`${value || nothing}`}
+                            </span>
                 </div>
             `,
         )
+
     }
 }

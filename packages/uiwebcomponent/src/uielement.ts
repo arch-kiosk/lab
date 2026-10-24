@@ -91,8 +91,9 @@ export class UIElement {
 
     static isIdentifier(context: UIElementRenderContext) {
         if (context.uicomponent.linkIdentifiers) {
-            if (context.elementDefinition.element_type.is_identifier) {
-                return true
+            if ("display_identifier" in context.elementDefinition) {
+                if (context.elementDefinition.display_identifier)
+                    return true
             }
         }
         return false
