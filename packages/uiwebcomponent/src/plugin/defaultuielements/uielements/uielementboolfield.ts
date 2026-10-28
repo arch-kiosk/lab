@@ -7,7 +7,9 @@ import {
 
 } from '#src/uischema'
 import { UIElementRenderContext } from '#src/uielementrendercontext'
-import { TemplateResultOrNothing } from '#src/sharedtypes'
+import { TemplateResultOrNothing, UIElementDataChangedEvent } from '#src/sharedtypes'
+import { DateTimePicker } from '@vaadin/date-time-picker'
+import { DatePicker } from '@vaadin/date-picker'
 
 export class UIElementBoolField extends UIElement {
 
@@ -36,6 +38,18 @@ export class UIElementBoolField extends UIElement {
         return context.elementDefinition
     }
 
+    static onDataChanged(e:CustomEvent) {
+        const element = e.currentTarget as HTMLInputElement
+        e.stopPropagation()
+        try {
+                element.dispatchEvent(new UIElementDataChangedEvent({
+                    id: element.id,
+                    value: element.checked}
+                ));
+        } catch(e) {
+            console.error(`UIElementBoolField.onValueChanged threw exception ${e} in event ${e}`, )
+        }
+    }
 
     static renderElement(context: UIElementRenderContext, id: string, skeleton = false): TemplateResultOrNothing {
 
@@ -129,6 +143,7 @@ export class UIElementBoolField extends UIElement {
                         type="checkbox"
                         class=${erc.cssClasses.join(' ')}
                         style=${styleMap(erc.cssStyles)}
+                        @change="${this.onDataChanged}"
                         ?checked=${value}
                         ?disabled=${!(elementDefinition.enabled ?? true)}
                 />

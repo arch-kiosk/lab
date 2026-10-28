@@ -17,13 +17,13 @@ export class LabApp extends LitElement {
 
     renderVirtualLayout () {
         return html`
-            <virtual-scroll-container ${ref(this.virtualLayoutRef)} id="virtualizerLayout" rowheight="64"></virtual-scroll-container>
+            <virtual-scroll-container intercept-input ${ref(this.virtualLayoutRef)} id="virtualizerLayout" rowheight="64"></virtual-scroll-container>
         `
     }
 
     renderVirtualLayout2 () {
         return html`
-            <virtual-scroll-container ${ref(this.virtualLayoutRef2)} id="virtualizerLayout2" rowheight="36"></virtual-scroll-container>
+            <virtual-scroll-container intercept-input ${ref(this.virtualLayoutRef2)} id="virtualizerLayout2" rowheight="36"></virtual-scroll-container>
         `
     }
 

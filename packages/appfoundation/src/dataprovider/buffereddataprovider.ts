@@ -94,10 +94,9 @@ export abstract class BufferedDataProvider extends DataProviderBasis {
     }
 
     public override dataChanged(recordIndex: number, fieldId: string, value: unknown): void {
-        const validationResult: DataProviderValidationResults = {
+        const validationResult: DataProviderValidationResults = this.validationStore.get(recordIndex) ?? {
             result: 'unknown',
         }
-
         if (this.activeRecordIndex !== recordIndex) {
             throw Error("record is not the active record")
         }

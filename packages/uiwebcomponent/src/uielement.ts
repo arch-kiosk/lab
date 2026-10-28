@@ -1,11 +1,10 @@
 // oxlint-disable typescript/no-redundant-type-constituents
 import {
-    ApiTimeZoneInfo,
     InterpretedExpression,
     UISchemaBaseUIElement, UISchemaIdentifierDisplay
 } from '#src/uischema'
-import { html} from 'lit'
-import {type TemplateResultOrNothing} from './sharedtypes'
+import { html, LitElement } from 'lit'
+import { ApiTimeZoneInfo, type TemplateResultOrNothing } from './sharedtypes'
 import { UIElementRenderContext } from '#src/uielementrendercontext'
 
 export class UIElement {
@@ -68,6 +67,10 @@ export class UIElement {
         } else {
             return this.renderElement(context, id)
         }
+    }
+
+    static onDataChanged(e:CustomEvent) {
+     throw new Error(`ui-element "${e.target?(e.target as LitElement).id:'unknown'}" issued a data change event without implementing the onDataChanged handler.`)
     }
 
     static isVisible(context: UIElementRenderContext, id: string, value?: unknown) {

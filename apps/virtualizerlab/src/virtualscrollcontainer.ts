@@ -38,6 +38,17 @@ export class VirtualScrollContainer extends LitElement {
     @property({ type: Number, attribute: 'rowheight' })
     rowHeight = this.DEFAULT_ROW_HEIGHT
 
+    /**
+     * IF set, the component intercepts any input event on row level and
+     * channels the changed value to the data provider. By default this is false! Set it as an attribute like this:
+     * ```html
+     * <virtual-scroll-container intercept-input ${ref(this.virtualLayoutRef)} id="virtualizerLayout" rowheight="64"></virtual-scroll-container>
+     * ```
+     * Don't use this in production. It is for development purposes only as it only works for standard html elements anyhow.
+     */
+    @property({ type: Boolean, attribute: 'intercept-input' })
+    interceptInput = false
+
     @state()
     private recordCount = 0
 
@@ -278,7 +289,7 @@ export class VirtualScrollContainer extends LitElement {
                                             ?data-loaded=${isLoaded}
                                             @focusin="${this.focusChange}"
                                             @focusout="${this.focusChange}"
-                                            @input="${this.dataChanged}"
+                                            @input="${this.interceptInput?this.dataChanged:undefined}"
                                             style="position: absolute; top: 0; left: 0; width: 100%; height: ${this.rowHeight}px; transform: translateY(${row.start}px); display: flex; align-items: center;"
                                     >
                                         ${isLoaded

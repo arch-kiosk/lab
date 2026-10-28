@@ -7,7 +7,7 @@ import {
 
 } from '#src/uischema'
 import { UIElementRenderContext } from '#src/uielementrendercontext'
-import { TemplateResultOrNothing } from '#src/sharedtypes'
+import { TemplateResultOrNothing, UIElementDataChangedEvent } from '#src/sharedtypes'
 
 export class UIElementTextField extends UIElement {
 
@@ -35,6 +35,21 @@ export class UIElementTextField extends UIElement {
     //     )
     //     return validationInfo
     // }
+
+    static onDataChanged(e:CustomEvent) {
+        const element = e.currentTarget as HTMLInputElement
+        console.log("text field element has value ", element.value)
+        e.stopPropagation()
+        try {
+            element.dispatchEvent(new UIElementDataChangedEvent({
+                id: element.id,
+                value: element.value}
+            ));
+        } catch(e) {
+            console.error(`UIElementBoolField.onValueChanged threw exception ${e} in event ${e}`, )
+        }
+    }
+
 
     static renderElement(context: UIElementRenderContext, id: string, skeleton = false): TemplateResultOrNothing {
 
@@ -140,6 +155,7 @@ export class UIElementTextField extends UIElement {
                         id=${context.getScopedId(id)}
                         class=${erc.cssClasses.join(' ')}
                         style=${styleMap(erc.cssStyles)}
+                        @change=${this.onDataChanged}
                     >${value ?? ''}</textarea>
                 `,
             )
@@ -191,6 +207,7 @@ export class UIElementTextField extends UIElement {
                         class=${erc.cssClasses.join(' ')}
                         style=${styleMap(erc.cssStyles)}
                         value=${value ?? ''}
+                        @change=${this.onDataChanged}
                         ?disabled=${!(elementDefinition.enabled ?? true) ||
                         elementDefinition.readonly}/>
             `,

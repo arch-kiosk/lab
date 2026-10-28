@@ -1,50 +1,68 @@
 import { UIElement } from '#src/uielement'
-import { UIElementRenderContext } from '#src/uielementrendercontext'
+import { nothing, html } from 'lit'
+import { styleMap } from 'lit/directives/style-map.js'
 
-// import {html} from "lit/static-html.js";
-import { html, nothing } from 'lit'
-import { UISchemaLine } from '#src/uischema'
+import {
+    UISchemaLine
+
+} from '#src/uischema'
+import { UIElementRenderContext } from '#src/uielementrendercontext'
+import { TemplateResultOrNothing } from '#src/sharedtypes'
 
 export class UIElementLine extends UIElement {
-    // line needs a different way of dealing with the defaultElementVisibility
-    // @ts-ignore
-    static isVisible(context: UIElementRenderContext, _: unknown) {
-        let visible =
-            context.elementDefinition.element_type.visible ??
-            context.parentLayout.defaultElementVisibility
-        if (visible === 'false' || visible == false) return false
-        if (visible === 'true' || visible == true) return true
-        if (visible === '.') {
-            // lines don't have a value, so they are always visible on "."
-            return true
-        }
-        return Boolean(this.resolve(context, visible))
+
+    static renderSkeleton(context: UIElementRenderContext, id: string) {
+        return this.renderElement(context, id)
     }
 
-    static render(context: UIElementRenderContext, id: string) {
-        if (!this.isVisible(context, '')) {
-            return html`${nothing}`
+    static checkElementDefinition(id: string, context: UIElementRenderContext): UISchemaLine {
+        if (!context.parentLayout)
+            throw context.uicomponent.i18NST('uic.missing_parent_layout', '{{ui_element_name}}: render context is missing parentLayout', [id])
+        if (context.elementDefinition.element_type !== 'line')
+            throw context.uicomponent.i18NST('uic.wrong_element_type', '{{ui_element_name}}: render called with wrong element type {{element_type}}', [id, context.elementDefinition.element_type])
+
+        return context.elementDefinition
+    }
+
+    static renderElement(context: UIElementRenderContext, id: string): TemplateResultOrNothing {
+
+        /* ============================================
+           First of all: prepare what is needed for the rendering part
+           ============================================ */
+
+        const elementDefinition = this.checkElementDefinition(id, context)
+        const parentLayout = context.parentLayout!
+
+        if (!this.isVisible(context, id)) {
+            return nothing
         }
 
-        let cssClass = this.getStyleSetting(context.elementDefinition.element_type, 'classes', '')
-        cssClass =
-            (cssClass ? cssClass + ' ' : '') +
-            ((context.elementDefinition.element_type as UISchemaLine).transparent
-                ? 'ui-line-transparent'
-                : '')
+        const cssClasses = this.getCSSClasses(context, elementDefinition.style?.css_classes)
+        const cssStyles = this.getCSSStyles(context, elementDefinition.style?.css_styles)
 
-        // let style = context.uicomponent
-        //     .getPaddingStyle(context.elementDefinition.element_type.padding)
-        //     .replace('padding', 'margin')
-
-        const cssStyle = this.addStyle(
-            style,
-            context.parentLayout.renderLayoutStyles(context.elementDefinition.layout),
+        parentLayout.adjustElementStyles({
+                cssClasses: cssClasses,
+                cssStyles: cssStyles
+            },
         )
-
-        return context.parentLayout.renderElement(
-            context.elementDefinition.layout,
-            html` <div class="ui-line ${cssClass}" id="${id}" style="${cssStyle}"></div> `,
+        cssClasses.push(elementDefinition.transparent?"ui-line-transparent":"ui-line")
+        /* ============================================
+            Enough preparation, let's render.
+        ============================================ */
+        // normal, active input field
+        return parentLayout.renderElement(
+            elementDefinition,
+            {
+                cssClasses: cssClasses,
+                cssStyles: cssStyles
+            },
+            (erc) => html`
+                <div id="${id}"
+                     class=${erc.cssClasses.join(' ')}
+                     style=${styleMap(erc.cssStyles)}
+                >
+                </div>
+            `,
         )
     }
 }

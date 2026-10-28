@@ -8,22 +8,33 @@ interface MyDataRecord extends VirtualScrollContainerDataRecord {
     text_input: string
     // oxlint-disable-next-line typescript/no-explicit-any
     yesno_field: boolean,
-    data: any
+    datetime_field: string,
+    date_field: string,
+    // data: any
 }
 
 export class ConcreteDataProvider extends BufferedDataProvider implements UIComponentDataProvider {
+
+    private getRandomISOString(start = new Date(2000, 0, 1), end = new Date()) {
+        const randomTimestamp = start.getTime() + Math.random() * (end.getTime() - start.getTime())
+        return new Date(randomTimestamp).toISOString()
+    }
 
     private records: Array<MyDataRecord> = Array.from({ length: MAX_RECORDS }, (_v, k) => ({
         uid: crypto.randomUUID() as string,
         text_input: `value ${k}`,
         yesno_field: true,
-        data: {
-        },
+        datetime_field: this.getRandomISOString(),
+        date_field: this.getRandomISOString()
     }))
 
     protected recalcDbRecordCount(): Promise<boolean> {
         this.cachedDbRecordCount = this.records.length
         return Promise.resolve(true)
+    }
+
+    public override dataChanged(recordIndex: number, fieldId: string, value: unknown): void {
+        super.dataChanged(recordIndex, fieldId, value)
     }
 
     protected getSingleExpressionContent(str: string): string | null {

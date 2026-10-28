@@ -1,7 +1,7 @@
 import { UIComponentBasePlugin } from '#src/uicomponentbaseplugin'
 import { UIConfigurableElementFactory } from '#src/uielementfactory'
 import { UIElementTextField } from './uielements/uielementtextfield'
-import { UIElementDateField } from './uielements/uielementdatefield'
+// import { UIElementDateField } from './uielements/uielementdatefield'
 import { UIElementDateTimeField } from './uielements/uielementdatetimefield'
 import { UIElementButton } from './uielements/uielementbutton'
 import { UIElementTemplateLabel } from './uielements/uielementtemplatelabel'
@@ -28,7 +28,7 @@ export class DefaultUIElementFactory extends UIComponentBasePlugin {
 
     registerUIElements = (factory: UIConfigurableElementFactory) => {
         factory.addUIElementClass('text_field', UIElementTextField)
-        factory.addUIElementClass('date_field', UIElementDateField)
+        // factory.addUIElementClass('date_field', UIElementDateField)
         factory.addUIElementClass('date_time_field', UIElementDateTimeField)
         factory.addUIElementClass('button', UIElementButton)
         factory.addUIElementClass('template_label', UIElementTemplateLabel)

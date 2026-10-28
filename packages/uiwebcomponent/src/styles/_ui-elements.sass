@@ -2,6 +2,12 @@
 @use "basics" as *
 @use "colors" as *
 
+.ui-line
+  width: 100%
+  height: 1px
+  margin-top: 1em
+  margin-bottom: 1em
+  border-top: solid 1px $col-accent
 .ui-line-transparent
   height: 0
   opacity: 0
@@ -130,3 +136,39 @@ button:disabled
   &:active
     border-color: $col-bd-dk-alert
     background-color: $col-bg-alert-dk
+
+vaadin-date-picker, vaadin-date-time-picker
+  input
+    height: unset!important
+    border: unset!important
+vaadin-time-picker::part(input-field), vaadin-date-picker::part(input-field)
+  padding: 0
+  border: none
+
+vaadin-time-picker[disabled]::part(input-field), vaadin-date-picker[disabled]::part(input-field)
+  background-color: $col-bg-lt
+  --lumo-disabled-text-color: $col-primary
+
+
+.date-time-frame
+  background-color: $col-bg-lt
+  display: flex
+  flex-direction: row
+  align-items: center
+.time-zone-marker
+  display: inline-block
+  border-right: solid 1px $col-bg-dk
+  width: 28px
+  padding: 4px 4px
+  font-size: $font-size-standard
+.time-zone-marker:before
+  content: ""
+.date-time-popover
+  position: absolute
+  display: none
+  background-color: $col-bg-ack
+  color: $col-primary-ack
+  padding: 5px
+  font-family: $font-standard
+  font-size: $font-size-standard
+  font-weight: normal

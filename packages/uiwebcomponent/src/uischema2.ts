@@ -107,7 +107,6 @@ export interface UISchemaBaseUIElement {
     /** optional. Determines if the element is visible. Defaults to a layout setting or true.
      * @see {@link InterpretedExpression}*/
     visible?: InterpretedExpression | boolean
-
 }
 
 /**
@@ -189,7 +188,7 @@ export interface UISchemaUIElementStyleBasics {
      * By default, that prefix is unset, so nothing gets sent to the host for interpretation.
      *
      * @example
-     * In this example the host would have set the `interpretedExpressionPrefix` to `#` to receive the css style `border` for interpretation.
+     * In this example the host would have set the `interpretedExpressionPrefix` to `#` to receive the css style `order` for interpretation.
      * ```json
      * style: {
      *      css_styles: {
@@ -309,7 +308,7 @@ export interface UISchemaLayoutSettings<S extends UISchemaOrchestrationStrategyK
     readonly?: boolean
 
     /** all visible child elements must be listed here in order of their appearance within the layout.
-     * If this is missing all elements will show in random order.*/
+     * If this is missing all elements will show in random order. */
     order?: string[]
 
     /** defines whether an element in the layout is visible if it does not have a visibility setting of its own. */
@@ -422,14 +421,25 @@ export interface UISchemaDisplayEllipsis {
  */
 export interface UISchemaDateTimeField extends UISchemaBoundUIElement {
     element_type: 'date_time_field'
-    date_format?: string
+
+    /** leave date_format out unless you want to set it to latin. In that case the date format will look like dd.xx.yyyy with xx being the latin number for the month  */
+    date_format?: 'latin'
+
+    /** set to true if you actually want to include a time input field */
     include_time?: boolean
 }
 
 /**
- * A horizontal line
+ * Elements that allow this property can be used as template elements.
+ * A template element can occur more than once in the "order" list in {@link UISchemaLayoutSettings} and so appear multiple times on the layout.
+ * They will not get included in the ... placeholder, though.
  */
-export interface UISchemaLine extends UISchemaBaseUIElement {
+export type UISchemaUIElementTemplate = {is_template?: true}
+
+/**
+ * A horizontal line. Lines can be template elements. See {@link UISchemaUIElementTemplate}
+ */
+export type UISchemaLine = UISchemaBaseUIElement & UISchemaUIElementTemplate & {
     element_type: 'line'
 
     /** if set the element does not show the line but acts as a horizontal spacer */

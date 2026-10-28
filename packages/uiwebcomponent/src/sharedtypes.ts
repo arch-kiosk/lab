@@ -73,6 +73,25 @@ export type UIElementRenderer = (
     parentLayout: UILayout,
     dataContext: RenderContextDataContext
 ) => TemplateResultOrNothing
-// export declare interface UISchemaUIElements {
-//     [key: string]: UISchemaUIElement
-// }
+
+
+/**
+ * Custom Event and its detail definition. The event is issued by an ui element to report a change of data to the data provider.
+ * The event is going to be picked up by the layout and forwarded to the data-provider.
+ */
+export interface UIElementDataChangedDetail {
+    id: string
+    value: unknown
+}
+
+export class UIElementDataChangedEvent extends CustomEvent<UIElementDataChangedDetail> {
+    static readonly TYPE = 'ui-element-data-changed';
+
+    constructor(detail: UIElementDataChangedDetail) {
+        super(UIElementDataChangedEvent.TYPE, {
+            bubbles: true,
+            cancelable: false,
+            detail,
+        })
+    }
+}

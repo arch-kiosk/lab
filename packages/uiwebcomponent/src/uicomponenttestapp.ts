@@ -84,13 +84,13 @@ export class UIComponentTestApp extends LitElement {
             <p>Active i18N-locale: <strong>${i18next.language}</strong></p>
             <button onclick="gotoRecord(5)">goto record 5</button>
             <div style="display: flex; padding: 5em">
-                <!--ui-component
+                <ui-component
                         ${ref(this.uiComponentRef1)}
                         id="ui1"
                         current-locale="${this.currentLocale}"
                         style="border: 2px solid cornflowerblue"
                 >
-                </ui-component-->
+                </ui-component>
                 <ui-component
                         style="margin-inline-start: 1em"
                         ${ref(this.uiComponentRef2)}

@@ -36,6 +36,7 @@ import { UIVirtualScrollLayout } from './layouts/virtualscrolllayout'
 import { UILayout } from '#src/layouts/uilayout'
 import { UIColumnLayoutClass } from '#src/layouts/layoutclasscolumn'
 import { UIRenderBoundary } from '#src/layouts/uirenderboundary'
+import { DateTime } from 'luxon'
 
 export type * from './uischema'
 
@@ -590,6 +591,17 @@ export class UIComponent extends LitElement {
         // noinspection JSMismatchedCollectionQueryUpdate
         const itemTemplates: TemplateResultOrNothing[] = []
         let rootLayout
+        console.log("date time logging", new Intl.DateTimeFormat('ar').resolvedOptions());
+
+        console.log(
+            DateTime.local(1998, 4, 11)
+                .setLocale('ar')
+                .resolvedLocaleOptions()
+        );
+
+        console.log(
+            new Intl.DateTimeFormat('ar').format(new Date(1998, 4, 11))
+        );
         if (this.showDevelopmentInfo) {
             itemTemplates.push(html`
                 <div

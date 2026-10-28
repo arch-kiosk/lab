@@ -41,6 +41,9 @@ class Type1DataProvider extends ConcreteDataProvider {
         })
         return super.resolve(valueExpression, _, recordIndex)
     }
+    public override dataChanged(recordIndex: number, fieldId: string, value: unknown): void {
+        super.dataChanged(recordIndex, fieldId, value)
+    }
 }
 
 export function configureTestSchema1TypeLayout(uiComponent: UIComponent) {
@@ -72,7 +75,7 @@ export function configureTestSchema1TypeLayout(uiComponent: UIComponent) {
 
     dataProvider.onValidateField = (_, fieldId, value) => {
         const rc: Array<DataProviderValidationResult> = []
-        console.log(`dataProvider.onValidate ${fieldId}`)
+        console.log(`dataProvider.onValidate ${fieldId} with value ${value}`)
         if (fieldId === 'text_input') {
             if (!value || value as string === '') {
                 rc.push({ result: 'error', msg: 'Please enter a value for this field' })
@@ -80,14 +83,18 @@ export function configureTestSchema1TypeLayout(uiComponent: UIComponent) {
         }
         if (fieldId === 'yesno_field' && value) {
             rc.push({ result: 'error', msg: 'Please enter a value for this field' })
-            console.log(`yesno_field has value ${value}`)
+        }
+        if (fieldId === 'date_field' && value) {
+            rc.push({ result: 'error', msg: 'Please enter a value for this field' })
+        }
+        if (fieldId === 'datetime_field' && value) {
+            rc.push({ result: 'error', msg: 'Please enter a value for this field' })
         }
         return [rc, undefined] as ValidationResultsReturnType<typeof value>
     }
 
     dataProvider.onValidateRecord = (recordIndex, _record) => {
         const rc: Array<DataProviderValidationResult> = []
-
         if (_record['text_input'] === 'asdf') {
             rc.push({ result: 'error', msg: 'This record is not valid!' })
         }
@@ -119,7 +126,7 @@ function getUiSchema(): UISchema {
         root: {
             element_type: 'layout',
             orchestration_strategy: 'columns',
-            order: ['uid', '...', 'text_input', 'sub_layout'],
+            order: ['uid', 'line_1', '...','text_input', 'line_1','sub_layout'],
             ui_level: 2,
             layout: {
                 max_height: '50vh',
@@ -146,10 +153,47 @@ function getUiSchema(): UISchema {
                     display_identifier: true,
                     text: 'text_label',
                 },
+                "date_time_field_1": {
+                    binding: {
+                      field_name: "datetime_field"
+                    },
+                    // layout: {
+                    //     max_width: '',
+                    //     min_width: 'max',
+                    //     max_height: '',
+                    //     min_height: '',
+                    // },
+                    element_type: 'date_time_field',
+                    enabled: true,
+                    readonly: false,
+                    date_format: "latin",
+                    include_time: true,
+                    value: '${datetime_field}',
+                    text: 'date and time',
+                },
+                "date_field_1": {
+                    binding: {
+                      field_name: "date_field"
+                    },
+                    element_type: 'date_time_field',
+                    enabled: true,
+                    readonly: false,
+                    include_time: false,
+                    value: '${date_field}',
+                    text: 'date',
+                },
                 "button_1": {
                     element_type: 'button',
                     button_type: 'iconButton',
                     icon: ''
+                },
+                "line_1": {
+                    layout: {
+                        min_width: "max"
+                    },
+                    element_type: 'line',
+                    transparent: false,
+                    is_template: true
                 },
                 text_input: {
                     binding: {
@@ -197,7 +241,7 @@ function getUiSchema(): UISchema {
                             binding: {
                                 field_name: 'yesno_field',
                             },
-                            readonly: true,
+                            readonly: false,
                             element_type: 'bool',
                             value: "${yesno_field}",
                             text: 'yes no',

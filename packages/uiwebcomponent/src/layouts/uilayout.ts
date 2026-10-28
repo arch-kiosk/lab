@@ -5,9 +5,13 @@ import {
     UISchemaLayoutElement, UISchemaOrchestrationStrategyKeys, UISchemaUILevels,
 } from '../uischema'
 import { UIElementRenderContext, UILayoutRenderContext } from '../uielementrendercontext'
-import { html, nothing, ReactiveController, TemplateResult } from 'lit'
+import { html, LitElement, nothing, ReactiveController, TemplateResult } from 'lit'
 import { UIComponent } from '#src/uicomponent'
-import { TemplateResultOrNothing, UIElementRenderer } from '#src/sharedtypes'
+import {
+    TemplateResultOrNothing,
+    UIElementDataChangedEvent,
+    UIElementRenderer,
+} from '#src/sharedtypes'
 import { UIElement } from '#src/uielement'
 
 // @ts-ignore
@@ -79,20 +83,26 @@ export abstract class UILayout implements ReactiveController {
     }
 
 
-    public dataChangedEvent(event: InputEvent, recordIndex?: number) {
+    public uiElementChangedEvent(event: UIElementDataChangedEvent, recordIndex?: number) {
         // const element=this.reactiveControllerHost.getSchemaElement(elementId)
-        const domElement = event.target as HTMLInputElement
-        if (recordIndex !== undefined && domElement) {
-            const elementId = this.reactiveControllerHost.unScopeId(domElement.id)
-            if (elementId) {
-                const elementDefinition = this.reactiveControllerHost.getSchemaElement(elementId)
-                if ("binding" in elementDefinition) {
-                    const elementClass = this.reactiveControllerHost.getUIElementClass(
-                        elementDefinition.element_type,
-                    )
-                    const value = elementClass.getDomValue(elementId, domElement)
-                    this.reactiveControllerHost.dataProvider?.dataChanged(recordIndex, elementDefinition.binding.field_name, value)
-                    this.requestRerender(domElement)
+        const htmlId = event.detail.id || (event.target as HTMLElement).id
+
+        if (recordIndex !== undefined && htmlId) {
+            const schemaId = this.reactiveControllerHost.unScopeId(htmlId)
+            if (schemaId) {
+                try {
+                    const elementDefinition = this.reactiveControllerHost.getSchemaElement(schemaId)
+                    if ("binding" in elementDefinition) {
+                        const elementClass = this.reactiveControllerHost.getUIElementClass(
+                            elementDefinition.element_type,
+                        )
+                        const value = event.detail.value ?? elementClass.getDomValue(schemaId, event.target as HTMLElement)
+                        this.reactiveControllerHost.dataProvider?.dataChanged(recordIndex, elementDefinition.binding.field_name, value)
+                        this.requestRerender(event.target as LitElement)
+                    }
+                } catch(e) {
+                    console.error(`dataChangedEvent threw error on field ${schemaId}`, e)
+                    throw e
                 }
             }
         } else {
@@ -172,6 +182,10 @@ export abstract class UILayout implements ReactiveController {
             renderedElements)
     }
 
+    private inputEvent(e: Event) {
+        e.stopPropagation()
+    }
+
     protected renderHtmlTemplate(recordNr: number | undefined,
                                  layoutId: string,
                                  renderContext: UILayoutRenderContext,
@@ -186,7 +200,7 @@ export abstract class UILayout implements ReactiveController {
                  data-record-nr="${recordNr ?? nothing}"
                  data-record-uid="${recordUid ?? nothing}"
                  ui-level=${'l'+this.uilevel}
-                 @input="${(event: InputEvent) => this.dataChangedEvent(event, recordNr)}"
+                 @ui-element-data-changed="${(event: InputEvent) => this.uiElementChangedEvent(event, recordNr)}"
             >
                 ${renderedElements}
             </div>
@@ -241,6 +255,7 @@ export abstract class UILayout implements ReactiveController {
         try {
             if (layoutSchema.order) {
                 const allElements = Object.keys(layoutSchema.ui_elements)
+                const templateElements: string[] = []
                 allElements.sort()
                 const orderedElements = [...layoutSchema.order]
                 const result: Array<string> = []
@@ -250,15 +265,23 @@ export abstract class UILayout implements ReactiveController {
                     } else {
                         let idx = allElements.findIndex((x) => x === orderedElementId)
                         if (idx > -1) {
-                            result.push(allElements[idx])
-                            allElements.splice(idx, 1)
+                            const elementId = allElements[idx]
+                            result.push(elementId)
+                            const element = layoutSchema.ui_elements[elementId]
+                            if ("is_template" in element && element.is_template) {
+                                templateElements.push(elementId)
+                            } else {
+                                allElements.splice(idx, 1)
+                            }
                         }
                     }
                 }
 
                 let idxPlaceholder = result.findIndex((x) => x === '...')
                 if (idxPlaceholder > -1) {
-                    result.splice(idxPlaceholder, 1, ...allElements)
+                    result.splice(idxPlaceholder, 1, ...allElements.filter(x => {
+                        return templateElements.findIndex((y) => y ===x ) === -1
+                    }))
                 }
 
                 return result
