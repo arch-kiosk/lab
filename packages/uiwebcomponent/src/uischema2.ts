@@ -145,7 +145,7 @@ export interface UISchemaBoundUIElement extends UISchemaDynamicUIElement {
 }
 
 /**
- * settings that to bind a BoundUIElement to the data provider
+ * settings that bind a BoundUIElement to the data provider
  */
 export interface UISchemaUIElementBinding {
     field_name: string
@@ -453,6 +453,9 @@ export type UISchemaLine = UISchemaBaseUIElement & UISchemaUIElementTemplate & {
  * This is the element that allows for dynamic and lazy loading of the list contents.
  * Note that the combobox element does not have a value attribute! The value of the
  * element is directly pulled from the binding.
+ * See {@link UISchemaUIElementBinding}
+ *
+ * Note that there is also a drop-down selection: {@link UISchemaDropDownSelection}
  */
 export interface UISchemaComboBox extends Omit<UISchemaBoundUIElement, 'value'> {
     element_type: 'combo-box'
@@ -467,7 +470,8 @@ export interface UISchemaComboBox extends Omit<UISchemaBoundUIElement, 'value'> 
 /**
  * A drop-down selection element (drop down list without an input element) selecting a value from a list.
  * This element loads the selection list only once and assumes it is static. If you need something more dynamic or lazy, use the combo-box element.
- * element is directly pulled from the binding.
+ * Note that there is no "value" property for this element. The value is directly pulled from the database binding.
+ * See {@link UISchemaUIElementBinding}
  */
 export interface UISchemaDropDownSelection extends Omit<UISchemaBoundUIElement, 'value'> {
     element_type: 'drop-down-selection'
