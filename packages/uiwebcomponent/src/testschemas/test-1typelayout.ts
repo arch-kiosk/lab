@@ -10,6 +10,11 @@ import {
     ValidationResultsReturnType,
 } from '@arch-kiosk/appfoundation/dataprovider'
 import { _ } from 'ajv'
+import {
+    LookupListParams,
+    UIComponentLookupProvider,
+    UIElementLookupListItem,
+} from '#src/sharedtypes'
 
 class Type1DataProvider extends ConcreteDataProvider {
     resolve(valueExpression: unknown | Array<unknown | undefined>, _?: string, recordIndex?: number): unknown {
@@ -41,6 +46,7 @@ class Type1DataProvider extends ConcreteDataProvider {
         })
         return super.resolve(valueExpression, _, recordIndex)
     }
+
     public override dataChanged(recordIndex: number, fieldId: string, value: unknown): void {
         super.dataChanged(recordIndex, fieldId, value)
     }
@@ -48,6 +54,7 @@ class Type1DataProvider extends ConcreteDataProvider {
 
 export function configureTestSchema1TypeLayout(uiComponent: UIComponent) {
     uiComponent.uiSchema = getUiSchema()
+    uiComponent.lookupProvider = getLookupProvider()
     const dataProvider = getDataProvider()
     uiComponent.dataProvider = dataProvider
     uiComponent.interpretedExpressionPrefix = '#'
@@ -90,6 +97,10 @@ export function configureTestSchema1TypeLayout(uiComponent: UIComponent) {
         if (fieldId === 'datetime_field' && value) {
             rc.push({ result: 'error', msg: 'Please enter a value for this field' })
         }
+
+        if (fieldId === 'l1' && value === "ac") {
+            rc.push({ result: 'error', msg: "Please don't select 'ac' for this field" })
+        }
         return [rc, undefined] as ValidationResultsReturnType<typeof value>
     }
 
@@ -109,6 +120,36 @@ function getDataProvider() {
     //   // virtualLayout.notifyDataReady(notification)
     // })
     // // virtualLayout.init(this.dataProvider, this.renderRow.bind(this))
+}
+
+function getLookupProvider(): UIComponentLookupProvider {
+    const lookupLists: Record<string, Record<string, string>> = {
+        "selection topic 1": {
+            "1": "topic 1 - 1",
+            "2": "topic 2 - 2",
+        },
+        "selection topic 2": {
+            "1": "topic 2 - 1",
+            "2": "topic 2 - 2",
+        }
+    }
+
+    return {
+
+        getLookupList(topic: string, _params: LookupListParams): Array<UIElementLookupListItem>  {
+            const rc = Object.entries(lookupLists[topic]).map((item) => {
+                return {
+                    value: item[0],
+                    label: item[1]
+                }
+            })
+            console.log("looking up topic", topic, rc)
+            return rc
+        },
+        lookup(topic: string, value: string) {
+            return lookupLists[topic][value]
+        }
+    }
 }
 
 function getUiSchema(): UISchema {
@@ -141,6 +182,43 @@ function getUiSchema(): UISchema {
                     text: 'uid',
                     visible: '${text_input}',
                 },
+                "list1": {
+                    binding: {
+                        field_name: 'l1',
+                    },
+                    element_type: 'drop-down-selection',
+                    text: 'list-1',
+                    visible: '${l1}',
+                    readonly: false,
+                    // items: [["ac", "Architecture"], ["dp", "Deposit"], ["bu", "Burial"]]
+                    items: {
+                        topic: "selection topic 1"
+                    }
+                },
+                "list2": {
+                    binding: {
+                        field_name: 'l2',
+                    },
+                    element_type: 'combo-box',
+                    text: 'dynamic list',
+                    visible: '${l2}',
+                    readonly: false,
+                    items: {
+                        topic: "selection topic 1"
+                    }
+                },
+                "list3": {
+                    binding: {
+                        field_name: 'l3',
+                    },
+                    element_type: 'combo-box',
+                    text: 'dynamic list 2',
+                    visible: '${l3}',
+                    readonly: false,
+                    items: {
+                        topic: "selection topic 2"
+                    }
+                },
                 "text_label_2": {
                     layout: {
                         max_width: '',
@@ -157,12 +235,12 @@ function getUiSchema(): UISchema {
                     binding: {
                       field_name: "datetime_field"
                     },
-                    // layout: {
-                    //     max_width: '',
-                    //     min_width: 'max',
-                    //     max_height: '',
-                    //     min_height: '',
-                    // },
+                    layout: {
+                        max_width: '',
+                        min_width: 'max',
+                        max_height: '',
+                        min_height: '',
+                    },
                     element_type: 'date_time_field',
                     enabled: true,
                     readonly: false,

@@ -1,7 +1,7 @@
 // import {DataNotifier, DataRecord, RecordState} from "@arch-kiosk/virtualscrollcontainer/src/sharedtypes";
 import {
     Dictionary,
-    UISchemaBaseUIElement, UISchemaLookupSettings, UISchemaUIElements,
+    UISchemaBaseUIElement, UISchemaFullLookupSettings, UISchemaUIElements,
 } from './uischema'
 import { VirtualScrollContainerDataProvider } from '@arch-kiosk/appfoundation/dataprovider'
 import { ComboBoxDataProviderParams } from '@vaadin/combo-box'
@@ -30,6 +30,7 @@ export interface UIComponentDataProvider extends VirtualScrollContainerDataProvi
     getRecordValidationInformation(recordIndex: number): Array<DataProviderValidationResult>
 }
 
+
 export declare interface UIElementWithId {
     id: string
     element: UISchemaBaseUIElement
@@ -38,7 +39,7 @@ export declare interface UIElementWithId {
 // eslint-disable-next-line typescript/no-explicit-any
 export type UISchemaLookupProvider = (
     elementId: string,
-    lookupSettings: UISchemaLookupSettings,
+    lookupSettings: UISchemaFullLookupSettings,
     params: ComboBoxDataProviderParams,
     callback: ComboBoxDataProviderCallback<unknown>,
 ) => void
@@ -80,7 +81,7 @@ export type UIElementRenderer = (
  * The event is going to be picked up by the layout and forwarded to the data-provider.
  */
 export interface UIElementDataChangedDetail {
-    id: string
+    htmlId: string
     value: unknown
 }
 
@@ -94,4 +95,20 @@ export class UIElementDataChangedEvent extends CustomEvent<UIElementDataChangedD
             detail,
         })
     }
+}
+
+export interface LookupListParams {
+    page: number;
+    pageSize: number;
+    filter: string;
+}
+
+export interface UIElementLookupListItem {
+    value: string;
+    label: string;
+}
+
+export interface UIComponentLookupProvider {
+    getLookupList(topic: string, params?: LookupListParams): Array<UIElementLookupListItem>
+    lookup(topic: string, value: unknown): string | undefined
 }

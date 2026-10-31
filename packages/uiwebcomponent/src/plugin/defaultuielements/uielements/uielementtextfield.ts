@@ -42,11 +42,11 @@ export class UIElementTextField extends UIElement {
         e.stopPropagation()
         try {
             element.dispatchEvent(new UIElementDataChangedEvent({
-                id: element.id,
+                htmlId: element.id,
                 value: element.value}
             ));
         } catch(e) {
-            console.error(`UIElementBoolField.onValueChanged threw exception ${e} in event ${e}`, )
+            console.error(`UIElementTextField.onValueChanged threw exception ${e} in event ${e}`, )
         }
     }
 

@@ -9,6 +9,9 @@ import { UIElementComboBox } from './uielements/uielementcombobox'
 import { UIElementLine } from './uielements/uielementline'
 import { UIElementFile } from './uielements/uielementfile'
 import { UIElementBoolField } from './uielements/uielementboolfield'
+import {
+    UIElementDropDownSelection
+} from '#src/plugin/defaultuielements/uielements/uielementdropdownselection'
 
 export class DefaultUIElementFactory extends UIComponentBasePlugin {
     constructor(active = true) {
@@ -32,7 +35,8 @@ export class DefaultUIElementFactory extends UIComponentBasePlugin {
         factory.addUIElementClass('date_time_field', UIElementDateTimeField)
         factory.addUIElementClass('button', UIElementButton)
         factory.addUIElementClass('template_label', UIElementTemplateLabel)
-        factory.addUIElementClass('selection', UIElementComboBox)
+        factory.addUIElementClass('combo-box', UIElementComboBox)
+        factory.addUIElementClass('drop-down-selection', UIElementDropDownSelection)
         factory.addUIElementClass('line', UIElementLine)
         factory.addUIElementClass('file', UIElementFile)
         factory.addUIElementClass('bool', UIElementBoolField)

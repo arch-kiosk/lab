@@ -68,8 +68,7 @@ export class UIVirtualScrollLayout extends UILayout {
 
     // @ts-ignore
     renderLayoutStyles(_?: UISchemaUIElementElementLayout): string {
-        let style = ''
-        return style
+        return ''
     }
 
     public renderLayout(

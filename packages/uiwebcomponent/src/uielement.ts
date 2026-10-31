@@ -1,7 +1,7 @@
 // oxlint-disable typescript/no-redundant-type-constituents
 import {
     InterpretedExpression,
-    UISchemaBaseUIElement, UISchemaIdentifierDisplay
+    UISchemaIdentifierDisplay
 } from '#src/uischema'
 import { html, LitElement } from 'lit'
 import { ApiTimeZoneInfo, type TemplateResultOrNothing } from './sharedtypes'
@@ -129,18 +129,20 @@ export class UIElement {
         return undefined
     }
 
-    static getStyleSetting(
-        elementDefinition: UISchemaBaseUIElement,
-        attribute: string,
-        _default: string,
-    ): string {
-        if (elementDefinition.style) {
-            if (elementDefinition.style.hasOwnProperty(attribute)) {
-                return elementDefinition.style[attribute]
-            }
-        }
-        return _default
-    }
+    //obsolete
+    // static getStyleSetting(
+    //     elementDefinition: UISchemaBaseUIElement,
+    //     attribute: string,
+    //     _default: string,
+    // ): string {
+    //     if (elementDefinition.style) {
+    //         if (elementDefinition.style.hasOwnProperty(attribute)) {
+    //             return elementDefinition.style[attribute]
+    //         }
+    //     }
+    //     return _default
+    // }
+    //
 
     public static getCSSClasses(context: UIElementRenderContext, css_classes: InterpretedExpression[] | undefined) : string[] {
         let toInterpret: string[] = []

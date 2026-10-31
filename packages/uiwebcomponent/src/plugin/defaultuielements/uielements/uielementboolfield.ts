@@ -8,8 +8,6 @@ import {
 } from '#src/uischema'
 import { UIElementRenderContext } from '#src/uielementrendercontext'
 import { TemplateResultOrNothing, UIElementDataChangedEvent } from '#src/sharedtypes'
-import { DateTimePicker } from '@vaadin/date-time-picker'
-import { DatePicker } from '@vaadin/date-picker'
 
 export class UIElementBoolField extends UIElement {
 
@@ -43,7 +41,7 @@ export class UIElementBoolField extends UIElement {
         e.stopPropagation()
         try {
                 element.dispatchEvent(new UIElementDataChangedEvent({
-                    id: element.id,
+                    htmlId: element.id,
                     value: element.checked}
                 ));
         } catch(e) {

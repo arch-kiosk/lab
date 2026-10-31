@@ -35,6 +35,8 @@
         "@arch-kiosk/appfoundation": "workspace:*",
         "@arch-kiosk/virtualizerlab": "workspace:*",
         "@vaadin/select": "^25.3.4",
+        "@vaadin/list-box": "^25.3.4",
+        "@vaadin/item": "^25.3.4",
         "@vaadin/combo-box": "^25.3.4",
         "@vaadin/date-picker": "^25.3.4",
         "@vaadin/date-time-picker": "^25.3.4",

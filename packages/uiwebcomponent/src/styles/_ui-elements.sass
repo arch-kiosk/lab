@@ -14,7 +14,6 @@
   margin: 0
   border: none
 
-
 .text-field-div, .read-only-textarea
   display: flex
   flex-direction: column
@@ -137,12 +136,15 @@ button:disabled
     border-color: $col-bd-dk-alert
     background-color: $col-bg-alert-dk
 
-vaadin-date-picker, vaadin-date-time-picker
+vaadin-date-picker, vaadin-date-time-picker, vaadin-combo-box
   input
-    height: unset!important
+    //height: unset!important
     border: unset!important
+    box-sizing: border-box
 vaadin-time-picker::part(input-field), vaadin-date-picker::part(input-field)
-  padding: 0
+  padding-block-start: 0
+  padding-inline-start: 0
+  padding-block-end: 0
   border: none
 
 vaadin-time-picker[disabled]::part(input-field), vaadin-date-picker[disabled]::part(input-field)
@@ -172,3 +174,23 @@ vaadin-time-picker[disabled]::part(input-field), vaadin-date-picker[disabled]::p
   font-family: $font-standard
   font-size: $font-size-standard
   font-weight: normal
+
+vaadin-combo-box, vaadin-date-time-picker, vaadin-date-picker, vaadin-select
+  vertical-align: top
+  line-height: 1  // This is needed to make sure no vertical scrollbars appear when input has about 30px height.
+
+vaadin-combo-box::part(input-field),vaadin-select::part(input-field)
+  padding-block-start: 0
+  padding-inline-start: 0
+  padding-block-end: 0
+  border: none
+  box-sizing: border-box
+
+vaadin-select::part(value)
+  line-height: 1rem
+
+vaadin-select::part(toggle-button)
+  padding: 0
+
+vaadin-select::part(toggle-button)
+  line-height: 1

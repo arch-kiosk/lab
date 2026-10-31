@@ -101,998 +101,1441 @@
       "type": "object"
     },
     "UISchemaElementOnLayout<\"columns\">": {
-      "anyOf": [
+      "allOf": [
         {
-          "properties": {
-            "layout": {
-              "$ref": "#/definitions/UISchemaUIElementElementLayoutBase"
+          "if": {
+            "properties": {
+              "element_type": {
+                "const": "layout",
+                "type": "string"
+              }
             }
           },
-          "type": "object"
+          "then": {
+            "properties": {
+              "layout": {
+                "$ref": "#/definitions/UISchemaUIElementElementLayoutBase"
+              }
+            },
+            "type": "object"
+          }
         },
         {
-          "additionalProperties": false,
-          "properties": {
-            "button_type": {
-              "description": "the type of button determines the appearance",
-              "enum": [
-                "okButton",
-                "cancelButton",
-                "iconButton"
-              ],
-              "type": "string"
-            },
-            "default": {
-              "description": "optional setting that controls if a button is triggered when a user confirms or cancels by any other means than pressing the button. E.g. and most common if the user presses ENTER or the ESC (CANCEL) on the keyboard while within the button's layout bounds.",
-              "enum": [
-                "ENTER",
-                "CANCEL"
-              ],
-              "type": "string"
-            },
-            "element_type": {
-              "const": "button",
-              "type": "string"
-            },
-            "enabled": {
-              "anyOf": [
-                {
-                  "$ref": "#/definitions/InterpretedExpression"
-                },
-                {
-                  "type": "boolean"
-                }
-              ],
-              "description": "optional. Determines if a field can be navigated to (receive the focus). Default is true."
-            },
-            "icon": {
-              "$ref": "#/definitions/InterpretedExpression",
-              "description": "for type iconButton: The icon, which must resolve to a FontAwesome icon code."
-            },
-            "layout": {
-              "$ref": "#/definitions/UISchemaUIElementElementLayoutBase"
-            },
-            "style": {
-              "$ref": "#/definitions/UISchemaUIElementStyleBasics",
-              "description": "optional visual design - how the element itself appears"
-            },
-            "visible": {
-              "anyOf": [
-                {
-                  "$ref": "#/definitions/InterpretedExpression"
-                },
-                {
-                  "type": "boolean"
-                }
-              ],
-              "description": "optional. Determines if the element is visible. Defaults to a layout setting or true."
+          "if": {
+            "properties": {
+              "element_type": {
+                "const": "button",
+                "type": "string"
+              }
             }
           },
-          "required": [
-            "button_type",
-            "element_type"
-          ],
-          "type": "object"
+          "then": {
+            "additionalProperties": false,
+            "properties": {
+              "button_type": {
+                "description": "the type of button determines the appearance",
+                "enum": [
+                  "okButton",
+                  "cancelButton",
+                  "iconButton"
+                ],
+                "type": "string"
+              },
+              "default": {
+                "description": "optional setting that controls if a button is triggered when a user confirms or cancels by any other means than pressing the button. E.g. and most common if the user presses ENTER or the ESC (CANCEL) on the keyboard while within the button's layout bounds.",
+                "enum": [
+                  "ENTER",
+                  "CANCEL"
+                ],
+                "type": "string"
+              },
+              "element_type": {
+                "const": "button",
+                "type": "string"
+              },
+              "enabled": {
+                "anyOf": [
+                  {
+                    "$ref": "#/definitions/InterpretedExpression"
+                  },
+                  {
+                    "type": "boolean"
+                  }
+                ],
+                "description": "optional. Determines if a field can be navigated to (receive the focus). Default is true."
+              },
+              "icon": {
+                "$ref": "#/definitions/InterpretedExpression",
+                "description": "for type iconButton: The icon, which must resolve to a FontAwesome icon code."
+              },
+              "layout": {
+                "$ref": "#/definitions/UISchemaUIElementElementLayoutBase"
+              },
+              "style": {
+                "$ref": "#/definitions/UISchemaUIElementStyleBasics",
+                "description": "optional visual design - how the element itself appears"
+              },
+              "visible": {
+                "anyOf": [
+                  {
+                    "$ref": "#/definitions/InterpretedExpression"
+                  },
+                  {
+                    "type": "boolean"
+                  }
+                ],
+                "description": "optional. Determines if the element is visible. Defaults to a layout setting or true."
+              }
+            },
+            "required": [
+              "button_type",
+              "element_type"
+            ],
+            "type": "object"
+          }
         },
         {
-          "additionalProperties": false,
-          "properties": {
-            "binding": {
-              "$ref": "#/definitions/UISchemaUIElementBinding",
-              "description": "binding to the data"
-            },
-            "display_identifier": {
-              "$ref": "#/definitions/UISchemaIdentifierDisplay",
-              "description": "Defines that the value represents an identifier.\n\nEither simply boolean `true` or a  {@link  UISchemaIdentifierDisplay }  section that allows masking. If absent, the value is not rendered or treated as an identifier."
-            },
-            "element_type": {
-              "const": "text_field",
-              "type": "string"
-            },
-            "ellipsis": {
-              "$ref": "#/definitions/UISchemaDisplayEllipsis",
-              "description": "settings to limit the text length"
-            },
-            "enabled": {
-              "anyOf": [
-                {
-                  "$ref": "#/definitions/InterpretedExpression"
-                },
-                {
-                  "type": "boolean"
-                }
-              ],
-              "description": "optional. Determines if a field can be navigated to (receive the focus). Default is true."
-            },
-            "layout": {
-              "$ref": "#/definitions/UISchemaUIElementElementLayoutBase"
-            },
-            "multiline": {
-              "description": "is this a multiline field, so should line feeds or carriage returns be accepted?",
-              "type": "boolean"
-            },
-            "readonly": {
-              "description": "optional. Determines if a field takes inputs right now. The element might still receive the caret or focus (unlike enabled=false elements), you just cannot change the value. but you might e.g. be able to copy the input value onto the clipboard. Default is false.",
-              "type": "boolean"
-            },
-            "style": {
-              "$ref": "#/definitions/UISchemaUIElementStyleBasics",
-              "description": "optional visual design - how the element itself appears"
-            },
-            "text": {
-              "$ref": "#/definitions/InterpretedExpression",
-              "description": "optional. the text for the label or name of the field on the ui Some elements do not interpret this property because they don't show a label. Refer to the element's documentation"
-            },
-            "value": {
-              "$ref": "#/definitions/InterpretedExpression",
-              "description": "optional. the expression that defines what value is being displayed in the input part of the element Some elements do not interpret this property or do not show it as a direct value Refer to the element's documentation"
-            },
-            "visible": {
-              "anyOf": [
-                {
-                  "const": ".",
-                  "type": "string"
-                },
-                {
-                  "type": "boolean"
-                },
-                {
-                  "$ref": "#/definitions/InterpretedExpression"
-                }
-              ],
-              "description": "Determines if the element will show at all on the layout. The default depends on the layout's default setting  {@link  UISchemaLayoutElement } .\n\n- Use `\".\"` to make this dependent on whether there is a value to display (no value -> element vanishes).\n- Use an  {@link  InterpretedExpression }  that the host can resolve to a boolean result."
+          "if": {
+            "properties": {
+              "element_type": {
+                "const": "text_field",
+                "type": "string"
+              }
             }
           },
-          "required": [
-            "binding",
-            "element_type"
-          ],
-          "type": "object"
-        },
-        {
-          "additionalProperties": false,
-          "properties": {
-            "binding": {
-              "$ref": "#/definitions/UISchemaUIElementBinding",
-              "description": "binding to the data"
-            },
-            "date_format": {
-              "type": "string"
-            },
-            "element_type": {
-              "const": "date_time_field",
-              "type": "string"
-            },
-            "enabled": {
-              "anyOf": [
-                {
-                  "$ref": "#/definitions/InterpretedExpression"
-                },
-                {
-                  "type": "boolean"
-                }
-              ],
-              "description": "optional. Determines if a field can be navigated to (receive the focus). Default is true."
-            },
-            "include_time": {
-              "type": "boolean"
-            },
-            "layout": {
-              "$ref": "#/definitions/UISchemaUIElementElementLayoutBase"
-            },
-            "readonly": {
-              "description": "optional. Determines if a field takes inputs right now. The element might still receive the caret or focus (unlike enabled=false elements), you just cannot change the value. but you might e.g. be able to copy the input value onto the clipboard. Default is false.",
-              "type": "boolean"
-            },
-            "style": {
-              "$ref": "#/definitions/UISchemaUIElementStyleBasics",
-              "description": "optional visual design - how the element itself appears"
-            },
-            "text": {
-              "$ref": "#/definitions/InterpretedExpression",
-              "description": "optional. the text for the label or name of the field on the ui Some elements do not interpret this property because they don't show a label. Refer to the element's documentation"
-            },
-            "value": {
-              "$ref": "#/definitions/InterpretedExpression",
-              "description": "optional. the expression that defines what value is being displayed in the input part of the element Some elements do not interpret this property or do not show it as a direct value Refer to the element's documentation"
-            },
-            "visible": {
-              "anyOf": [
-                {
-                  "$ref": "#/definitions/InterpretedExpression"
-                },
-                {
-                  "type": "boolean"
-                }
-              ],
-              "description": "optional. Determines if the element is visible. Defaults to a layout setting or true."
-            }
-          },
-          "required": [
-            "binding",
-            "element_type"
-          ],
-          "type": "object"
-        },
-        {
-          "additionalProperties": false,
-          "properties": {
-            "element_type": {
-              "const": "line",
-              "type": "string"
-            },
-            "layout": {
-              "$ref": "#/definitions/UISchemaUIElementElementLayoutBase"
-            },
-            "style": {
-              "$ref": "#/definitions/UISchemaUIElementStyleBasics",
-              "description": "optional visual design - how the element itself appears"
-            },
-            "transparent": {
-              "description": "if set the element does not show the line but acts as a horizontal spacer",
-              "type": "boolean"
-            },
-            "visible": {
-              "anyOf": [
-                {
-                  "$ref": "#/definitions/InterpretedExpression"
-                },
-                {
-                  "type": "boolean"
-                }
-              ],
-              "description": "optional. Determines if the element is visible. Defaults to a layout setting or true."
-            }
-          },
-          "required": [
-            "element_type"
-          ],
-          "type": "object"
-        },
-        {
-          "additionalProperties": false,
-          "properties": {
-            "binding": {
-              "$ref": "#/definitions/UISchemaUIElementBinding",
-              "description": "binding to the data"
-            },
-            "element_type": {
-              "const": "selection",
-              "type": "string"
-            },
-            "enabled": {
-              "anyOf": [
-                {
-                  "$ref": "#/definitions/InterpretedExpression"
-                },
-                {
-                  "type": "boolean"
-                }
-              ],
-              "description": "optional. Determines if a field can be navigated to (receive the focus). Default is true."
-            },
-            "items": {
-              "anyOf": [
-                {
-                  "items": {
+          "then": {
+            "additionalProperties": false,
+            "properties": {
+              "binding": {
+                "$ref": "#/definitions/UISchemaUIElementBinding",
+                "description": "binding to the data"
+              },
+              "display_identifier": {
+                "$ref": "#/definitions/UISchemaIdentifierDisplay",
+                "description": "Defines that the value represents an identifier.\n\nEither simply boolean `true` or a  {@link  UISchemaIdentifierDisplay }  section that allows masking. If absent, the value is not rendered or treated as an identifier."
+              },
+              "element_type": {
+                "const": "text_field",
+                "type": "string"
+              },
+              "ellipsis": {
+                "$ref": "#/definitions/UISchemaDisplayEllipsis",
+                "description": "settings to limit the text length"
+              },
+              "enabled": {
+                "anyOf": [
+                  {
+                    "$ref": "#/definitions/InterpretedExpression"
+                  },
+                  {
+                    "type": "boolean"
+                  }
+                ],
+                "description": "optional. Determines if a field can be navigated to (receive the focus). Default is true."
+              },
+              "layout": {
+                "$ref": "#/definitions/UISchemaUIElementElementLayoutBase"
+              },
+              "multiline": {
+                "description": "is this a multiline field, so should line feeds or carriage returns be accepted?",
+                "type": "boolean"
+              },
+              "readonly": {
+                "description": "optional. Determines if a field takes inputs right now. The element might still receive the caret or focus (unlike enabled=false elements), you just cannot change the value. but you might e.g. be able to copy the input value onto the clipboard. Default is false.",
+                "type": "boolean"
+              },
+              "style": {
+                "$ref": "#/definitions/UISchemaUIElementStyleBasics",
+                "description": "optional visual design - how the element itself appears"
+              },
+              "text": {
+                "$ref": "#/definitions/InterpretedExpression",
+                "description": "optional. the text for the label or name of the field on the ui Some elements do not interpret this property because they don't show a label. Refer to the element's documentation"
+              },
+              "value": {
+                "$ref": "#/definitions/InterpretedExpression",
+                "description": "optional. the expression that defines what value is being displayed in the input part of the element Some elements do not interpret this property or do not show it as a direct value Refer to the element's documentation"
+              },
+              "visible": {
+                "anyOf": [
+                  {
+                    "const": ".",
                     "type": "string"
                   },
-                  "type": "array"
-                },
-                {
-                  "$ref": "#/definitions/UISchemaLookupSettings"
-                }
-              ],
-              "description": "Either a list of static selection values or more refined settings via UISchemaLookupSettings"
+                  {
+                    "type": "boolean"
+                  },
+                  {
+                    "$ref": "#/definitions/InterpretedExpression"
+                  }
+                ],
+                "description": "Determines if the element will show at all on the layout. The default depends on the layout's default setting  {@link  UISchemaLayoutElement } .\n\n- Use `\".\"` to make this dependent on whether there is a value to display (no value -> element vanishes).\n- Use an  {@link  InterpretedExpression }  that the host can resolve to a boolean result."
+              }
             },
-            "layout": {
-              "$ref": "#/definitions/UISchemaUIElementElementLayoutBase"
-            },
-            "readonly": {
-              "description": "optional. Determines if a field takes inputs right now. The element might still receive the caret or focus (unlike enabled=false elements), you just cannot change the value. but you might e.g. be able to copy the input value onto the clipboard. Default is false.",
-              "type": "boolean"
-            },
-            "style": {
-              "$ref": "#/definitions/UISchemaUIElementStyleBasics",
-              "description": "optional visual design - how the element itself appears"
-            },
-            "text": {
-              "$ref": "#/definitions/InterpretedExpression",
-              "description": "optional. the text for the label or name of the field on the ui Some elements do not interpret this property because they don't show a label. Refer to the element's documentation"
-            },
-            "value": {
-              "$ref": "#/definitions/InterpretedExpression",
-              "description": "optional. the expression that defines what value is being displayed in the input part of the element Some elements do not interpret this property or do not show it as a direct value Refer to the element's documentation"
-            },
-            "visible": {
-              "anyOf": [
-                {
-                  "$ref": "#/definitions/InterpretedExpression"
-                },
-                {
-                  "type": "boolean"
-                }
-              ],
-              "description": "optional. Determines if the element is visible. Defaults to a layout setting or true."
-            }
-          },
-          "required": [
-            "binding",
-            "element_type",
-            "items"
-          ],
-          "type": "object"
+            "required": [
+              "binding",
+              "element_type"
+            ],
+            "type": "object"
+          }
         },
         {
-          "additionalProperties": false,
-          "properties": {
-            "display_identifier": {
-              "$ref": "#/definitions/UISchemaIdentifierDisplay",
-              "description": "Defines that the value represents an identifier.\n\nEither simply boolean `true` or a  {@link  UISchemaIdentifierDisplay }  section that allows masking. If absent, the value is not rendered or treated as an identifier."
-            },
-            "element_type": {
-              "const": "template_label",
-              "type": "string"
-            },
-            "layout": {
-              "$ref": "#/definitions/UISchemaUIElementElementLayoutBase"
-            },
-            "style": {
-              "$ref": "#/definitions/UISchemaUIElementStyleBasics",
-              "description": "optional visual design - how the element itself appears"
-            },
-            "text": {
-              "$ref": "#/definitions/InterpretedExpression",
-              "description": "optional. the text for the label or name of the field on the ui Some elements do not interpret this property because they don't show a label. Refer to the element's documentation"
-            },
-            "value": {
-              "$ref": "#/definitions/InterpretedExpression",
-              "description": "optional. the expression that defines what value is being displayed in the input part of the element Some elements do not interpret this property or do not show it as a direct value Refer to the element's documentation"
-            },
-            "visible": {
-              "anyOf": [
-                {
-                  "$ref": "#/definitions/InterpretedExpression"
-                },
-                {
-                  "type": "boolean"
-                }
-              ],
-              "description": "optional. Determines if the element is visible. Defaults to a layout setting or true."
+          "if": {
+            "properties": {
+              "element_type": {
+                "const": "date_time_field",
+                "type": "string"
+              }
             }
           },
-          "required": [
-            "element_type"
-          ],
-          "type": "object"
+          "then": {
+            "additionalProperties": false,
+            "properties": {
+              "binding": {
+                "$ref": "#/definitions/UISchemaUIElementBinding",
+                "description": "binding to the data"
+              },
+              "date_format": {
+                "const": "latin",
+                "description": "leave date_format out unless you want to set it to latin. In that case the date format will look like dd.xx.yyyy with xx being the latin number for the month",
+                "type": "string"
+              },
+              "element_type": {
+                "const": "date_time_field",
+                "type": "string"
+              },
+              "enabled": {
+                "anyOf": [
+                  {
+                    "$ref": "#/definitions/InterpretedExpression"
+                  },
+                  {
+                    "type": "boolean"
+                  }
+                ],
+                "description": "optional. Determines if a field can be navigated to (receive the focus). Default is true."
+              },
+              "include_time": {
+                "description": "set to true if you actually want to include a time input field",
+                "type": "boolean"
+              },
+              "layout": {
+                "$ref": "#/definitions/UISchemaUIElementElementLayoutBase"
+              },
+              "readonly": {
+                "description": "optional. Determines if a field takes inputs right now. The element might still receive the caret or focus (unlike enabled=false elements), you just cannot change the value. but you might e.g. be able to copy the input value onto the clipboard. Default is false.",
+                "type": "boolean"
+              },
+              "style": {
+                "$ref": "#/definitions/UISchemaUIElementStyleBasics",
+                "description": "optional visual design - how the element itself appears"
+              },
+              "text": {
+                "$ref": "#/definitions/InterpretedExpression",
+                "description": "optional. the text for the label or name of the field on the ui Some elements do not interpret this property because they don't show a label. Refer to the element's documentation"
+              },
+              "value": {
+                "$ref": "#/definitions/InterpretedExpression",
+                "description": "optional. the expression that defines what value is being displayed in the input part of the element Some elements do not interpret this property or do not show it as a direct value Refer to the element's documentation"
+              },
+              "visible": {
+                "anyOf": [
+                  {
+                    "$ref": "#/definitions/InterpretedExpression"
+                  },
+                  {
+                    "type": "boolean"
+                  }
+                ],
+                "description": "optional. Determines if the element is visible. Defaults to a layout setting or true."
+              }
+            },
+            "required": [
+              "binding",
+              "element_type"
+            ],
+            "type": "object"
+          }
         },
         {
-          "additionalProperties": false,
-          "properties": {
-            "binding": {
-              "$ref": "#/definitions/UISchemaUIElementBinding",
-              "description": "binding to the data"
-            },
-            "element_type": {
-              "const": "bool",
-              "type": "string"
-            },
-            "enabled": {
-              "anyOf": [
-                {
-                  "$ref": "#/definitions/InterpretedExpression"
-                },
-                {
-                  "type": "boolean"
-                }
-              ],
-              "description": "optional. Determines if a field can be navigated to (receive the focus). Default is true."
-            },
-            "layout": {
-              "$ref": "#/definitions/UISchemaUIElementElementLayoutBase"
-            },
-            "readonly": {
-              "description": "optional. Determines if a field takes inputs right now. The element might still receive the caret or focus (unlike enabled=false elements), you just cannot change the value. but you might e.g. be able to copy the input value onto the clipboard. Default is false.",
-              "type": "boolean"
-            },
-            "style": {
-              "$ref": "#/definitions/UISchemaUIElementStyleBasics",
-              "description": "optional visual design - how the element itself appears"
-            },
-            "text": {
-              "$ref": "#/definitions/InterpretedExpression",
-              "description": "optional. the text for the label or name of the field on the ui Some elements do not interpret this property because they don't show a label. Refer to the element's documentation"
-            },
-            "value": {
-              "$ref": "#/definitions/InterpretedExpression",
-              "description": "optional. the expression that defines what value is being displayed in the input part of the element Some elements do not interpret this property or do not show it as a direct value Refer to the element's documentation"
-            },
-            "visible": {
-              "anyOf": [
-                {
-                  "$ref": "#/definitions/InterpretedExpression"
-                },
-                {
-                  "type": "boolean"
-                }
-              ],
-              "description": "optional. Determines if the element is visible. Defaults to a layout setting or true."
+          "if": {
+            "properties": {
+              "element_type": {
+                "const": "line",
+                "type": "string"
+              }
             }
           },
-          "required": [
-            "binding",
-            "element_type"
-          ],
-          "type": "object"
+          "then": {
+            "additionalProperties": false,
+            "properties": {
+              "element_type": {
+                "const": "line",
+                "type": "string"
+              },
+              "is_template": {
+                "const": true,
+                "type": "boolean"
+              },
+              "layout": {
+                "$ref": "#/definitions/UISchemaUIElementElementLayoutBase"
+              },
+              "style": {
+                "$ref": "#/definitions/UISchemaUIElementStyleBasics",
+                "description": "optional visual design - how the element itself appears"
+              },
+              "transparent": {
+                "description": "if set the element does not show the line but acts as a horizontal spacer",
+                "type": "boolean"
+              },
+              "visible": {
+                "anyOf": [
+                  {
+                    "$ref": "#/definitions/InterpretedExpression"
+                  },
+                  {
+                    "type": "boolean"
+                  }
+                ],
+                "description": "optional. Determines if the element is visible. Defaults to a layout setting or true."
+              }
+            },
+            "required": [
+              "element_type"
+            ],
+            "type": "object"
+          }
         },
         {
-          "additionalProperties": false,
-          "properties": {
-            "align_image": {
-              "enum": [
-                "center",
-                "left"
-              ],
-              "type": "string"
-            },
-            "alternate_description": {
-              "type": "string"
-            },
-            "element_type": {
-              "const": "file",
-              "type": "string"
-            },
-            "file_description": {
-              "enum": [
-                "right",
-                "bottom",
-                "none"
-              ],
-              "type": "string"
-            },
-            "fit_content": {
-              "enum": [
-                "contain",
-                "fit",
-                "scale"
-              ],
-              "type": "string"
-            },
-            "layout": {
-              "$ref": "#/definitions/UISchemaUIElementElementLayoutBase"
-            },
-            "resolution": {
-              "type": "string"
-            },
-            "style": {
-              "$ref": "#/definitions/UISchemaUIElementStyleBasics",
-              "description": "optional visual design - how the element itself appears"
-            },
-            "text": {
-              "$ref": "#/definitions/InterpretedExpression",
-              "description": "optional. the text for the label or name of the field on the ui Some elements do not interpret this property because they don't show a label. Refer to the element's documentation"
-            },
-            "value": {
-              "$ref": "#/definitions/InterpretedExpression",
-              "description": "optional. the expression that defines what value is being displayed in the input part of the element Some elements do not interpret this property or do not show it as a direct value Refer to the element's documentation"
-            },
-            "visible": {
-              "anyOf": [
-                {
-                  "$ref": "#/definitions/InterpretedExpression"
-                },
-                {
-                  "type": "boolean"
-                }
-              ],
-              "description": "optional. Determines if the element is visible. Defaults to a layout setting or true."
+          "if": {
+            "properties": {
+              "element_type": {
+                "const": "combo-box",
+                "type": "string"
+              }
             }
           },
-          "required": [
-            "element_type",
-            "resolution"
-          ],
-          "type": "object"
+          "then": {
+            "additionalProperties": false,
+            "properties": {
+              "binding": {
+                "$ref": "#/definitions/UISchemaUIElementBinding",
+                "description": "binding to the data"
+              },
+              "element_type": {
+                "const": "combo-box",
+                "type": "string"
+              },
+              "enabled": {
+                "anyOf": [
+                  {
+                    "$ref": "#/definitions/InterpretedExpression"
+                  },
+                  {
+                    "type": "boolean"
+                  }
+                ],
+                "description": "optional. Determines if a field can be navigated to (receive the focus). Default is true."
+              },
+              "items": {
+                "anyOf": [
+                  {
+                    "items": {
+                      "type": "string"
+                    },
+                    "type": "array"
+                  },
+                  {
+                    "items": {
+                      "items": {
+                        "type": "string"
+                      },
+                      "maxItems": 2,
+                      "minItems": 2,
+                      "type": "array"
+                    },
+                    "type": "array"
+                  },
+                  {
+                    "$ref": "#/definitions/UISchemaFullLookupSettings"
+                  }
+                ],
+                "description": "Either a list of static selection values, defined in the schema, or dynamic list values set via UISchemaFullLookupSettings UISchemaDynamicLookupSettings is not yet implemented but supposed to support lazy and filtered lookups when available."
+              },
+              "layout": {
+                "$ref": "#/definitions/UISchemaUIElementElementLayoutBase"
+              },
+              "readonly": {
+                "description": "optional. Determines if a field takes inputs right now. The element might still receive the caret or focus (unlike enabled=false elements), you just cannot change the value. but you might e.g. be able to copy the input value onto the clipboard. Default is false.",
+                "type": "boolean"
+              },
+              "style": {
+                "$ref": "#/definitions/UISchemaUIElementStyleBasics",
+                "description": "optional visual design - how the element itself appears"
+              },
+              "text": {
+                "$ref": "#/definitions/InterpretedExpression",
+                "description": "optional. the text for the label or name of the field on the ui Some elements do not interpret this property because they don't show a label. Refer to the element's documentation"
+              },
+              "visible": {
+                "anyOf": [
+                  {
+                    "$ref": "#/definitions/InterpretedExpression"
+                  },
+                  {
+                    "type": "boolean"
+                  }
+                ],
+                "description": "optional. Determines if the element is visible. Defaults to a layout setting or true."
+              }
+            },
+            "required": [
+              "binding",
+              "element_type",
+              "items"
+            ],
+            "type": "object"
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "element_type": {
+                "const": "drop-down-selection",
+                "type": "string"
+              }
+            }
+          },
+          "then": {
+            "additionalProperties": false,
+            "properties": {
+              "binding": {
+                "$ref": "#/definitions/UISchemaUIElementBinding",
+                "description": "binding to the data"
+              },
+              "element_type": {
+                "const": "drop-down-selection",
+                "type": "string"
+              },
+              "enabled": {
+                "anyOf": [
+                  {
+                    "$ref": "#/definitions/InterpretedExpression"
+                  },
+                  {
+                    "type": "boolean"
+                  }
+                ],
+                "description": "optional. Determines if a field can be navigated to (receive the focus). Default is true."
+              },
+              "items": {
+                "anyOf": [
+                  {
+                    "items": {
+                      "type": "string"
+                    },
+                    "type": "array"
+                  },
+                  {
+                    "items": {
+                      "items": {
+                        "type": "string"
+                      },
+                      "maxItems": 2,
+                      "minItems": 2,
+                      "type": "array"
+                    },
+                    "type": "array"
+                  },
+                  {
+                    "$ref": "#/definitions/UISchemaFullLookupSettings"
+                  }
+                ],
+                "description": "Either a list of static selection values, defined in the schema, or dynamic list values set via UISchemaFullLookupSettings"
+              },
+              "layout": {
+                "$ref": "#/definitions/UISchemaUIElementElementLayoutBase"
+              },
+              "readonly": {
+                "description": "optional. Determines if a field takes inputs right now. The element might still receive the caret or focus (unlike enabled=false elements), you just cannot change the value. but you might e.g. be able to copy the input value onto the clipboard. Default is false.",
+                "type": "boolean"
+              },
+              "style": {
+                "$ref": "#/definitions/UISchemaUIElementStyleBasics",
+                "description": "optional visual design - how the element itself appears"
+              },
+              "text": {
+                "$ref": "#/definitions/InterpretedExpression",
+                "description": "optional. the text for the label or name of the field on the ui Some elements do not interpret this property because they don't show a label. Refer to the element's documentation"
+              },
+              "visible": {
+                "anyOf": [
+                  {
+                    "$ref": "#/definitions/InterpretedExpression"
+                  },
+                  {
+                    "type": "boolean"
+                  }
+                ],
+                "description": "optional. Determines if the element is visible. Defaults to a layout setting or true."
+              }
+            },
+            "required": [
+              "binding",
+              "element_type",
+              "items"
+            ],
+            "type": "object"
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "element_type": {
+                "const": "template_label",
+                "type": "string"
+              }
+            }
+          },
+          "then": {
+            "additionalProperties": false,
+            "properties": {
+              "display_identifier": {
+                "$ref": "#/definitions/UISchemaIdentifierDisplay",
+                "description": "Defines that the value represents an identifier.\n\nEither simply boolean `true` or a  {@link  UISchemaIdentifierDisplay }  section that allows masking. If absent, the value is not rendered or treated as an identifier."
+              },
+              "element_type": {
+                "const": "template_label",
+                "type": "string"
+              },
+              "layout": {
+                "$ref": "#/definitions/UISchemaUIElementElementLayoutBase"
+              },
+              "style": {
+                "$ref": "#/definitions/UISchemaUIElementStyleBasics",
+                "description": "optional visual design - how the element itself appears"
+              },
+              "text": {
+                "$ref": "#/definitions/InterpretedExpression",
+                "description": "optional. the text for the label or name of the field on the ui Some elements do not interpret this property because they don't show a label. Refer to the element's documentation"
+              },
+              "value": {
+                "$ref": "#/definitions/InterpretedExpression",
+                "description": "optional. the expression that defines what value is being displayed in the input part of the element Some elements do not interpret this property or do not show it as a direct value Refer to the element's documentation"
+              },
+              "visible": {
+                "anyOf": [
+                  {
+                    "$ref": "#/definitions/InterpretedExpression"
+                  },
+                  {
+                    "type": "boolean"
+                  }
+                ],
+                "description": "optional. Determines if the element is visible. Defaults to a layout setting or true."
+              }
+            },
+            "required": [
+              "element_type"
+            ],
+            "type": "object"
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "element_type": {
+                "const": "bool",
+                "type": "string"
+              }
+            }
+          },
+          "then": {
+            "additionalProperties": false,
+            "properties": {
+              "binding": {
+                "$ref": "#/definitions/UISchemaUIElementBinding",
+                "description": "binding to the data"
+              },
+              "element_type": {
+                "const": "bool",
+                "type": "string"
+              },
+              "enabled": {
+                "anyOf": [
+                  {
+                    "$ref": "#/definitions/InterpretedExpression"
+                  },
+                  {
+                    "type": "boolean"
+                  }
+                ],
+                "description": "optional. Determines if a field can be navigated to (receive the focus). Default is true."
+              },
+              "layout": {
+                "$ref": "#/definitions/UISchemaUIElementElementLayoutBase"
+              },
+              "readonly": {
+                "description": "optional. Determines if a field takes inputs right now. The element might still receive the caret or focus (unlike enabled=false elements), you just cannot change the value. but you might e.g. be able to copy the input value onto the clipboard. Default is false.",
+                "type": "boolean"
+              },
+              "style": {
+                "$ref": "#/definitions/UISchemaUIElementStyleBasics",
+                "description": "optional visual design - how the element itself appears"
+              },
+              "text": {
+                "$ref": "#/definitions/InterpretedExpression",
+                "description": "optional. the text for the label or name of the field on the ui Some elements do not interpret this property because they don't show a label. Refer to the element's documentation"
+              },
+              "value": {
+                "$ref": "#/definitions/InterpretedExpression",
+                "description": "optional. the expression that defines what value is being displayed in the input part of the element Some elements do not interpret this property or do not show it as a direct value Refer to the element's documentation"
+              },
+              "visible": {
+                "anyOf": [
+                  {
+                    "$ref": "#/definitions/InterpretedExpression"
+                  },
+                  {
+                    "type": "boolean"
+                  }
+                ],
+                "description": "optional. Determines if the element is visible. Defaults to a layout setting or true."
+              }
+            },
+            "required": [
+              "binding",
+              "element_type"
+            ],
+            "type": "object"
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "element_type": {
+                "const": "file",
+                "type": "string"
+              }
+            }
+          },
+          "then": {
+            "additionalProperties": false,
+            "properties": {
+              "align_image": {
+                "enum": [
+                  "center",
+                  "left"
+                ],
+                "type": "string"
+              },
+              "alternate_description": {
+                "type": "string"
+              },
+              "element_type": {
+                "const": "file",
+                "type": "string"
+              },
+              "file_description": {
+                "enum": [
+                  "right",
+                  "bottom",
+                  "none"
+                ],
+                "type": "string"
+              },
+              "fit_content": {
+                "enum": [
+                  "contain",
+                  "fit",
+                  "scale"
+                ],
+                "type": "string"
+              },
+              "layout": {
+                "$ref": "#/definitions/UISchemaUIElementElementLayoutBase"
+              },
+              "resolution": {
+                "type": "string"
+              },
+              "style": {
+                "$ref": "#/definitions/UISchemaUIElementStyleBasics",
+                "description": "optional visual design - how the element itself appears"
+              },
+              "text": {
+                "$ref": "#/definitions/InterpretedExpression",
+                "description": "optional. the text for the label or name of the field on the ui Some elements do not interpret this property because they don't show a label. Refer to the element's documentation"
+              },
+              "value": {
+                "$ref": "#/definitions/InterpretedExpression",
+                "description": "optional. the expression that defines what value is being displayed in the input part of the element Some elements do not interpret this property or do not show it as a direct value Refer to the element's documentation"
+              },
+              "visible": {
+                "anyOf": [
+                  {
+                    "$ref": "#/definitions/InterpretedExpression"
+                  },
+                  {
+                    "type": "boolean"
+                  }
+                ],
+                "description": "optional. Determines if the element is visible. Defaults to a layout setting or true."
+              }
+            },
+            "required": [
+              "element_type",
+              "resolution"
+            ],
+            "type": "object"
+          }
         }
       ],
-      "description": "Wraps any UI element (leaf or sub-layout) when placed inside a layout of strategy S, attaching the strategy-specific layout positioning property."
+      "description": "Wraps any UI element (leaf or sub-layout) when placed inside a layout of strategy S, attaching the strategy-specific layout positioning property.",
+      "properties": {
+        "element_type": {
+          "enum": [
+            "layout",
+            "button",
+            "text_field",
+            "date_time_field",
+            "line",
+            "combo-box",
+            "drop-down-selection",
+            "template_label",
+            "bool",
+            "file"
+          ]
+        }
+      },
+      "required": [
+        "element_type"
+      ],
+      "type": "object"
     },
     "UISchemaElementOnLayout<\"scroll\">": {
-      "anyOf": [
+      "allOf": [
         {
-          "properties": {
-            "layout": {
-              "$ref": "#/definitions/UISchemaUIElementElementLayoutBase"
+          "if": {
+            "properties": {
+              "element_type": {
+                "const": "layout",
+                "type": "string"
+              }
             }
           },
-          "type": "object"
+          "then": {
+            "properties": {
+              "layout": {
+                "$ref": "#/definitions/UISchemaUIElementElementLayoutBase"
+              }
+            },
+            "type": "object"
+          }
         },
         {
-          "additionalProperties": false,
-          "properties": {
-            "button_type": {
-              "description": "the type of button determines the appearance",
-              "enum": [
-                "okButton",
-                "cancelButton",
-                "iconButton"
-              ],
-              "type": "string"
-            },
-            "default": {
-              "description": "optional setting that controls if a button is triggered when a user confirms or cancels by any other means than pressing the button. E.g. and most common if the user presses ENTER or the ESC (CANCEL) on the keyboard while within the button's layout bounds.",
-              "enum": [
-                "ENTER",
-                "CANCEL"
-              ],
-              "type": "string"
-            },
-            "element_type": {
-              "const": "button",
-              "type": "string"
-            },
-            "enabled": {
-              "anyOf": [
-                {
-                  "$ref": "#/definitions/InterpretedExpression"
-                },
-                {
-                  "type": "boolean"
-                }
-              ],
-              "description": "optional. Determines if a field can be navigated to (receive the focus). Default is true."
-            },
-            "icon": {
-              "$ref": "#/definitions/InterpretedExpression",
-              "description": "for type iconButton: The icon, which must resolve to a FontAwesome icon code."
-            },
-            "layout": {
-              "$ref": "#/definitions/UISchemaUIElementElementLayoutBase"
-            },
-            "style": {
-              "$ref": "#/definitions/UISchemaUIElementStyleBasics",
-              "description": "optional visual design - how the element itself appears"
-            },
-            "visible": {
-              "anyOf": [
-                {
-                  "$ref": "#/definitions/InterpretedExpression"
-                },
-                {
-                  "type": "boolean"
-                }
-              ],
-              "description": "optional. Determines if the element is visible. Defaults to a layout setting or true."
+          "if": {
+            "properties": {
+              "element_type": {
+                "const": "button",
+                "type": "string"
+              }
             }
           },
-          "required": [
-            "button_type",
-            "element_type"
-          ],
-          "type": "object"
+          "then": {
+            "additionalProperties": false,
+            "properties": {
+              "button_type": {
+                "description": "the type of button determines the appearance",
+                "enum": [
+                  "okButton",
+                  "cancelButton",
+                  "iconButton"
+                ],
+                "type": "string"
+              },
+              "default": {
+                "description": "optional setting that controls if a button is triggered when a user confirms or cancels by any other means than pressing the button. E.g. and most common if the user presses ENTER or the ESC (CANCEL) on the keyboard while within the button's layout bounds.",
+                "enum": [
+                  "ENTER",
+                  "CANCEL"
+                ],
+                "type": "string"
+              },
+              "element_type": {
+                "const": "button",
+                "type": "string"
+              },
+              "enabled": {
+                "anyOf": [
+                  {
+                    "$ref": "#/definitions/InterpretedExpression"
+                  },
+                  {
+                    "type": "boolean"
+                  }
+                ],
+                "description": "optional. Determines if a field can be navigated to (receive the focus). Default is true."
+              },
+              "icon": {
+                "$ref": "#/definitions/InterpretedExpression",
+                "description": "for type iconButton: The icon, which must resolve to a FontAwesome icon code."
+              },
+              "layout": {
+                "$ref": "#/definitions/UISchemaUIElementElementLayoutBase"
+              },
+              "style": {
+                "$ref": "#/definitions/UISchemaUIElementStyleBasics",
+                "description": "optional visual design - how the element itself appears"
+              },
+              "visible": {
+                "anyOf": [
+                  {
+                    "$ref": "#/definitions/InterpretedExpression"
+                  },
+                  {
+                    "type": "boolean"
+                  }
+                ],
+                "description": "optional. Determines if the element is visible. Defaults to a layout setting or true."
+              }
+            },
+            "required": [
+              "button_type",
+              "element_type"
+            ],
+            "type": "object"
+          }
         },
         {
-          "additionalProperties": false,
-          "properties": {
-            "binding": {
-              "$ref": "#/definitions/UISchemaUIElementBinding",
-              "description": "binding to the data"
-            },
-            "display_identifier": {
-              "$ref": "#/definitions/UISchemaIdentifierDisplay",
-              "description": "Defines that the value represents an identifier.\n\nEither simply boolean `true` or a  {@link  UISchemaIdentifierDisplay }  section that allows masking. If absent, the value is not rendered or treated as an identifier."
-            },
-            "element_type": {
-              "const": "text_field",
-              "type": "string"
-            },
-            "ellipsis": {
-              "$ref": "#/definitions/UISchemaDisplayEllipsis",
-              "description": "settings to limit the text length"
-            },
-            "enabled": {
-              "anyOf": [
-                {
-                  "$ref": "#/definitions/InterpretedExpression"
-                },
-                {
-                  "type": "boolean"
-                }
-              ],
-              "description": "optional. Determines if a field can be navigated to (receive the focus). Default is true."
-            },
-            "layout": {
-              "$ref": "#/definitions/UISchemaUIElementElementLayoutBase"
-            },
-            "multiline": {
-              "description": "is this a multiline field, so should line feeds or carriage returns be accepted?",
-              "type": "boolean"
-            },
-            "readonly": {
-              "description": "optional. Determines if a field takes inputs right now. The element might still receive the caret or focus (unlike enabled=false elements), you just cannot change the value. but you might e.g. be able to copy the input value onto the clipboard. Default is false.",
-              "type": "boolean"
-            },
-            "style": {
-              "$ref": "#/definitions/UISchemaUIElementStyleBasics",
-              "description": "optional visual design - how the element itself appears"
-            },
-            "text": {
-              "$ref": "#/definitions/InterpretedExpression",
-              "description": "optional. the text for the label or name of the field on the ui Some elements do not interpret this property because they don't show a label. Refer to the element's documentation"
-            },
-            "value": {
-              "$ref": "#/definitions/InterpretedExpression",
-              "description": "optional. the expression that defines what value is being displayed in the input part of the element Some elements do not interpret this property or do not show it as a direct value Refer to the element's documentation"
-            },
-            "visible": {
-              "anyOf": [
-                {
-                  "const": ".",
-                  "type": "string"
-                },
-                {
-                  "type": "boolean"
-                },
-                {
-                  "$ref": "#/definitions/InterpretedExpression"
-                }
-              ],
-              "description": "Determines if the element will show at all on the layout. The default depends on the layout's default setting  {@link  UISchemaLayoutElement } .\n\n- Use `\".\"` to make this dependent on whether there is a value to display (no value -> element vanishes).\n- Use an  {@link  InterpretedExpression }  that the host can resolve to a boolean result."
+          "if": {
+            "properties": {
+              "element_type": {
+                "const": "text_field",
+                "type": "string"
+              }
             }
           },
-          "required": [
-            "binding",
-            "element_type"
-          ],
-          "type": "object"
-        },
-        {
-          "additionalProperties": false,
-          "properties": {
-            "binding": {
-              "$ref": "#/definitions/UISchemaUIElementBinding",
-              "description": "binding to the data"
-            },
-            "date_format": {
-              "type": "string"
-            },
-            "element_type": {
-              "const": "date_time_field",
-              "type": "string"
-            },
-            "enabled": {
-              "anyOf": [
-                {
-                  "$ref": "#/definitions/InterpretedExpression"
-                },
-                {
-                  "type": "boolean"
-                }
-              ],
-              "description": "optional. Determines if a field can be navigated to (receive the focus). Default is true."
-            },
-            "include_time": {
-              "type": "boolean"
-            },
-            "layout": {
-              "$ref": "#/definitions/UISchemaUIElementElementLayoutBase"
-            },
-            "readonly": {
-              "description": "optional. Determines if a field takes inputs right now. The element might still receive the caret or focus (unlike enabled=false elements), you just cannot change the value. but you might e.g. be able to copy the input value onto the clipboard. Default is false.",
-              "type": "boolean"
-            },
-            "style": {
-              "$ref": "#/definitions/UISchemaUIElementStyleBasics",
-              "description": "optional visual design - how the element itself appears"
-            },
-            "text": {
-              "$ref": "#/definitions/InterpretedExpression",
-              "description": "optional. the text for the label or name of the field on the ui Some elements do not interpret this property because they don't show a label. Refer to the element's documentation"
-            },
-            "value": {
-              "$ref": "#/definitions/InterpretedExpression",
-              "description": "optional. the expression that defines what value is being displayed in the input part of the element Some elements do not interpret this property or do not show it as a direct value Refer to the element's documentation"
-            },
-            "visible": {
-              "anyOf": [
-                {
-                  "$ref": "#/definitions/InterpretedExpression"
-                },
-                {
-                  "type": "boolean"
-                }
-              ],
-              "description": "optional. Determines if the element is visible. Defaults to a layout setting or true."
-            }
-          },
-          "required": [
-            "binding",
-            "element_type"
-          ],
-          "type": "object"
-        },
-        {
-          "additionalProperties": false,
-          "properties": {
-            "element_type": {
-              "const": "line",
-              "type": "string"
-            },
-            "layout": {
-              "$ref": "#/definitions/UISchemaUIElementElementLayoutBase"
-            },
-            "style": {
-              "$ref": "#/definitions/UISchemaUIElementStyleBasics",
-              "description": "optional visual design - how the element itself appears"
-            },
-            "transparent": {
-              "description": "if set the element does not show the line but acts as a horizontal spacer",
-              "type": "boolean"
-            },
-            "visible": {
-              "anyOf": [
-                {
-                  "$ref": "#/definitions/InterpretedExpression"
-                },
-                {
-                  "type": "boolean"
-                }
-              ],
-              "description": "optional. Determines if the element is visible. Defaults to a layout setting or true."
-            }
-          },
-          "required": [
-            "element_type"
-          ],
-          "type": "object"
-        },
-        {
-          "additionalProperties": false,
-          "properties": {
-            "binding": {
-              "$ref": "#/definitions/UISchemaUIElementBinding",
-              "description": "binding to the data"
-            },
-            "element_type": {
-              "const": "selection",
-              "type": "string"
-            },
-            "enabled": {
-              "anyOf": [
-                {
-                  "$ref": "#/definitions/InterpretedExpression"
-                },
-                {
-                  "type": "boolean"
-                }
-              ],
-              "description": "optional. Determines if a field can be navigated to (receive the focus). Default is true."
-            },
-            "items": {
-              "anyOf": [
-                {
-                  "items": {
+          "then": {
+            "additionalProperties": false,
+            "properties": {
+              "binding": {
+                "$ref": "#/definitions/UISchemaUIElementBinding",
+                "description": "binding to the data"
+              },
+              "display_identifier": {
+                "$ref": "#/definitions/UISchemaIdentifierDisplay",
+                "description": "Defines that the value represents an identifier.\n\nEither simply boolean `true` or a  {@link  UISchemaIdentifierDisplay }  section that allows masking. If absent, the value is not rendered or treated as an identifier."
+              },
+              "element_type": {
+                "const": "text_field",
+                "type": "string"
+              },
+              "ellipsis": {
+                "$ref": "#/definitions/UISchemaDisplayEllipsis",
+                "description": "settings to limit the text length"
+              },
+              "enabled": {
+                "anyOf": [
+                  {
+                    "$ref": "#/definitions/InterpretedExpression"
+                  },
+                  {
+                    "type": "boolean"
+                  }
+                ],
+                "description": "optional. Determines if a field can be navigated to (receive the focus). Default is true."
+              },
+              "layout": {
+                "$ref": "#/definitions/UISchemaUIElementElementLayoutBase"
+              },
+              "multiline": {
+                "description": "is this a multiline field, so should line feeds or carriage returns be accepted?",
+                "type": "boolean"
+              },
+              "readonly": {
+                "description": "optional. Determines if a field takes inputs right now. The element might still receive the caret or focus (unlike enabled=false elements), you just cannot change the value. but you might e.g. be able to copy the input value onto the clipboard. Default is false.",
+                "type": "boolean"
+              },
+              "style": {
+                "$ref": "#/definitions/UISchemaUIElementStyleBasics",
+                "description": "optional visual design - how the element itself appears"
+              },
+              "text": {
+                "$ref": "#/definitions/InterpretedExpression",
+                "description": "optional. the text for the label or name of the field on the ui Some elements do not interpret this property because they don't show a label. Refer to the element's documentation"
+              },
+              "value": {
+                "$ref": "#/definitions/InterpretedExpression",
+                "description": "optional. the expression that defines what value is being displayed in the input part of the element Some elements do not interpret this property or do not show it as a direct value Refer to the element's documentation"
+              },
+              "visible": {
+                "anyOf": [
+                  {
+                    "const": ".",
                     "type": "string"
                   },
-                  "type": "array"
-                },
-                {
-                  "$ref": "#/definitions/UISchemaLookupSettings"
-                }
-              ],
-              "description": "Either a list of static selection values or more refined settings via UISchemaLookupSettings"
+                  {
+                    "type": "boolean"
+                  },
+                  {
+                    "$ref": "#/definitions/InterpretedExpression"
+                  }
+                ],
+                "description": "Determines if the element will show at all on the layout. The default depends on the layout's default setting  {@link  UISchemaLayoutElement } .\n\n- Use `\".\"` to make this dependent on whether there is a value to display (no value -> element vanishes).\n- Use an  {@link  InterpretedExpression }  that the host can resolve to a boolean result."
+              }
             },
-            "layout": {
-              "$ref": "#/definitions/UISchemaUIElementElementLayoutBase"
-            },
-            "readonly": {
-              "description": "optional. Determines if a field takes inputs right now. The element might still receive the caret or focus (unlike enabled=false elements), you just cannot change the value. but you might e.g. be able to copy the input value onto the clipboard. Default is false.",
-              "type": "boolean"
-            },
-            "style": {
-              "$ref": "#/definitions/UISchemaUIElementStyleBasics",
-              "description": "optional visual design - how the element itself appears"
-            },
-            "text": {
-              "$ref": "#/definitions/InterpretedExpression",
-              "description": "optional. the text for the label or name of the field on the ui Some elements do not interpret this property because they don't show a label. Refer to the element's documentation"
-            },
-            "value": {
-              "$ref": "#/definitions/InterpretedExpression",
-              "description": "optional. the expression that defines what value is being displayed in the input part of the element Some elements do not interpret this property or do not show it as a direct value Refer to the element's documentation"
-            },
-            "visible": {
-              "anyOf": [
-                {
-                  "$ref": "#/definitions/InterpretedExpression"
-                },
-                {
-                  "type": "boolean"
-                }
-              ],
-              "description": "optional. Determines if the element is visible. Defaults to a layout setting or true."
-            }
-          },
-          "required": [
-            "binding",
-            "element_type",
-            "items"
-          ],
-          "type": "object"
+            "required": [
+              "binding",
+              "element_type"
+            ],
+            "type": "object"
+          }
         },
         {
-          "additionalProperties": false,
-          "properties": {
-            "display_identifier": {
-              "$ref": "#/definitions/UISchemaIdentifierDisplay",
-              "description": "Defines that the value represents an identifier.\n\nEither simply boolean `true` or a  {@link  UISchemaIdentifierDisplay }  section that allows masking. If absent, the value is not rendered or treated as an identifier."
-            },
-            "element_type": {
-              "const": "template_label",
-              "type": "string"
-            },
-            "layout": {
-              "$ref": "#/definitions/UISchemaUIElementElementLayoutBase"
-            },
-            "style": {
-              "$ref": "#/definitions/UISchemaUIElementStyleBasics",
-              "description": "optional visual design - how the element itself appears"
-            },
-            "text": {
-              "$ref": "#/definitions/InterpretedExpression",
-              "description": "optional. the text for the label or name of the field on the ui Some elements do not interpret this property because they don't show a label. Refer to the element's documentation"
-            },
-            "value": {
-              "$ref": "#/definitions/InterpretedExpression",
-              "description": "optional. the expression that defines what value is being displayed in the input part of the element Some elements do not interpret this property or do not show it as a direct value Refer to the element's documentation"
-            },
-            "visible": {
-              "anyOf": [
-                {
-                  "$ref": "#/definitions/InterpretedExpression"
-                },
-                {
-                  "type": "boolean"
-                }
-              ],
-              "description": "optional. Determines if the element is visible. Defaults to a layout setting or true."
+          "if": {
+            "properties": {
+              "element_type": {
+                "const": "date_time_field",
+                "type": "string"
+              }
             }
           },
-          "required": [
-            "element_type"
-          ],
-          "type": "object"
+          "then": {
+            "additionalProperties": false,
+            "properties": {
+              "binding": {
+                "$ref": "#/definitions/UISchemaUIElementBinding",
+                "description": "binding to the data"
+              },
+              "date_format": {
+                "const": "latin",
+                "description": "leave date_format out unless you want to set it to latin. In that case the date format will look like dd.xx.yyyy with xx being the latin number for the month",
+                "type": "string"
+              },
+              "element_type": {
+                "const": "date_time_field",
+                "type": "string"
+              },
+              "enabled": {
+                "anyOf": [
+                  {
+                    "$ref": "#/definitions/InterpretedExpression"
+                  },
+                  {
+                    "type": "boolean"
+                  }
+                ],
+                "description": "optional. Determines if a field can be navigated to (receive the focus). Default is true."
+              },
+              "include_time": {
+                "description": "set to true if you actually want to include a time input field",
+                "type": "boolean"
+              },
+              "layout": {
+                "$ref": "#/definitions/UISchemaUIElementElementLayoutBase"
+              },
+              "readonly": {
+                "description": "optional. Determines if a field takes inputs right now. The element might still receive the caret or focus (unlike enabled=false elements), you just cannot change the value. but you might e.g. be able to copy the input value onto the clipboard. Default is false.",
+                "type": "boolean"
+              },
+              "style": {
+                "$ref": "#/definitions/UISchemaUIElementStyleBasics",
+                "description": "optional visual design - how the element itself appears"
+              },
+              "text": {
+                "$ref": "#/definitions/InterpretedExpression",
+                "description": "optional. the text for the label or name of the field on the ui Some elements do not interpret this property because they don't show a label. Refer to the element's documentation"
+              },
+              "value": {
+                "$ref": "#/definitions/InterpretedExpression",
+                "description": "optional. the expression that defines what value is being displayed in the input part of the element Some elements do not interpret this property or do not show it as a direct value Refer to the element's documentation"
+              },
+              "visible": {
+                "anyOf": [
+                  {
+                    "$ref": "#/definitions/InterpretedExpression"
+                  },
+                  {
+                    "type": "boolean"
+                  }
+                ],
+                "description": "optional. Determines if the element is visible. Defaults to a layout setting or true."
+              }
+            },
+            "required": [
+              "binding",
+              "element_type"
+            ],
+            "type": "object"
+          }
         },
         {
-          "additionalProperties": false,
-          "properties": {
-            "binding": {
-              "$ref": "#/definitions/UISchemaUIElementBinding",
-              "description": "binding to the data"
-            },
-            "element_type": {
-              "const": "bool",
-              "type": "string"
-            },
-            "enabled": {
-              "anyOf": [
-                {
-                  "$ref": "#/definitions/InterpretedExpression"
-                },
-                {
-                  "type": "boolean"
-                }
-              ],
-              "description": "optional. Determines if a field can be navigated to (receive the focus). Default is true."
-            },
-            "layout": {
-              "$ref": "#/definitions/UISchemaUIElementElementLayoutBase"
-            },
-            "readonly": {
-              "description": "optional. Determines if a field takes inputs right now. The element might still receive the caret or focus (unlike enabled=false elements), you just cannot change the value. but you might e.g. be able to copy the input value onto the clipboard. Default is false.",
-              "type": "boolean"
-            },
-            "style": {
-              "$ref": "#/definitions/UISchemaUIElementStyleBasics",
-              "description": "optional visual design - how the element itself appears"
-            },
-            "text": {
-              "$ref": "#/definitions/InterpretedExpression",
-              "description": "optional. the text for the label or name of the field on the ui Some elements do not interpret this property because they don't show a label. Refer to the element's documentation"
-            },
-            "value": {
-              "$ref": "#/definitions/InterpretedExpression",
-              "description": "optional. the expression that defines what value is being displayed in the input part of the element Some elements do not interpret this property or do not show it as a direct value Refer to the element's documentation"
-            },
-            "visible": {
-              "anyOf": [
-                {
-                  "$ref": "#/definitions/InterpretedExpression"
-                },
-                {
-                  "type": "boolean"
-                }
-              ],
-              "description": "optional. Determines if the element is visible. Defaults to a layout setting or true."
+          "if": {
+            "properties": {
+              "element_type": {
+                "const": "line",
+                "type": "string"
+              }
             }
           },
-          "required": [
-            "binding",
-            "element_type"
-          ],
-          "type": "object"
+          "then": {
+            "additionalProperties": false,
+            "properties": {
+              "element_type": {
+                "const": "line",
+                "type": "string"
+              },
+              "is_template": {
+                "const": true,
+                "type": "boolean"
+              },
+              "layout": {
+                "$ref": "#/definitions/UISchemaUIElementElementLayoutBase"
+              },
+              "style": {
+                "$ref": "#/definitions/UISchemaUIElementStyleBasics",
+                "description": "optional visual design - how the element itself appears"
+              },
+              "transparent": {
+                "description": "if set the element does not show the line but acts as a horizontal spacer",
+                "type": "boolean"
+              },
+              "visible": {
+                "anyOf": [
+                  {
+                    "$ref": "#/definitions/InterpretedExpression"
+                  },
+                  {
+                    "type": "boolean"
+                  }
+                ],
+                "description": "optional. Determines if the element is visible. Defaults to a layout setting or true."
+              }
+            },
+            "required": [
+              "element_type"
+            ],
+            "type": "object"
+          }
         },
         {
-          "additionalProperties": false,
-          "properties": {
-            "align_image": {
-              "enum": [
-                "center",
-                "left"
-              ],
-              "type": "string"
-            },
-            "alternate_description": {
-              "type": "string"
-            },
-            "element_type": {
-              "const": "file",
-              "type": "string"
-            },
-            "file_description": {
-              "enum": [
-                "right",
-                "bottom",
-                "none"
-              ],
-              "type": "string"
-            },
-            "fit_content": {
-              "enum": [
-                "contain",
-                "fit",
-                "scale"
-              ],
-              "type": "string"
-            },
-            "layout": {
-              "$ref": "#/definitions/UISchemaUIElementElementLayoutBase"
-            },
-            "resolution": {
-              "type": "string"
-            },
-            "style": {
-              "$ref": "#/definitions/UISchemaUIElementStyleBasics",
-              "description": "optional visual design - how the element itself appears"
-            },
-            "text": {
-              "$ref": "#/definitions/InterpretedExpression",
-              "description": "optional. the text for the label or name of the field on the ui Some elements do not interpret this property because they don't show a label. Refer to the element's documentation"
-            },
-            "value": {
-              "$ref": "#/definitions/InterpretedExpression",
-              "description": "optional. the expression that defines what value is being displayed in the input part of the element Some elements do not interpret this property or do not show it as a direct value Refer to the element's documentation"
-            },
-            "visible": {
-              "anyOf": [
-                {
-                  "$ref": "#/definitions/InterpretedExpression"
-                },
-                {
-                  "type": "boolean"
-                }
-              ],
-              "description": "optional. Determines if the element is visible. Defaults to a layout setting or true."
+          "if": {
+            "properties": {
+              "element_type": {
+                "const": "combo-box",
+                "type": "string"
+              }
             }
           },
-          "required": [
-            "element_type",
-            "resolution"
-          ],
-          "type": "object"
+          "then": {
+            "additionalProperties": false,
+            "properties": {
+              "binding": {
+                "$ref": "#/definitions/UISchemaUIElementBinding",
+                "description": "binding to the data"
+              },
+              "element_type": {
+                "const": "combo-box",
+                "type": "string"
+              },
+              "enabled": {
+                "anyOf": [
+                  {
+                    "$ref": "#/definitions/InterpretedExpression"
+                  },
+                  {
+                    "type": "boolean"
+                  }
+                ],
+                "description": "optional. Determines if a field can be navigated to (receive the focus). Default is true."
+              },
+              "items": {
+                "anyOf": [
+                  {
+                    "items": {
+                      "type": "string"
+                    },
+                    "type": "array"
+                  },
+                  {
+                    "items": {
+                      "items": {
+                        "type": "string"
+                      },
+                      "maxItems": 2,
+                      "minItems": 2,
+                      "type": "array"
+                    },
+                    "type": "array"
+                  },
+                  {
+                    "$ref": "#/definitions/UISchemaFullLookupSettings"
+                  }
+                ],
+                "description": "Either a list of static selection values, defined in the schema, or dynamic list values set via UISchemaFullLookupSettings UISchemaDynamicLookupSettings is not yet implemented but supposed to support lazy and filtered lookups when available."
+              },
+              "layout": {
+                "$ref": "#/definitions/UISchemaUIElementElementLayoutBase"
+              },
+              "readonly": {
+                "description": "optional. Determines if a field takes inputs right now. The element might still receive the caret or focus (unlike enabled=false elements), you just cannot change the value. but you might e.g. be able to copy the input value onto the clipboard. Default is false.",
+                "type": "boolean"
+              },
+              "style": {
+                "$ref": "#/definitions/UISchemaUIElementStyleBasics",
+                "description": "optional visual design - how the element itself appears"
+              },
+              "text": {
+                "$ref": "#/definitions/InterpretedExpression",
+                "description": "optional. the text for the label or name of the field on the ui Some elements do not interpret this property because they don't show a label. Refer to the element's documentation"
+              },
+              "visible": {
+                "anyOf": [
+                  {
+                    "$ref": "#/definitions/InterpretedExpression"
+                  },
+                  {
+                    "type": "boolean"
+                  }
+                ],
+                "description": "optional. Determines if the element is visible. Defaults to a layout setting or true."
+              }
+            },
+            "required": [
+              "binding",
+              "element_type",
+              "items"
+            ],
+            "type": "object"
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "element_type": {
+                "const": "drop-down-selection",
+                "type": "string"
+              }
+            }
+          },
+          "then": {
+            "additionalProperties": false,
+            "properties": {
+              "binding": {
+                "$ref": "#/definitions/UISchemaUIElementBinding",
+                "description": "binding to the data"
+              },
+              "element_type": {
+                "const": "drop-down-selection",
+                "type": "string"
+              },
+              "enabled": {
+                "anyOf": [
+                  {
+                    "$ref": "#/definitions/InterpretedExpression"
+                  },
+                  {
+                    "type": "boolean"
+                  }
+                ],
+                "description": "optional. Determines if a field can be navigated to (receive the focus). Default is true."
+              },
+              "items": {
+                "anyOf": [
+                  {
+                    "items": {
+                      "type": "string"
+                    },
+                    "type": "array"
+                  },
+                  {
+                    "items": {
+                      "items": {
+                        "type": "string"
+                      },
+                      "maxItems": 2,
+                      "minItems": 2,
+                      "type": "array"
+                    },
+                    "type": "array"
+                  },
+                  {
+                    "$ref": "#/definitions/UISchemaFullLookupSettings"
+                  }
+                ],
+                "description": "Either a list of static selection values, defined in the schema, or dynamic list values set via UISchemaFullLookupSettings"
+              },
+              "layout": {
+                "$ref": "#/definitions/UISchemaUIElementElementLayoutBase"
+              },
+              "readonly": {
+                "description": "optional. Determines if a field takes inputs right now. The element might still receive the caret or focus (unlike enabled=false elements), you just cannot change the value. but you might e.g. be able to copy the input value onto the clipboard. Default is false.",
+                "type": "boolean"
+              },
+              "style": {
+                "$ref": "#/definitions/UISchemaUIElementStyleBasics",
+                "description": "optional visual design - how the element itself appears"
+              },
+              "text": {
+                "$ref": "#/definitions/InterpretedExpression",
+                "description": "optional. the text for the label or name of the field on the ui Some elements do not interpret this property because they don't show a label. Refer to the element's documentation"
+              },
+              "visible": {
+                "anyOf": [
+                  {
+                    "$ref": "#/definitions/InterpretedExpression"
+                  },
+                  {
+                    "type": "boolean"
+                  }
+                ],
+                "description": "optional. Determines if the element is visible. Defaults to a layout setting or true."
+              }
+            },
+            "required": [
+              "binding",
+              "element_type",
+              "items"
+            ],
+            "type": "object"
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "element_type": {
+                "const": "template_label",
+                "type": "string"
+              }
+            }
+          },
+          "then": {
+            "additionalProperties": false,
+            "properties": {
+              "display_identifier": {
+                "$ref": "#/definitions/UISchemaIdentifierDisplay",
+                "description": "Defines that the value represents an identifier.\n\nEither simply boolean `true` or a  {@link  UISchemaIdentifierDisplay }  section that allows masking. If absent, the value is not rendered or treated as an identifier."
+              },
+              "element_type": {
+                "const": "template_label",
+                "type": "string"
+              },
+              "layout": {
+                "$ref": "#/definitions/UISchemaUIElementElementLayoutBase"
+              },
+              "style": {
+                "$ref": "#/definitions/UISchemaUIElementStyleBasics",
+                "description": "optional visual design - how the element itself appears"
+              },
+              "text": {
+                "$ref": "#/definitions/InterpretedExpression",
+                "description": "optional. the text for the label or name of the field on the ui Some elements do not interpret this property because they don't show a label. Refer to the element's documentation"
+              },
+              "value": {
+                "$ref": "#/definitions/InterpretedExpression",
+                "description": "optional. the expression that defines what value is being displayed in the input part of the element Some elements do not interpret this property or do not show it as a direct value Refer to the element's documentation"
+              },
+              "visible": {
+                "anyOf": [
+                  {
+                    "$ref": "#/definitions/InterpretedExpression"
+                  },
+                  {
+                    "type": "boolean"
+                  }
+                ],
+                "description": "optional. Determines if the element is visible. Defaults to a layout setting or true."
+              }
+            },
+            "required": [
+              "element_type"
+            ],
+            "type": "object"
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "element_type": {
+                "const": "bool",
+                "type": "string"
+              }
+            }
+          },
+          "then": {
+            "additionalProperties": false,
+            "properties": {
+              "binding": {
+                "$ref": "#/definitions/UISchemaUIElementBinding",
+                "description": "binding to the data"
+              },
+              "element_type": {
+                "const": "bool",
+                "type": "string"
+              },
+              "enabled": {
+                "anyOf": [
+                  {
+                    "$ref": "#/definitions/InterpretedExpression"
+                  },
+                  {
+                    "type": "boolean"
+                  }
+                ],
+                "description": "optional. Determines if a field can be navigated to (receive the focus). Default is true."
+              },
+              "layout": {
+                "$ref": "#/definitions/UISchemaUIElementElementLayoutBase"
+              },
+              "readonly": {
+                "description": "optional. Determines if a field takes inputs right now. The element might still receive the caret or focus (unlike enabled=false elements), you just cannot change the value. but you might e.g. be able to copy the input value onto the clipboard. Default is false.",
+                "type": "boolean"
+              },
+              "style": {
+                "$ref": "#/definitions/UISchemaUIElementStyleBasics",
+                "description": "optional visual design - how the element itself appears"
+              },
+              "text": {
+                "$ref": "#/definitions/InterpretedExpression",
+                "description": "optional. the text for the label or name of the field on the ui Some elements do not interpret this property because they don't show a label. Refer to the element's documentation"
+              },
+              "value": {
+                "$ref": "#/definitions/InterpretedExpression",
+                "description": "optional. the expression that defines what value is being displayed in the input part of the element Some elements do not interpret this property or do not show it as a direct value Refer to the element's documentation"
+              },
+              "visible": {
+                "anyOf": [
+                  {
+                    "$ref": "#/definitions/InterpretedExpression"
+                  },
+                  {
+                    "type": "boolean"
+                  }
+                ],
+                "description": "optional. Determines if the element is visible. Defaults to a layout setting or true."
+              }
+            },
+            "required": [
+              "binding",
+              "element_type"
+            ],
+            "type": "object"
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "element_type": {
+                "const": "file",
+                "type": "string"
+              }
+            }
+          },
+          "then": {
+            "additionalProperties": false,
+            "properties": {
+              "align_image": {
+                "enum": [
+                  "center",
+                  "left"
+                ],
+                "type": "string"
+              },
+              "alternate_description": {
+                "type": "string"
+              },
+              "element_type": {
+                "const": "file",
+                "type": "string"
+              },
+              "file_description": {
+                "enum": [
+                  "right",
+                  "bottom",
+                  "none"
+                ],
+                "type": "string"
+              },
+              "fit_content": {
+                "enum": [
+                  "contain",
+                  "fit",
+                  "scale"
+                ],
+                "type": "string"
+              },
+              "layout": {
+                "$ref": "#/definitions/UISchemaUIElementElementLayoutBase"
+              },
+              "resolution": {
+                "type": "string"
+              },
+              "style": {
+                "$ref": "#/definitions/UISchemaUIElementStyleBasics",
+                "description": "optional visual design - how the element itself appears"
+              },
+              "text": {
+                "$ref": "#/definitions/InterpretedExpression",
+                "description": "optional. the text for the label or name of the field on the ui Some elements do not interpret this property because they don't show a label. Refer to the element's documentation"
+              },
+              "value": {
+                "$ref": "#/definitions/InterpretedExpression",
+                "description": "optional. the expression that defines what value is being displayed in the input part of the element Some elements do not interpret this property or do not show it as a direct value Refer to the element's documentation"
+              },
+              "visible": {
+                "anyOf": [
+                  {
+                    "$ref": "#/definitions/InterpretedExpression"
+                  },
+                  {
+                    "type": "boolean"
+                  }
+                ],
+                "description": "optional. Determines if the element is visible. Defaults to a layout setting or true."
+              }
+            },
+            "required": [
+              "element_type",
+              "resolution"
+            ],
+            "type": "object"
+          }
         }
       ],
-      "description": "Wraps any UI element (leaf or sub-layout) when placed inside a layout of strategy S, attaching the strategy-specific layout positioning property."
+      "description": "Wraps any UI element (leaf or sub-layout) when placed inside a layout of strategy S, attaching the strategy-specific layout positioning property.",
+      "properties": {
+        "element_type": {
+          "enum": [
+            "layout",
+            "button",
+            "text_field",
+            "date_time_field",
+            "line",
+            "combo-box",
+            "drop-down-selection",
+            "template_label",
+            "bool",
+            "file"
+          ]
+        }
+      },
+      "required": [
+        "element_type"
+      ],
+      "type": "object"
+    },
+    "UISchemaFullLookupSettings": {
+      "additionalProperties": false,
+      "description": "settings that are used to fetch values for a static selection list from the data provider. This is not for lazy loading or paged lists. This loads all elements at once.",
+      "properties": {
+        "topic": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "topic"
+      ],
+      "type": "object"
     },
     "UISchemaHeaderDictV2": {
       "additionalProperties": false,
@@ -1126,30 +1569,6 @@
         }
       ],
       "description": "settings needed to describe how an element shows an identifier. An identifier in the context of the ui-component is a link destination. It represents a value that is semantically significant for the host. The element renders a link of some sort that triggers the component's gotoIdentifier callback."
-    },
-    "UISchemaLookupSettings": {
-      "additionalProperties": false,
-      "description": "settings that are used to fetch selection values from the data provide",
-      "properties": {
-        "key": {
-          "type": "string"
-        },
-        "selection": {
-          "items": {
-            "type": "string"
-          },
-          "type": "array"
-        },
-        "topic": {
-          "type": "string"
-        }
-      },
-      "required": [
-        "topic",
-        "selection",
-        "key"
-      ],
-      "type": "object"
     },
     "UISchemaMetaSettings": {
       "additionalProperties": false,

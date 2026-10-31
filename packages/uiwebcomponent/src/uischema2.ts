@@ -293,6 +293,7 @@ export type UISchemaUIElements =
     | UISchemaDateTimeField
     | UISchemaLine
     | UISchemaComboBox
+    | UISchemaDropDownSelection
     | UISchemaTemplateLabel
     | UISchemaBoolField
     | UISchemaFile
@@ -321,7 +322,8 @@ export interface UISchemaLayoutSettings<S extends UISchemaOrchestrationStrategyK
 /**
  * Wraps any UI element (leaf or sub-layout) when placed inside a layout of strategy S,
  * attaching the strategy-specific layout positioning property.
- */
+ * @discriminator element_type
+*/
 export type UISchemaElementOnLayout<S extends UISchemaOrchestrationStrategyKeys> =
     UISchemaUIElements & {
     layout?: UISchemaOrchestrationStrategyElementLayouts[S]
@@ -447,21 +449,39 @@ export type UISchemaLine = UISchemaBaseUIElement & UISchemaUIElementTemplate & {
 }
 
 /**
- * A comobobox element (drop down list) that allows typing and selecting values
+ * A combobox element (drop down list combined with an input element) that allows typing and selecting values
+ * This is the element that allows for dynamic and lazy loading of the list contents.
+ * Note that the combobox element does not have a value attribute! The value of the
+ * element is directly pulled from the binding.
  */
-export interface UISchemaComboBox extends UISchemaBoundUIElement {
-    element_type: 'selection'
-    /** Either a list of static selection values or more refined settings via UISchemaLookupSettings */
-    items: Array<string> | UISchemaLookupSettings
+export interface UISchemaComboBox extends Omit<UISchemaBoundUIElement, 'value'> {
+    element_type: 'combo-box'
+    /** Either a list of static selection values, defined in the schema,
+     * or dynamic list values set via UISchemaFullLookupSettings
+     * UISchemaDynamicLookupSettings is not yet implemented but supposed to
+     * support lazy and filtered lookups when available.
+     * */
+    items: Array<string> | Array<[string,string]> | UISchemaFullLookupSettings
 }
 
 /**
- * settings that are used to fetch selection values from the data provide
+ * A drop-down selection element (drop down list without an input element) selecting a value from a list.
+ * This element loads the selection list only once and assumes it is static. If you need something more dynamic or lazy, use the combo-box element.
+ * element is directly pulled from the binding.
  */
-export interface UISchemaLookupSettings {
+export interface UISchemaDropDownSelection extends Omit<UISchemaBoundUIElement, 'value'> {
+    element_type: 'drop-down-selection'
+    /** Either a list of static selection values, defined in the schema,
+     * or dynamic list values set via UISchemaFullLookupSettings */
+    items: Array<string> | Array<[string,string]> | UISchemaFullLookupSettings
+}
+
+/**
+ * settings that are used to fetch values for a static selection list from the data provider.
+ * This is not for lazy loading or paged lists. This loads all elements at once.
+ */
+export interface UISchemaFullLookupSettings {
     topic: string
-    selection: string[]
-    key: string
 }
 
 /**

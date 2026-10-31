@@ -85,7 +85,7 @@ export abstract class UILayout implements ReactiveController {
 
     public uiElementChangedEvent(event: UIElementDataChangedEvent, recordIndex?: number) {
         // const element=this.reactiveControllerHost.getSchemaElement(elementId)
-        const htmlId = event.detail.id || (event.target as HTMLElement).id
+        const htmlId = event.detail.htmlId || (event.target as HTMLElement).id
 
         if (recordIndex !== undefined && htmlId) {
             const schemaId = this.reactiveControllerHost.unScopeId(htmlId)
@@ -200,7 +200,7 @@ export abstract class UILayout implements ReactiveController {
                  data-record-nr="${recordNr ?? nothing}"
                  data-record-uid="${recordUid ?? nothing}"
                  ui-level=${'l'+this.uilevel}
-                 @ui-element-data-changed="${(event: InputEvent) => this.uiElementChangedEvent(event, recordNr)}"
+                 @ui-element-data-changed=${(event: CustomEvent) => this.uiElementChangedEvent(event, recordNr)}
             >
                 ${renderedElements}
             </div>

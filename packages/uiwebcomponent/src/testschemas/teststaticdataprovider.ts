@@ -10,6 +10,7 @@ interface MyDataRecord extends VirtualScrollContainerDataRecord {
     yesno_field: boolean,
     datetime_field: string,
     date_field: string,
+    l1: string
     // data: any
 }
 
@@ -25,7 +26,10 @@ export class ConcreteDataProvider extends BufferedDataProvider implements UIComp
         text_input: `value ${k}`,
         yesno_field: true,
         datetime_field: this.getRandomISOString(),
-        date_field: this.getRandomISOString()
+        date_field: this.getRandomISOString(),
+        l1: "2",
+        l2: "1",
+        l3: "2"
     }))
 
     protected recalcDbRecordCount(): Promise<boolean> {

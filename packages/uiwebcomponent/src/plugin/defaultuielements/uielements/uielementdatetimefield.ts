@@ -121,12 +121,12 @@ export class UIElementDateTimeField extends UIElement {
                     element.setAttribute('value', newValue);
                 }
                 element.dispatchEvent(new UIElementDataChangedEvent({
-                        id: element.id,
+                        htmlId: element.id,
                         value: newValue}
                 ));
             }
         } catch(e) {
-            console.error(`UIElementDateTimeField.onValueChanged throew exception ${e} in event ${{ ...e }}`, )
+            console.error(`UIElementDateTimeField.onValueChanged throew exception ${e} in event`, e)
         }
     }
     static renderElement(context: UIElementRenderContext, id: string, skeleton = false): TemplateResultOrNothing {

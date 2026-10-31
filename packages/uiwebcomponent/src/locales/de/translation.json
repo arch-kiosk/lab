@@ -1,5 +1,6 @@
 {
   "uic": {
+    "dynamic_selection_without_lookup_provider": "Dynamische Auswahl braucht einen lookup provider.",
     "error-init-root-layout": "Das root layout kann nicht initialisiert werden: {{error}}",
     "layout-error-N-cardinality-only-root": "Layouts für N-Kardinalität sind nur als Root-Layouts zulässig. Das Layout {{layoutElementId}} ist kein Root-Layout. Dies muss ein Programmierfehler sein.",
     "layout-error-no-cardinality": "Keine Kardinalität für Layout {{layoutElementId}} angegeben.",
@@ -7,6 +8,7 @@
     "layout-error-unknown-cardinality": "Unbekannte Kardinalität {{cardinality}} für Layout {{layoutElementId}}.",
     "layout-error-unknown-orchestration-strategy": "Unbekannte Orchestrierungsstrategie {{orchestration_strategy}} in Layout {{layoutElementId}}.",
     "layout-unspecific-creation-error": "Layout {{layoutElementId}} kann nicht erstellt werden.",
+    "list_definition_missing": "{{ui_element_name}}: no list definition given for selection element.",
     "missing_parent_layout": "{{ui_element_name}}: render context fehlt ein parent_layout",
     "no": "nein",
     "render-layout-error-unspecific": "Völlig unbekannte orchestration strategy {{orchestration_strategy}}",

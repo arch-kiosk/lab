@@ -1,5 +1,6 @@
 {
   "uic": {
+    "dynamic_selection_without_lookup_provider": "Element {{ui_element_name}}: UIElementComboBox.renderWithDynamicSelection called without a lookup provider in place.",
     "error-init-root-layout": "تعذر تهيئة root Layout: {{error}}",
     "layout-error-N-cardinality-only-root": "التخطيطات ذات التعددية N مسموح بها فقط كـ root Layout. التخطيط {{layoutElementId}} ليس root Layout. يجب أن يكون هذا خطأ برمجياً.",
     "layout-error-no-cardinality": "لا توجد تعددية للتخطيط {{layoutElementId}}",
@@ -7,6 +8,7 @@
     "layout-error-unknown-cardinality": "تعددية غير معروفة {{cardinality}} للتخطيط {{layoutElementId}}",
     "layout-error-unknown-orchestration-strategy": "استراتيجية تنسيق غير معروفة {{orchestration_strategy}} في التخطيط {{layoutElementId}}",
     "layout-unspecific-creation-error": "لا يمكن إنشاء التخطيط {{layoutElementId}}",
+    "list_definition_missing": "{{ui_element_name}}: no list definition given for selection element.",
     "missing_parent_layout": "{{ui_element_name}}: سياق Render يفتقد إلى parentLayout",
     "no": "لا",
     "render-layout-error-unspecific": "استراتيجية تنسيق غير معروفة تماماً {{orchestration_strategy}}",

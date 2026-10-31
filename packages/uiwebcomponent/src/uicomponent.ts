@@ -20,7 +20,8 @@ import {
     UIComponentDataProvider,
     UIComponentTimeZoneInfoProvider,
     UIInputData,
-    UIElementWithId, UIComponenti18NTCallback, TemplateResultOrNothing,
+    UIElementWithId, UIComponenti18NTCallback, TemplateResultOrNothing, LookupListParams,
+    UIComponentLookupProvider, UIElementLookupListItem,
 } from './sharedtypes'
 
 export type { UIComponentDataProvider, UIComponentTimeZoneInfoProvider } from './sharedtypes'
@@ -71,6 +72,9 @@ export class UIComponent extends LitElement {
 
     @property()
     dataProvider: UIComponentDataProvider | null = null
+
+    @property()
+    lookupProvider?: UIComponentLookupProvider
 
     @property()
     i18NTProvider?: UIComponenti18NTCallback
@@ -147,7 +151,7 @@ export class UIComponent extends LitElement {
         return last_R_index === -1 ? scopedId : scopedId.substring(0, last_R_index)
     }
 
-    protected keyupOnElement = (e: KeyboardEvent) => {
+    public keyupOnElement = (e: KeyboardEvent) => {
         throw Error('keyupOnElement not implemented')
         // if (e.key === "Enter" && this._default?.["ENTER"]) {
         //   this.fieldChangedById(this._default?.["ENTER"])
@@ -165,6 +169,20 @@ export class UIComponent extends LitElement {
                 this.instanceSheet,
             ]
         }
+    }
+
+    public getLookupList(topic: string, params?: LookupListParams): Array<UIElementLookupListItem> | undefined  {
+        if (this.lookupProvider) {
+            return this.lookupProvider.getLookupList(topic, params)
+        }
+        return undefined
+    }
+
+    public lookup(topic: string, value: unknown | undefined): string | undefined  {
+        if (this.lookupProvider) {
+            return this.lookupProvider.lookup(topic, value)
+        }
+        return undefined
     }
 
     // protected firstUpdated(_changedProperties: PropertyValueMap<unknown>) {

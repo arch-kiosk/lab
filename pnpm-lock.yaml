@@ -424,6 +424,12 @@ importers:
       '@vaadin/date-time-picker':
         specifier: ^25.3.4
         version: 25.3.4
+      '@vaadin/item':
+        specifier: ^25.3.4
+        version: 25.3.4
+      '@vaadin/list-box':
+        specifier: ^25.3.4
+        version: 25.3.4
       '@vaadin/select':
         specifier: ^25.3.4
         version: 25.3.4
