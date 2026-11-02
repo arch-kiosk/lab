@@ -39,8 +39,8 @@ export default defineConfig(({ command, mode }) => {
             minify: true,
             lib: {
                 entry: resolve(__dirname, 'src/schemaui.ts'),
-                name: 'UIComponent',
-                filename: 'uicomponent',
+                name: 'schema-ui',
+                filename: 'schemaui',
                 formats: ['es'],
             },
             rolldownOptions: {

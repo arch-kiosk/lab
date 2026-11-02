@@ -368,7 +368,7 @@ export class SchemaUI extends LitElement {
             }
             return uiElementClass.render(renderContext, id)
         } catch (e) {
-            console.error(`Exception in UIComponent.renderUIElement: ${e as string}`)
+            console.error(`Exception in SchemaUI.renderUIElement: ${e as string}`)
             return html`
                 <div style="border: 2px dashed red">${elementDefinition.element_type} "${id}":
                     ${e}
@@ -487,7 +487,7 @@ export class SchemaUI extends LitElement {
         if (this.showDevelopmentInfo) {
             itemTemplates.push(html`
                 <div
-                        class="uicomponent-version"
+                        class="schema-ui.version"
                         @click="${this.hideDevelopmentInfo}"
                 >
                     ${html`${import.meta.env.PACKAGE_VERSION}`}

@@ -1,5 +1,5 @@
 import { createPluginManager, type PluginManager } from '@arch-kiosk/appfoundation'
-import configFunction from '../uicomponent.config'
+import configFunction from '../schemaui.config'
 import { type EventCatalog, type AppContext } from '#src/apptypes'
 
 let bootPromise: Promise<PluginManager<AppContext, EventCatalog>> | null = null

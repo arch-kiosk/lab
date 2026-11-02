@@ -1582,7 +1582,7 @@
     },
     "UISchemaUIElementBinding": {
       "additionalProperties": false,
-      "description": "settings that to bind a BoundUIElement to the data provider",
+      "description": "settings that bind a BoundUIElement to the data provider",
       "properties": {
         "field_name": {
           "type": "string"

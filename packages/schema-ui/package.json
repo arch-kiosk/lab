@@ -1,21 +1,21 @@
 {
-    "name": "@arch-kiosk/uicomponent",
+    "name": "@arch-kiosk/schemaui",
     "version": "2.0.0",
     "private": true,
     "files": [
         "./dist"
     ],
     "type": "module",
-    "main": "./dist/uicomponent.js",
-    "module": "./dist/uicomponent.js",
-    "types": "./dist/uicomponent.d.ts",
+    "main": "./dist/schemaui.js",
+    "module": "./dist/schemaui.js",
+    "types": "./dist/schemaui.d.ts",
     "imports": {
         "#src/*": "./src/*"
     },
     "exports": {
         ".": {
-            "types": "./dist/uicomponent.d.ts",
-            "import": "./dist/uicomponent.js"
+            "types": "./dist/schemaui.d.ts",
+            "import": "./dist/schemaui.js"
         }
     },
     "scripts": {

@@ -1,8 +1,8 @@
 import { defineConfig } from 'vitepress'
 import { generateSidebar } from 'vitepress-sidebar'
 export default defineConfig({
-    title: 'ui-component',
-    base: '/lab/packages/uiwebcomponent/',
+    title: 'schema-ui',
+    base: '/lab/packages/schema-ui/',
     description: 'Render User Interfaces from JSON',
     lastUpdated: true,
     head: [
