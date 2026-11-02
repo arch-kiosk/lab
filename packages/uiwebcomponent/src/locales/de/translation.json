@@ -16,7 +16,7 @@
     "schema-error-illegal-element-id": "Fehler in der Schemadefinition: Die Element-ID {{id}} ist ungültig. \nSie muss mit einem Buchstaben beginnen, gefolgt von ausschließlich Buchstaben und Zahlen. Element übersprungen.",
     "schema-error-must-equal": "{{path}}: muss mit der Konstanten {{expected}} übereinstimmen.",
     "schema-error-must-one-of": "{{path}}: muss einer der folgenden Werte sein: [{{allowed}}].",
-    "schema-error-no-element-type": "ui-component: Element-ID {{id}} fehlt das Attribut \"element_type\": übersprungen.",
+    "schema-error-no-element-type": "schema-ui: Element-ID {{id}} fehlt das Attribut \"element_type\": übersprungen.",
     "schema-error-property-required": "{{path}}: Erforderliche Eigenschaft {{property}} fehlt.",
     "schema-error-redundant-dsd-binding": "Fehler in der Schemadefinition: Das DSD-Feld {{fieldName}} wurde im Element {{id}} im UI-Schema erneut gebunden.",
     "schema-error-unknown-property": "{{path}}: Unbekannte Eigenschaft \"{{property}}\" ist nicht zulässig.",

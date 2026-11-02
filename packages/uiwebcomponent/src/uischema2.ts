@@ -161,7 +161,7 @@ export interface UISchemaUIElementStyleBasics {
      * E.g. Don't assign a class that sets max-height or any of the properties that you find in {@link UISchemaUIElementElementLayoutBase}.
      *
      * Note that an expression is only sent to the host for interpretation if it starts with a prefix that the host set
-     * on the ui-component (property `interpretedExpressionPrefix`).
+     * on the schema-ui component (property `interpretedExpressionPrefix`).
      * By default, that prefix is unset, so nothing gets sent to the host for interpretation.
      *
      * @example
@@ -184,7 +184,7 @@ export interface UISchemaUIElementStyleBasics {
      * E.g. Don't set max-height or any of the properties that you find in {@link UISchemaUIElementElementLayoutBase}.
      *
      * Note that an expression is only sent to the host for interpretation if it starts with a prefix that the host set
-     * on the ui-component (property `interpretedExpressionPrefix`).
+     * on the schema-ui component (property `interpretedExpressionPrefix`).
      * By default, that prefix is unset, so nothing gets sent to the host for interpretation.
      *
      * @example
@@ -206,7 +206,7 @@ export interface UISchemaUIElementStyleBasics {
 
 /**
  * settings needed to describe how an element shows an identifier.
- * An identifier in the context of the ui-component is a link destination.
+ * An identifier in the context of the schema-ui component is a link destination.
  * It represents a value that is semantically significant for the host.
  * The element renders a link of some sort that triggers the
  * component's gotoIdentifier callback.

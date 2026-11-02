@@ -18,7 +18,7 @@ import {
 } from '#src/sharedtypes'
 import { DataProviderValidationResult } from '@arch-kiosk/appfoundation/dataprovider'
 import { UILayout } from '#src/layouts/uilayout'
-import { UIComponent } from '#src/uicomponent'
+import { SchemaUI } from '#src/schemaui'
 
 
 class TopicOptionsDirective extends Directive {
@@ -30,7 +30,7 @@ class TopicOptionsDirective extends Directive {
         super(partInfo)
     }
 
-    render(id: string, topic: string, uiComponent: UIComponent): TemplateResult[] {
+    render(id: string, topic: string, uiComponent: SchemaUI): TemplateResult[] {
         if (this.id !== id || this.topic !== topic || !this.cachedTemplates) {
             this.id = id
             this.topic = topic

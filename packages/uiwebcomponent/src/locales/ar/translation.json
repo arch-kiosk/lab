@@ -16,7 +16,7 @@
     "schema-error-illegal-element-id": "يوجد خطأ في تعريف المخطط (schema): معرف العنصر {{id}} غير صالح. يجب أن يبدأ بحرف ويليه أحرف وأرقام فقط. تم تخطي العنصر.",
     "schema-error-must-equal": "{{path}}: يجب أن يكون مساوياً للثابت {{expected}}",
     "schema-error-must-one-of": "{{path}}: يجب أن يكون واحداً من [{{allowed}}]",
-    "schema-error-no-element-type": "ui-component: معرف العنصر {{id}} يفتقر إلى \"element_type\": تم التخطي.",
+    "schema-error-no-element-type": "schema-ui: معرف العنصر {{id}} يفتقر إلى \"element_type\": تم التخطي.",
     "schema-error-property-required": "{{path}} يفتقر إلى الخاصية المطلوبة {{property}}",
     "schema-error-redundant-dsd-binding": "يوجد خطأ في تعريف المخطط (schema): حقل DSD المسمى {{fieldName}} تم ربطه مرة أخرى في العنصر {{id}} في مخطط واجهة المستخدم",
     "schema-error-unknown-property": "{{path}} خاصية غير معروفة \"{{property}}\" غير مسموح بها",

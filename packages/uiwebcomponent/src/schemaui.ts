@@ -5,7 +5,7 @@ import { customElement, property, state } from 'lit/decorators.js'
 import bootPluginManager from './boot'
 import './layouts/uirenderboundary'
 // @ts-ignore
-import local_css from './styles/ui-component.sass?inline'
+import local_css from './styles/schemaui.sass?inline'
 import { UIConfigurableElementFactory } from './uielementfactory'
 import { I18NMock } from './i18nsimpleprovider'
 import {
@@ -41,8 +41,8 @@ import { DateTime } from 'luxon'
 
 export type * from './uischema'
 
-@customElement('ui-component')
-export class UIComponent extends LitElement {
+@customElement('schema-ui')
+export class SchemaUI extends LitElement {
     /** @ignore */
     static styles = unsafeCSS(local_css)
     _messages: { [key: string]: object } = {}
@@ -119,7 +119,7 @@ export class UIComponent extends LitElement {
             this.pluginManager = await bootPluginManager()
             console.info(`plugin Manager has booted!`)
         } catch (e) {
-            console.error(`ui-component could not boot the PluginManager: ${e as string}`)
+            console.error(`schema-ui component could not boot the PluginManager: ${e as string}`)
         }
     }
 
@@ -149,6 +149,14 @@ export class UIComponent extends LitElement {
     public unScopeId(scopedId: string) {
         const last_R_index = scopedId.lastIndexOf('_R')
         return last_R_index === -1 ? scopedId : scopedId.substring(0, last_R_index)
+    }
+
+    //todo
+    private registerDefault(id: string, entry: UISchemaUIElement) {
+        console.log(`default for ${entry.element_type.name} ${id} is ${entry.element_type.default}`)
+        if (entry.element_type?.default) {
+            this._default[entry.element_type.default] = id
+        }
     }
 
     public keyupOnElement = (e: KeyboardEvent) => {
@@ -185,61 +193,12 @@ export class UIComponent extends LitElement {
         return undefined
     }
 
-    // protected firstUpdated(_changedProperties: PropertyValueMap<unknown>) {
-    //   super.firstUpdated(_changedProperties)
-    //
-    //   for (const comboBox of this.renderRoot.querySelectorAll("vaadin-combo-box")) {
-    //     if (comboBox && !comboBox.items && this.lookupProvider) {
-    //       let lookupProvider = this.lookupProvider
-    //       let element = this.getSchemaElement(comboBox.id)
-    //       if (element.element_type.name.toLowerCase() !== "selection") continue
-    //       const selectionElement = <UISchemaComboBox>element.element_type
-    //
-    //       // if this is a selection with a static list, no dataProvider is necessary
-    //       if (Array.isArray(selectionElement.items)) continue
-    //
-    //       //Todo: This should be in the uielementcombobox.ts
-    //       comboBox.dataProvider = async (params, callback) => {
-    //         if (!(comboBox.id in this._selection_data)) {
-    //           console.log("looking up", params)
-    //           lookupProvider(
-    //             comboBox.id,
-    //             <UISchemaLookupSettings>selectionElement.items,
-    //             params,
-    //             (items, size?: number) => {
-    //               //this is a finite list: The callback gets all items at once.
-    //               //item[1] is the display value, item[0] is the data value of the selection
-    //               const valuesOnly = []
-    //               this._selection_data[comboBox.id] = {}
-    //
-    //               for (const item of items) {
-    //                 this._selection_data[comboBox.id][item[1]] = item[0]
-    //                 valuesOnly.push(item[1])
-    //               }
-    //               callback(valuesOnly, size)
-    //             },
-    //           )
-    //         } else {
-    //           const values = Object.entries(this._selection_data[comboBox.id])
-    //             .map((x) => x[0])
-    //             .filter((v) => v.startsWith(params.filter))
-    //           callback(values, values.length)
-    //         }
-    //       }
-    //     }
-    //   }
-    // }
-
     updated(_changedProperties: PropertyValues) {
         super.updated(_changedProperties)
         if (_changedProperties.has('overrideCss')) {
             this.instanceSheet.replaceSync(this.overrideCss || '')
         }
     }
-
-    // protected getSchemaElement(id: string) {
-    //   return this._element_list[id]
-    // }
 
     public i18NST(key: string, defaultValue:string, values: string[], escapeValues=false) {
         const options: Record<string, unknown> & {defaultValue: string} = {defaultValue: defaultValue}
@@ -292,102 +251,7 @@ export class UIComponent extends LitElement {
         return this.flatElementList[id]
     }
 
-    // private registerDefault(id: string, entry: UISchemaUIElement) {
-    //   console.log(`default for ${entry.element_type.name} ${id} is ${entry.element_type.default}`)
-    //   if (entry.element_type?.default) {
-    //     this._default[entry.element_type.default] = id
-    //   }
-    // }
 
-    protected gatherData() {
-        throw Error('gatherData not implemented')
-        // const result: { [key: string]: unknown } = {}
-        // if (!this._dsd_to_element_list || Object.keys(this._dsd_to_element_list).length === 0) return {}
-        // Object.entries(this._dsd_to_element_list).map(([dsd_field, element_entry]) => {
-        //   result[dsd_field] = this.get_field_value(element_entry.id, element_entry.element)
-        // })
-        // return result
-    }
-
-    // protected get_field_value(id: string, element: UISchemaUIElement) {
-    //   const domElement: HTMLFormElement | null = this.renderRoot.querySelector(`#${id}`)
-    //   switch (element.element_type.name.toLowerCase()) {
-    //     case "selection":
-    //       return this.getSelectionValue(id, domElement, element.element_type as UISchemaComboBox)
-    //     case "bool":
-    //       return !!domElement?.checked
-    //     default:
-    //       return domElement?.value ? domElement?.value : ""
-    //   }
-    // }
-
-    // //Todo: This should be in the uielementcombobox.ts
-    // protected getSelectionValue(id: string, domElement: HTMLFormElement | null, comboBox: UISchemaComboBox) {
-    //   let displayValue = domElement?.value ? domElement?.value : ""
-    //   let dataValue: unknown
-    //   // this._element_list[id].element_type;
-    //   if (Array.isArray(comboBox.items) && comboBox.items.length > 0) {
-    //     if (Array.isArray(comboBox.items[0])) {
-    //       for (const item of comboBox.items) {
-    //         if (item[1] === displayValue) {
-    //           dataValue = item[0]
-    //           break
-    //         }
-    //       }
-    //     } else {
-    //       dataValue = displayValue
-    //     }
-    //   } else {
-    //     dataValue = domElement?.getAttribute("data-value")
-    //     if (displayValue) {
-    //       if (id in this._selection_data) {
-    //         try {
-    //           dataValue = this._selection_data[id][displayValue]
-    //         } catch {}
-    //       }
-    //     }
-    //   }
-    //   return dataValue ? dataValue : ""
-    // }
-
-    //todo: obsolete
-    protected fieldChangedById(id: string) {
-        throw Error('fieldChangedById not implemented')
-        // const options = {
-        //   detail: {
-        //     srcElement: id,
-        //     newData: this.gatherData(),
-        //   },
-        //   bubbles: true,
-        // }
-        // this.dispatchEvent(new CustomEvent("dataChanged", options))
-    }
-
-    //todo: obsolete
-    protected fieldChanged = (e: Event) => {
-        if ('currentTarget' in e) {
-            const id = (<HTMLElement>e.currentTarget).id
-            this.fieldChangedById(id)
-        }
-    }
-
-    // protected comboBoxFilterChanged = (e: ComboBoxFilterChangedEvent) => {
-    //   throw Error("comboBoxFilterChanged not implemented")
-    //   // const filter = e.detail.value.toLowerCase()
-    //   // const comboBox = e.currentTarget as ComboBox
-    //   // if (comboBox) {
-    //   //   if (filter === "") {
-    //   //     comboBox.filteredItems = undefined
-    //   //   }
-    //   //   let filteredItems = this._selection_data[comboBox.id]
-    //   //   if (filteredItems) {
-    //   //     let filteredItemsList = Object.keys(filteredItems).filter((v) =>
-    //   //       v.toLowerCase().startsWith(filter),
-    //   //     )
-    //   //     comboBox.filteredItems = filteredItemsList
-    //   //   }
-    //   // }
-    // }
 
     private getLayout(
         layoutElementId: string,

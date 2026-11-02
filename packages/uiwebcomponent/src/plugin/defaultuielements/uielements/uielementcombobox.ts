@@ -17,7 +17,7 @@ import { DataProviderValidationResult } from '@arch-kiosk/appfoundation/dataprov
 import { UILayout } from '#src/layouts/uilayout'
 import { ComboBox,type ComboBoxDataProvider} from '@vaadin/combo-box'
 import { directive, Directive, PartInfo, PartType } from 'lit/directive.js';
-import { UIComponent } from '#src/uicomponent'
+import { SchemaUI } from '#src/schemaui'
 
 class DataProviderDirective extends Directive {
     private id?: string;
@@ -30,7 +30,7 @@ class DataProviderDirective extends Directive {
         }
     }
 
-    render(id: string, topic: string, uiComponent: UIComponent): ComboBoxDataProvider<UIElementLookupListItem> {
+    render(id: string, topic: string, uiComponent: SchemaUI): ComboBoxDataProvider<UIElementLookupListItem> {
         if (this.id !== id || !this.provider) {
             this.id = id;
 
@@ -164,6 +164,26 @@ export class UIElementComboBox extends UIElement {
             `,
         )
     }
+
+    // todo?
+    // protected comboBoxFilterChanged = (e: ComboBoxFilterChangedEvent) => {
+    //   throw Error("comboBoxFilterChanged not implemented")
+    //   // const filter = e.detail.value.toLowerCase()
+    //   // const comboBox = e.currentTarget as ComboBox
+    //   // if (comboBox) {
+    //   //   if (filter === "") {
+    //   //     comboBox.filteredItems = undefined
+    //   //   }
+    //   //   let filteredItems = this._selection_data[comboBox.id]
+    //   //   if (filteredItems) {
+    //   //     let filteredItemsList = Object.keys(filteredItems).filter((v) =>
+    //   //       v.toLowerCase().startsWith(filter),
+    //   //     )
+    //   //     comboBox.filteredItems = filteredItemsList
+    //   //   }
+    //   // }
+    // }
+
 
     static onDynamicSelectionChanged(e:CustomEvent) {
         const element = e.currentTarget as ComboBox

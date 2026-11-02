@@ -1,11 +1,11 @@
-import { UIComponent, UISchema } from '#src/uicomponent'
+import { SchemaUI, UISchema } from '#src/schemaui'
 import { ConcreteDataProvider } from './teststaticdataprovider'
 import {
     DataProviderValidationResult,
     ValidationResultsReturnType,
 } from '@arch-kiosk/appfoundation/dataprovider'
 
-export function configureTestSchemaVirtualScrollLayout(uiComponent: UIComponent) {
+export function configureTestSchemaVirtualScrollLayout(uiComponent: SchemaUI) {
     uiComponent.uiSchema = getUiSchema()
     const dataProvider = getDataProvider()
     uiComponent.dataProvider = dataProvider

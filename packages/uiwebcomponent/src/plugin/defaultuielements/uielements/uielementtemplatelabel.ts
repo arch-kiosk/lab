@@ -94,7 +94,7 @@ export class UIElementTemplateLabel extends UIElement {
             Enough preparation, let's render.
         ============================================ */
 
-        //todo: I don't like this in the ui-component. The dataprovider must do this if necessary
+        //todo: I don't like this in the schema-ui component. The dataprovider must do this if necessary
         //if (typeof value === 'string') {
         //     value = value.replaceAll('\r\n', '\n')
         //     value = value.replaceAll('\r', '\n')

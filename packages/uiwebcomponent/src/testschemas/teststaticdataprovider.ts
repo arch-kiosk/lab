@@ -1,6 +1,6 @@
 import { BufferedDataProvider } from '@arch-kiosk/appfoundation/dataprovider'
 import { VirtualScrollContainerDataRecord } from '@arch-kiosk/appfoundation/dataprovider'
-import {type UIComponentDataProvider} from '#src/uicomponent'
+import {type UIComponentDataProvider} from '#src/schemaui'
 import delay from 'delay'
 const MAX_RECORDS = 50
 

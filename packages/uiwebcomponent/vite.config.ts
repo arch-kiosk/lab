@@ -38,7 +38,7 @@ export default defineConfig(({ command, mode }) => {
             emptyOutDir: true,
             minify: true,
             lib: {
-                entry: resolve(__dirname, 'src/uicomponent.ts'),
+                entry: resolve(__dirname, 'src/schemaui.ts'),
                 name: 'UIComponent',
                 filename: 'uicomponent',
                 formats: ['es'],

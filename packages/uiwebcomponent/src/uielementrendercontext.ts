@@ -1,4 +1,4 @@
-import { UIComponent } from './uicomponent'
+import { SchemaUI } from './schemaui'
 import { ApiTimeZoneInfo, UISchemaLayoutElement, UISchemaUIElements } from './uischema'
 import { UILayout } from './layoutclasses'
 import { DataProviderValidationResult } from '@arch-kiosk/virtualizerlab'
@@ -21,11 +21,11 @@ export interface RenderContextDataContext {
  * every layout or element receives this information about the current context in which it renders.
  */
 export class RenderContext {
-    uicomponent: UIComponent
+    uicomponent: SchemaUI
     parentLayout?: UILayout
     dataContext: RenderContextDataContext
 
-    constructor(component: UIComponent, dataContext: RenderContextDataContext, parentLayout?: UILayout) {
+    constructor(component: SchemaUI, dataContext: RenderContextDataContext, parentLayout?: UILayout) {
         this.uicomponent = component
         this.parentLayout = parentLayout
         this.dataContext = dataContext
@@ -98,7 +98,7 @@ export class RenderContext {
 export class UIElementRenderContext extends RenderContext {
     elementDefinition: UISchemaUIElements
 
-    constructor(component: UIComponent, elementDefinition: UISchemaUIElements, dataContext: RenderContextDataContext, parentLayout: UILayout) {
+    constructor(component: SchemaUI, elementDefinition: UISchemaUIElements, dataContext: RenderContextDataContext, parentLayout: UILayout) {
         super(component, dataContext, parentLayout)
         this.elementDefinition = elementDefinition
     }
@@ -107,7 +107,7 @@ export class UIElementRenderContext extends RenderContext {
 export class UILayoutRenderContext extends RenderContext {
     elementDefinition: UISchemaLayoutElement
 
-    constructor(component: UIComponent, layoutDefinition: UISchemaLayoutElement, dataContext: RenderContextDataContext, parentLayout?: UILayout) {
+    constructor(component: SchemaUI, layoutDefinition: UISchemaLayoutElement, dataContext: RenderContextDataContext, parentLayout?: UILayout) {
         super(component, dataContext, parentLayout)
         this.elementDefinition = layoutDefinition
     }

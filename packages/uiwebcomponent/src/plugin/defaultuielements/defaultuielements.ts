@@ -1,4 +1,4 @@
-import { UIComponentBasePlugin } from '#src/uicomponentbaseplugin'
+import { SchemaUIBasePlugin } from '#src/schemauibaseplugin'
 import { UIConfigurableElementFactory } from '#src/uielementfactory'
 import { UIElementTextField } from './uielements/uielementtextfield'
 // import { UIElementDateField } from './uielements/uielementdatefield'
@@ -13,7 +13,7 @@ import {
     UIElementDropDownSelection
 } from '#src/plugin/defaultuielements/uielements/uielementdropdownselection'
 
-export class DefaultUIElementFactory extends UIComponentBasePlugin {
+export class DefaultUIElementFactory extends SchemaUIBasePlugin {
     constructor(active = true) {
         super()
         this.active = active

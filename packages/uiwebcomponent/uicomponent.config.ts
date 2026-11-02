@@ -1,6 +1,6 @@
 import { DefaultUIElementFactory } from '#src/plugin/defaultuielements/defaultuielements'
-import { UIComponentBasePlugin } from '#src/uicomponentbaseplugin'
+import { SchemaUIBasePlugin } from '#src/schemauibaseplugin'
 
 export default () => ({
-    plugins: [new DefaultUIElementFactory()] as Array<UIComponentBasePlugin>,
+    plugins: [new DefaultUIElementFactory()] as Array<SchemaUIBasePlugin>,
 })

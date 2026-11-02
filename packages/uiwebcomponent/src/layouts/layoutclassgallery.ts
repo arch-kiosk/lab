@@ -39,7 +39,7 @@ export class UIGalleryLayoutClass extends UIListLayout {
                         gallery = parent
                         break
                     }
-                    if (parent.tagName === 'ui-component') {
+                    if (parent.tagName === 'schema-ui') {
                         parent = null
                     } else {
                         parent = parent.parentElement

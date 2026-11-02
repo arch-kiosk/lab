@@ -16,7 +16,7 @@
     "schema-error-illegal-element-id": "There is an error in the schema definition: the element id {{id}} is illegal. \n                    It must start with a letter followed by only letters and numbers. Element skipped.",
     "schema-error-must-equal": "{{path}}: must be equal to constant {{expected}}",
     "schema-error-must-one-of": "{{path}}: must be one of [{{allowed}}]",
-    "schema-error-no-element-type": "ui-component: Element id {{id}} lacks \"element_type\": skipped.",
+    "schema-error-no-element-type": "schema-ui: Element id {{id}} lacks \"element_type\": skipped.",
     "schema-error-property-required": "{{path}} missing required property {{property}}",
     "schema-error-redundant-dsd-binding": "There is an error in the schema definition: dsd field {{fieldName}} bound again in element {{id}} in UI schema",
     "schema-error-unknown-property": "{{path}} unknown property \"{{property}}\" is not allowed",

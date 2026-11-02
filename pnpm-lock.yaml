@@ -407,7 +407,7 @@ importers:
         specifier: 4.1.9
         version: 4.1.9(@types/node@24.13.2)(@vitest/browser-preview@4.1.10(@voidzero-dev/vite-plus-core@1.4.0(@types/node@26.1.0)(@volar/typescript@2.4.28)(jiti@2.7.0)(sass@1.101.7)(typescript@6.0.3)(yaml@2.9.1))(vitest@4.1.9))(@voidzero-dev/vite-plus-core@1.4.0(@types/node@24.13.2)(@volar/typescript@2.4.28)(jiti@2.7.0)(sass@1.101.7)(typescript@6.0.3)(yaml@2.9.1))
 
-  packages/uiwebcomponent:
+  packages/schema-ui:
     dependencies:
       '@arch-kiosk/appfoundation':
         specifier: workspace:*

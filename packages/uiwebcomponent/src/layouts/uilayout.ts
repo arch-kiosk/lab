@@ -6,7 +6,7 @@ import {
 } from '../uischema'
 import { UIElementRenderContext, UILayoutRenderContext } from '../uielementrendercontext'
 import { html, LitElement, nothing, ReactiveController, TemplateResult } from 'lit'
-import { UIComponent } from '#src/uicomponent'
+import { SchemaUI } from '#src/schemaui'
 import {
     TemplateResultOrNothing,
     UIElementDataChangedEvent,
@@ -19,7 +19,7 @@ export abstract class UILayout implements ReactiveController {
     layoutDefinition: UISchemaLayoutElement
     _id: string = '?'
     protected validation = false
-    reactiveControllerHost: UIComponent
+    reactiveControllerHost: SchemaUI
     abstract cssClass: string
     public renderElementLabels: boolean = true
     public abstract cardinality: '1' | 'N'
@@ -27,7 +27,7 @@ export abstract class UILayout implements ReactiveController {
 
     constructor(
         id: string,
-        reactiveControllerHost: UIComponent,
+        reactiveControllerHost: SchemaUI,
         layoutDefinition: UISchemaLayoutElement,
         recordValidation = false,
     ) {

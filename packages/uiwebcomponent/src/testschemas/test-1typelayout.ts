@@ -1,4 +1,4 @@
-import { UIComponent, UISchema } from '#src/uicomponent'
+import { SchemaUI, UISchema } from '#src/schemaui'
 import i18next from 'i18next';
 import { ConcreteDataProvider } from './teststaticdataprovider'
 import enTranslation from '#src/locales/en/translation.json'
@@ -52,7 +52,7 @@ class Type1DataProvider extends ConcreteDataProvider {
     }
 }
 
-export function configureTestSchema1TypeLayout(uiComponent: UIComponent) {
+export function configureTestSchema1TypeLayout(uiComponent: SchemaUI) {
     uiComponent.uiSchema = getUiSchema()
     uiComponent.lookupProvider = getLookupProvider()
     const dataProvider = getDataProvider()

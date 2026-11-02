@@ -14,7 +14,7 @@ import {
     BufferedDataProvider,
     VirtualScrollContainerDataProvider,
 } from '@arch-kiosk/appfoundation/dataprovider'
-import { UIComponent } from '#src/uicomponent'
+import { SchemaUI } from '#src/schemaui'
 import { UIElementRenderer } from '#src/sharedtypes'
 
 export class UIVirtualScrollLayout extends UILayout {
@@ -29,7 +29,7 @@ export class UIVirtualScrollLayout extends UILayout {
 
     constructor(
         id: string,
-        reactiveControllerHost: UIComponent,
+        reactiveControllerHost: SchemaUI,
         layoutDefinition: UISchemaLayoutElement,
     ) {
         super(id, reactiveControllerHost, layoutDefinition)

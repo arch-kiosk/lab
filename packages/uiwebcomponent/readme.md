@@ -1,6 +1,6 @@
-# 🧩 uiwebcomponent
+# 🧩 ui-schema
 
-The central Kiosk independent component to show externally defined user interfaces.
+The central Kiosk independent component to show schema-driven user interfaces.
 
 🔗[requirements to get this running](public/readme.md)
 

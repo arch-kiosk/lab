@@ -2,9 +2,9 @@
 layout: home
 
 hero:
-    name: 'ui-component'
+    name: 'schema-ui'
     text: 'Render User Interfaces from JSON'
-    tagline: "@arch-kiosk/ui-component"
+    tagline: "@arch-kiosk/schema-ui"
     image:
       src: K67.png
       alt: "K67 Project Logo"
@@ -13,7 +13,7 @@ hero:
           text: 'Get Started'
           link: /start
         - theme: alt
-          text: 'UI Schema reference'
+          text: 'Schema reference'
           link: /schema
         - theme: alt
           text: 'API Reference'
@@ -22,4 +22,4 @@ hero:
           text: 'styling'
           link: /styling/
 ---
-[![ui-component ui schema](/assets/uischema.svg)](/assets/uischema.svg)
+[![schema-ui schema](/assets/uischema.svg)](/assets/uischema.svg)

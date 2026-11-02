@@ -2,22 +2,22 @@ import { customElement, state } from 'lit/decorators.js'
 import { html, LitElement, unsafeCSS } from 'lit'
 import { createRef, Ref, ref } from 'lit/directives/ref.js'
 import local_css from "./styles/lap-app.sass?inline"
-import './uicomponent'
-import { UIComponent } from './uicomponent'
+import './schemaui'
+import { SchemaUI } from './schemaui'
 import "./localeselect"
 import { configureTestSchema1TypeLayout } from '#src/testschemas/test-1typelayout'
 import { configureTestSchemaVirtualScrollLayout } from '#src/testschemas/test-virtualscrolllayout'
 import { buildColorMatrix, renderColorMatrix } from './testcolormatrix'
 import i18next from 'i18next';
 
-@customElement('ui-component-test-app')
-export class UIComponentTestApp extends LitElement {
+@customElement('schema-ui-test-app')
+export class SchemaUITestApp extends LitElement {
     static styles = unsafeCSS(local_css)
     @state() private currentLocale = 'de-DE';
     // private dataProvider = new ConcreteDataProvider(10, 3)
 
-    uiComponentRef1: Ref<UIComponent> = createRef()
-    uiComponentRef2: Ref<UIComponent> = createRef()
+    uiComponentRef1: Ref<SchemaUI> = createRef()
+    uiComponentRef2: Ref<SchemaUI> = createRef()
     private mode: 'colors' | 'test' = 'test'
 
     firstUpdated() {
@@ -84,21 +84,21 @@ export class UIComponentTestApp extends LitElement {
             <p>Active i18N-locale: <strong>${i18next.language}</strong></p>
             <button onclick="gotoRecord(5)">goto record 5</button>
             <div style="display: flex; padding: 5em">
-                <ui-component
+                <schema-ui
                         ${ref(this.uiComponentRef1)}
                         id="ui1"
                         current-locale="${this.currentLocale}"
                         style="border: 2px solid cornflowerblue"
                 >
-                </ui-component>
-                <ui-component
+                </schema-ui>
+                <schema-ui
                         style="margin-inline-start: 1em"
                         ${ref(this.uiComponentRef2)}
                         current-locale="${this.currentLocale}"
                         id="ui2"
                         style="border: 2px solid cornflowerblue"
                 >
-                </ui-component>
+                </schema-ui>
             </div>
         `
     }
