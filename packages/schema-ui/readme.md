@@ -1,6 +1,6 @@
-# 🧩 ui-schema
+# 🧩 schema-ui
 
-The central Kiosk independent component to show schema-driven user interfaces.
+The central Kiosk-independent component to show schema-driven user interfaces.
 
 🔗[requirements to get this running](public/readme.md)
 
